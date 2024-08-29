@@ -1,0 +1,15 @@
+<h1>
+  <% switch (code) { case 404: %>
+  Not Found
+  <% break; case 403: %>
+  Unauthorized
+  <% break; case 500: %>
+  Server Error
+  <% break; default: %>
+  Error
+  <% } %>
+</h1>
+
+<p>
+  <%= message %>
+</p>

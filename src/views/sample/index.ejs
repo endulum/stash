@@ -1,0 +1,24 @@
+<h1>Index</h1>
+
+<% if (user) { %>
+  <p>Welcome back, <b><%= user.username %></b></p>
+  <% if (user.id === 1 && user.username === 'admin') { %>
+    <p>
+      <a href="/admin">Admin dashboard</a>
+    </p>
+  <% } %>
+  <p>
+    <a href="/account">Account settings</a>
+  </p>
+  <p>
+    <a href="/logout">Log out</a>
+  </p>
+<% } else { %>
+  <p>You are not logged in.</p>
+  <p>
+    <a href="/login">Log in</a>
+  </p>
+  <p>
+    <a href="/signup">Sign up</a>
+  </p>
+<% } %>

@@ -1,0 +1,32 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id String @id
+  sid String @unique
+  data String
+  expiresAt DateTime
+  // sid    String   @id @db.VarChar
+  // sess   Json     @db.Json
+  // expire DateTime @db.Timestamp(6)
+
+  // @@index([expire], map: "IDX_session_expire")
+}
+
+model User {
+  id       Int    @id @default(autoincrement())
+  username String @db.VarChar(32) @unique
+  password String @db.VarChar(255)
+  role Role @default(BASIC)
+}
+
+enum Role {
+  BASIC
+  ADMIN
+}
