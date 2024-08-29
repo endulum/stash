@@ -9,7 +9,6 @@ import { PrismaClient } from '@prisma/client';
 
 import logSession from './src/middleware/logSession';
 import errorHandler from './src/middleware/errorHandler';
-import sampleRouter from './src/routes/sampleRouter';
 
 const secret: string | undefined = process.env.SECRET
 if (secret === undefined) throw new Error('Secret is not defined.')
@@ -40,7 +39,6 @@ app.use(passport.initialize())
 app.use(passport.session())
 app.use(logSession)
 
-app.use(sampleRouter)
 app.use(errorHandler)
 
 app.listen(3000)
