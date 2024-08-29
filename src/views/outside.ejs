@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Stash :: <%= title %></title>
+    <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/reset.css">
+    <link rel="stylesheet" href="/style.css">
+  </head>
+  <body>
+    <div class="splash">
+      <header>
+        <h1>Stash 0.1</h1>
+        <p>Keep your stuff!</p>
+      </header>
+
+      <main>
+        <%- include(`${page}`) %>
+      </main>
+    </div>
+  </body>
+</html>

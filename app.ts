@@ -21,6 +21,7 @@ const app = express()
 
 app.set('views', path.join(__dirname, 'src/views'))
 app.set('view engine', 'ejs')
+app.use(express.static(path.join(__dirname, 'src/public')))
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(session({
@@ -47,6 +48,6 @@ app.use(asyncHandler(async (req, res, next) => {
   return req.user ? insideRouter(req, res, next) : outsideRouter(req, res, next)
 }))
 
-app.use(errorHandler)
+// app.use(errorHandler)
 
 app.listen(3000)

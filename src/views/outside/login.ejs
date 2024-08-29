@@ -1,0 +1,33 @@
+<h2>Log In</h2>
+
+<% if (formMessage) { %>
+  <p><%= formMessage %></p>
+<% } %>
+
+<form action="/login" method="post">
+  <div class="input">
+    <label for="username">
+      <span>Username: </span>
+      <input type="text" name="username" id="username">
+    </label>
+    <% if (formErrors && 'username' in formErrors) { %>
+      <small><%= formErrors.username %></small>
+    <% } %>
+  </div>
+
+  <div class="input">
+    <label for="password">
+      <span>Password: </span>
+      <input type="password" name="password" id="password">
+    </label>
+    <% if (formErrors && 'password' in formErrors) { %>
+      <small><%= formErrors.password %></small>
+    <% } %>
+  </div>
+
+  <button type="submit">Submit</button>
+</form>
+
+<p>
+  Don't have an account? <a href="/signup">Sign Up</a>
+</p>
