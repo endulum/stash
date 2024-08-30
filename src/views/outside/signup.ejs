@@ -1,43 +1,59 @@
+<main class="form">
+
 <h2>Sign Up</h2>
 
 <% if (formMessage) { %>
-  <p><%= formMessage %></p>
+  <p class="form-message"><%= formMessage %></p>
 <% } %>
 
 <form action="/signup" method="post">
+  <label for="username">
+    Username
+  </label>
   <div class="input">
-    <label for="username">
-      <span>Username: </span>
-      <input type="text" name="username" id="username" value=<%= prevForm.username %>>
-    </label>
+    <input type="text" name="username" id="username" value=<%= prevForm.username %>>
     <% if (formErrors && 'username' in formErrors) { %>
-      <small><%= formErrors.username %></small>
+      <p>
+        <small class="error">
+          <%= formErrors.username %>
+        </small>
+      </p>
     <% } %>
   </div>
 
+  <label for="password">
+    Password
+  </label>
   <div class="input">
-    <label for="password">
-      <span>Password: </span>
-      <input type="password" name="password" id="password">
-    </label>
+    <input type="password" name="password" id="password">
     <% if (formErrors && 'password' in formErrors) { %>
-      <small><%= formErrors.password %></small>
+      <p>
+        <small class="error">
+          <%= formErrors.password %>
+        </small>
+      </p>
     <% } %>
   </div>
 
+  <label for="confirmPassword">
+    Confirm
+  </label>
   <div class="input">
-    <label for="confirmPassword">
-      <span>Confirm Password: </span>
-      <input type="password" name="confirmPassword" id="confirmPassword">
-    </label>
+    <input type="password" name="confirmPassword" id="confirmPassword">
     <% if (formErrors && 'confirmPassword' in formErrors) { %>
-      <small><%= formErrors.confirmPassword %></small>
+      <p>
+        <small class="error">
+          <%= formErrors.confirmPassword %>
+        </small>
+      </p>
     <% } %>
   </div>
 
   <button type="submit">Submit</button>
 </form>
 
-<p>
+</main>
+
+<p class="under-form">
   Have an account? <a href="/login">Log In</a>
 </p>

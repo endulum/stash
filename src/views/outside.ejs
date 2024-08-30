@@ -5,17 +5,18 @@
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
     <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/outside-routes.css">
   </head>
   <body>
     <div class="splash">
       <header>
-        <h1>Stash 0.1</h1>
-        <p>Keep your stuff!</p>
+        <h1 class="logo">
+          <span class="logo-color">Stash</span> 
+          <span class="logo-fade">0.1</span>
+        </h1>
+        <p class="logo-tagline">Keep your stuff!</p>
       </header>
-
-      <main>
-        <%- include(`${page}`) %>
-      </main>
+      <%- include(`${page}`) %>
     </div>
   </body>
 </html>
