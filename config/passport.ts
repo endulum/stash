@@ -2,6 +2,7 @@ import passport, { type DoneCallback } from "passport";
 const LocalStrategy = require('passport-local').Strategy;
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from "@prisma/client";
+
 const prisma = new PrismaClient()
 
 passport.use(new LocalStrategy(
