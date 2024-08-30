@@ -7,9 +7,6 @@ router.route('/')
   .get(asyncHandler(async (req, res) => {
     res.send('logged in')
   }))
-
-// AUTHENTICATED
-// router.route('/')
 //   .get(asyncHandler(async (req, res) => res.redirect('/files')))
 // router.route('files')
 //   .get(renderFileDashboard)
@@ -17,6 +14,13 @@ router.route('/')
 // router.route('/files/:fileId')
 //   .get(isFileYours, renderFileview)
 //   .put(isFileYours, validateFileviewForm, handleFileviewForm)
-//   .delete()
+//   .delete(isFileYours, handleFileDelete)
+router.route('/logout')
+  .get(asyncHandler(async (req, res, next) => {
+    req.logOut((err) => {
+      if (err) return next(err)
+      return res.redirect('/')
+    })
+  }))
 
 export default router;
