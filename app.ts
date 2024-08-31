@@ -45,6 +45,7 @@ app.use(passport.session())
 app.use(logSession)
 
 app.use(asyncHandler(async (req, res, next) => {
+  res.locals.user = req.user
   return req.user ? insideRouter(req, res, next) : outsideRouter(req, res, next)
 }))
 

@@ -5,7 +5,10 @@ const router = express.Router();
 
 router.route('/')
   .get(asyncHandler(async (req, res) => {
-    res.send('logged in')
+    res.render('layout', {
+      page: 'pages/files',
+      title: 'Your Files'
+    })
   }))
 //   .get(asyncHandler(async (req, res) => res.redirect('/files')))
 // router.route('files')

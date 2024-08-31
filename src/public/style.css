@@ -24,6 +24,10 @@ a {
   text-decoration: none;
 }
 
+a:hover {
+  border-color: transparent;
+}
+
 @media (prefers-color-scheme: dark) {
   body {
     color: var(--white);
@@ -37,15 +41,21 @@ a {
   }
 }
 
-a:hover {
-  border-bottom: 0;
-}
-
 header {
   margin-bottom: 1rem;
 }
 
 .links {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid lightgray;
+  box-shadow: 0px 1px 0px #ffffff;
+}
+
+nav {
   display: flex;
   flex-direction: row;
   gap: 1rem;

@@ -12,16 +12,23 @@
       <h1>File Uploader</h1>
       <div class="links">
         <% if (locals.user) { %>
-          <span>
+          <p>
             Logged in as 
             <a href="/files">
               <%= locals.user.username %>
             </a>
-          </span>
-          <a href="/logout">Log out</a>
+          </p>
+          <nav>
+            <a href="/logout">Log out</a>
+          </nav>
         <% } else { %>
-          <a href="login">Log in</a>
-          <a href="/signup">Sign up</a>
+          <p>
+            Not logged in
+          </p>
+          <nav>
+            <a href="login">Log in</a>
+            <a href="/signup">Sign up</a> 
+          </nav>
         <% } %>
       </div>
     </header>
