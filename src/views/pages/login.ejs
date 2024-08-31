@@ -1,0 +1,23 @@
+<h2>Log In</h2>
+
+<% if (formMessage) { %>
+  <p class="form-message"><%= formMessage %></p>
+<% } %>
+
+<form action="/login" method="post">
+  <%- include('../components/form-input', { 
+    name: 'username',
+    label: 'Username',
+    type: 'text',
+    includePrevInput: true
+  }) %>
+
+  <%- include('../components/form-input', { 
+    name: 'password',
+    label: 'Password',
+    type: 'password',
+    includePrevInput: false
+  }) %>
+
+  <button type="submit">Submit</button>
+</form>

@@ -1,0 +1,19 @@
+<label for=<%= name %>>
+  <%= label %>
+</label>
+<div class="input">
+  <input 
+    type=<%= type %> 
+    name=<%= name %> 
+    id=<%= name %> 
+    value=<%= includePrevInput ? prevForm[name] : '' %>
+  >
+  <% if (formErrors && name in formErrors) { %>
+    <p>
+      <small class="error">
+        <b>Error: </b>
+        <%= formErrors[name] %>
+      </small>
+    </p>
+  <% } %>
+</div>

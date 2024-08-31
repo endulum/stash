@@ -9,8 +9,8 @@ const prisma = new PrismaClient()
 const router = express.Router();
 
 const renderLogin = asyncHandler(async (req, res, next) => {
-  return res.render('outside', {
-    page: 'outside/login',
+  return res.render('layout', {
+    page: 'pages/login',
     title: 'Log In',
     prevForm: req.body,
     formErrors: req.formErrors,
@@ -55,8 +55,8 @@ const handleLoginForm = asyncHandler(async (req, res, next) => {
 })
 
 const renderSignup = asyncHandler(async (req, res, next) => {
-  return res.render('outside', {
-    page: 'outside/signup',
+  return res.render('layout', {
+    page: 'pages/signup',
     title: 'Sign Up',
     prevForm: req.body,
     formErrors: req.formErrors,

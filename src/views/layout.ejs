@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Stash :: <%= title %></title>
+    <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
+    <link rel="stylesheet" href="/reset.css">
+    <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/outside-routes.css">
+  </head>
+  <body>
+    <header>
+      <h1>File Uploader</h1>
+      <div class="links">
+        <% if (locals.user) { %>
+          <span>
+            Logged in as 
+            <a href="/files">
+              <%= locals.user.username %>
+            </a>
+          </span>
+          <a href="/logout">Log out</a>
+        <% } else { %>
+          <a href="login">Log in</a>
+          <a href="/signup">Sign up</a>
+        <% } %>
+      </div>
+    </header>
+    <main>
+      <%- include(`${page}`) %>
+    </main>
+  </body>
+</html>
