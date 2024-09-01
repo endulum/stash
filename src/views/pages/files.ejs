@@ -1,3 +1,31 @@
-<a href="/files/upload">
+<table >
+  <thead>
+    <tr>
+      <td>Name</td>      
+      <td>Type</td>
+      <td>Size</td>
+    </tr>
+  </thead>
+  <tbody>
+    <% folders.forEach(folder => { %>
+      <tr>
+        <td>
+          <a href=<%= '/files/folder/' + folder.id %>>
+            <%= folder.name + '/' %>
+          </a>
+        </td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+
+<a href="/files/new-file">
   Upload a File
+</a>
+
+<a href="/files/new-folder">
+  Add a Folder
 </a>
