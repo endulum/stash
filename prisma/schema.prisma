@@ -4,21 +4,45 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url = env("DATABASE_URL")
+  url      = env("DATABASE_URL")
 }
 
 model Session {
-  id String @id
-  sid String @unique
-  data String
+  id        String   @id
+  sid       String   @unique
+  data      String
   expiresAt DateTime
 }
 
 model User {
-  id Int @id @default(autoincrement())
-  username String @db.VarChar(32) @unique
+  id       Int    @id @default(autoincrement())
+  username String @unique @db.VarChar(32)
   password String @db.VarChar(255)
-  role Role @default(BASIC)
+  role     Role   @default(BASIC)
+  files File[] @relation("authorFiles")
+  folders Folder[] @relation("authorFolders")
+}
+
+model Folder {
+  id String @id @default(uuid())
+  name String
+  files File[] @relation("folderFiles")
+  parent Folder? @relation("parentFolder", fields: [parentId], references: [id])
+  parentId String?
+  children Folder[] @relation("parentFolder")
+  author User @relation("authorFolders", fields: [authorId], references: [id])
+  authorId Int
+}
+
+model File {
+  id String @id @default(uuid())
+  name String
+  type String
+  size Float
+  folder Folder? @relation("folderFiles", fields: [folderId], references: [id])
+  folderId String?
+  author User @relation("authorFiles", fields: [authorId], references: [id])
+  authorId Int
 }
 
 enum Role {
