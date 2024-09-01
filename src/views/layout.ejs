@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Stash :: <%= title %></title>
+    <title><%= title %></title>
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
     <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="/style.css">
@@ -33,6 +33,7 @@
       </div>
     </header>
     <main>
+      <h2><%= title %></h2>
       <%- include(`${page}`) %>
     </main>
   </body>
