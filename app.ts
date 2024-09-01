@@ -42,7 +42,7 @@ app.use(session({
 }))
 app.use(passport.initialize())
 app.use(passport.session())
-app.use(logSession)
+// app.use(logSession)
 
 app.use(asyncHandler(async (req, res, next) => {
   res.locals.user = req.user
