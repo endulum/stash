@@ -1,0 +1,60 @@
+<small>
+  <% if (path.length === 0) { %>
+    Viewing home directory
+  <% } else { %>
+    Viewing <a href="/directory/">home</a>
+    <% path.forEach((folder, index) => { %>
+      <% if (index === path.length - 1) { %>
+        > <%= folder.name %>
+      <% } else { %>
+        > <a href=<%= '/directory/' + folder.id %>> <%= folder.name %></a>
+      <% } %>
+    <% }) %>
+  <% } %>
+</small>
+
+
+<table >
+  <thead>
+    <tr>
+      <td>Name</td>      
+      <td>Type</td>
+      <td>Size</td>
+    </tr>
+  </thead>
+  <tbody>
+    <% if (currentFolder) { %>
+      <tr>
+        <td>
+          <a href=<%= currentFolder.parentId 
+            ? '/directory/' +  currentFolder.parentId
+            : '/directory' %>>
+            ..
+          </a>
+        </td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    <% } %>
+    <% childFolders.forEach(folder => { %>
+      <tr>
+        <td>
+          <a href=<%= '/directory/' + folder.id %>>
+            <%= folder.name + '/' %>
+          </a>
+        </td>
+        <td>folder</td>
+        <td>-</td>
+      </tr>
+    <% }) %>
+  </tbody>
+</table>
+
+
+<a href='/new-file'>
+  Upload a File
+</a>
+
+<a href="/new-folder">
+  Add a Folder
+</a>

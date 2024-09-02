@@ -1,4 +1,4 @@
-<form action="/files/new-folder" method="post">
+<form action="/new-folder" method="post">
   <%- include('../components/form-input', { 
     name: 'name',
     label: 'Folder name',
@@ -6,9 +6,7 @@
     includePrevInput: true
   }) %>
 
-  <%- include('../components/folder-tree-dropdown', {
-    includePrevInput: true
-  }) %>
+  <%- include('../components/folder-tree-dropdown') %>
 
   <button type="submit">Submit</button>
 </form>

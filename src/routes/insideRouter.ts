@@ -1,12 +1,10 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient, type Folder } from '@prisma/client';
 import multer from 'multer';
 
 const prisma = new PrismaClient();
-
-const upload = multer()
-
+const upload = multer();
 const router = express.Router();
 
 async function makeFolderTree(): Promise<Array<{ name: string, id: null | string }>> {
@@ -31,14 +29,47 @@ async function makeFolderTree(): Promise<Array<{ name: string, id: null | string
   return results
 }
 
-const renderFileDashboard = asyncHandler(async (req, res) => {
-  const folders = (await prisma.folder.findMany({
-    where: { parentId: null },
-  }))
-  res.render('layout', {
-    page: 'pages/files',
+async function makeFolderPath(folder: Folder | null): Promise<Array<{ name: string, id: null | string }>> {
+  let currentFolder: Folder | null = folder
+  const folderPath: Array<{ name: string, id: null | string }> = []
+  while (currentFolder) {
+    folderPath.unshift({ name: currentFolder.name, id: currentFolder.id })
+    const parentFolder = await prisma.folder.findUnique({
+      where: { id: currentFolder.parentId || 'why doesnt this work with null?' }
+    })
+    currentFolder = parentFolder
+  }
+  return folderPath
+}
+
+const renderDirectory = asyncHandler(async (req, res, next) => {
+  let currentFolder = null
+  let childFolders = null
+  let path: Array<{ name: string, id: null | string }> = []
+  if ('directoryId' in req.params && req.params.directoryId) { 
+    // we are looking for a folder with this id
+    currentFolder = await prisma.folder.findUnique({
+      where: { id: req.params.directoryId },
+      include: { children: true }
+    })
+    if (currentFolder) {
+      path = await makeFolderPath(currentFolder)
+      childFolders = currentFolder.children
+    }
+  } else { 
+    // we are at the home directory, we need all parentless files and folders
+    childFolders = await prisma.folder.findMany({
+      where: { parentId: null },
+      // include: { files: true }
+    })
+  }
+  
+  return res.render('layout', {
+    page: 'pages/directory',
     title: 'Your Files',
-    folders
+    currentFolder,
+    childFolders,
+    path,
   })
 })
 
@@ -47,10 +78,13 @@ const renderNewFile = asyncHandler(async (req, res) => {
     page: 'pages/new-file',
     title: 'Upload File',
     folderTree: await makeFolderTree(),
-    prevForm: req.body,
     formErrors: req.formErrors,
-    formMessage: req.formMessage
   })
+})
+
+const handleNewFile = asyncHandler(async (req, res) => {
+  console.log(req.body)
+  return res.redirect('/new-file')
 })
 
 const renderNewFolder = asyncHandler(async (req, res) => {
@@ -60,40 +94,24 @@ const renderNewFolder = asyncHandler(async (req, res) => {
     folderTree: await makeFolderTree(),
     prevForm: req.body,
     formErrors: req.formErrors,
-    formMessage: req.formMessage
   })
 })
 
-const handleFilePost = asyncHandler(async (req, res) => {
-  return res.redirect('/files/new-file')
-})
-
-const handleFolderPost = asyncHandler(async (req, res) => {
-  if (req.user === undefined) throw new Error('No User found.')
-  await prisma.folder.create({
-    data: {
-      name: req.body.name,
-      parentId: req.body.location,
-      authorId: req.user.id
-    }
-  })
-  return res.redirect('/files')
+const handleNewFolder = asyncHandler(async (req, res) => {
+  console.log(req.body)
+  return res.redirect('/new-folder')
 })
 
 router.route('/')
-  .get(asyncHandler(async (req, res) => res.redirect('/files')));
-router.route('/files')
-  .get(renderFileDashboard)
-router.route('/files/new-file')
+  .get(asyncHandler(async (req, res) => res.redirect('/directory')))
+router.route(['/directory', '/directory/:directoryId'])
+  .get(renderDirectory)
+router.route('/new-file')
   .get(renderNewFile)
-  .post(upload.single('upload'), handleFilePost)
-router.route('/files/new-folder')
+  .post(handleNewFile)
+router.route('/new-folder')
   .get(renderNewFolder)
-  .post(handleFolderPost)
-// router.route('/files/:fileId')
-//   .get(isFileYours, renderFileview)
-//   .put(isFileYours, validateFileviewForm, handleFileviewForm)
-//   .delete(isFileYours, handleFileDelete)
+  .post(handleNewFolder)
 router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
     req.logOut((err) => {
