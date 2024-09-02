@@ -1,7 +1,9 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
+import { body } from 'express-validator';
 import { Prisma, PrismaClient, type Folder } from '@prisma/client';
 import multer from 'multer';
+import handleValidationErrors from '../middleware/handleValidationErrors';
 
 const prisma = new PrismaClient();
 const upload = multer();
@@ -45,30 +47,35 @@ async function makeFolderPath(folder: Folder | null): Promise<Array<{ name: stri
 const renderDirectory = asyncHandler(async (req, res, next) => {
   let currentFolder = null
   let childFolders = null
+  let childFiles = null
   let path: Array<{ name: string, id: null | string }> = []
-  if ('directoryId' in req.params && req.params.directoryId) { 
+  if ('directoryId' in req.params && req.params.directoryId) {
     // we are looking for a folder with this id
     currentFolder = await prisma.folder.findUnique({
       where: { id: req.params.directoryId },
-      include: { children: true }
+      include: { children: true, files: true }
     })
     if (currentFolder) {
       path = await makeFolderPath(currentFolder)
       childFolders = currentFolder.children
+      childFiles = currentFolder.files
     }
-  } else { 
+  } else {
     // we are at the home directory, we need all parentless files and folders
     childFolders = await prisma.folder.findMany({
       where: { parentId: null },
-      // include: { files: true }
+    })
+    childFiles = await prisma.file.findMany({
+      where: { folderId: null }
     })
   }
-  
+
   return res.render('layout', {
     page: 'pages/directory',
     title: 'Your Files',
     currentFolder,
-    childFolders,
+    childFolders: childFolders || [],
+    childFiles: childFiles || [],
     path,
   })
 })
@@ -82,9 +89,56 @@ const renderNewFile = asyncHandler(async (req, res) => {
   })
 })
 
-const handleNewFile = asyncHandler(async (req, res) => {
-  console.log(req.body)
-  return res.redirect('/new-file')
+const locationValidation = body('location')
+  .trim()
+  .notEmpty().withMessage('Please choose a location for this file.').bail()
+  .custom(async (value) => {
+    if (value !== 'home') {
+      const existingFolder = await prisma.folder.findUnique({
+        where: { id: value }
+      })
+      return existingFolder
+    }
+    return true
+  })
+  .escape()
+
+const validateNewFile = [
+  upload.single('upload'),
+  body('upload')
+    .custom((value, { req }) => {
+      if (!req.file) return false
+      return true
+    }).withMessage('Please upload a file.'),
+  locationValidation
+]
+
+const validateNewFolder = [
+  body('name')
+    .trim()
+    .notEmpty().withMessage('Please enter a name for this folder.').bail()
+    .isLength({ max: 32 })
+    .withMessage('Folder names cannot be longer than 64 characters.')
+    .matches(/^[A-Za-z0-9-_]+$/g)
+    .withMessage('Folder names must only consist of letters, numbers, hyphens, and underscores.'),
+  locationValidation
+]
+
+const handleNewFile = asyncHandler(async (req, res, next) => {
+  if (req.formErrors) return renderNewFile(req, res, next)
+  if (
+    !req.file || !req.user
+  ) throw new Error('Submitted file or current user is not defined.')
+  const newFile = await prisma.file.create({
+    data: {
+      name: req.file.originalname,
+      type: req.file.mimetype,
+      size: req.file.size,
+      folderId: req.body.location === 'home' ? null : req.body.location,
+      authorId: req.user.id
+    }
+  })
+  return res.redirect(`/directory/${req.body.location === 'home' ? '' : req.body.location}`)
 })
 
 const renderNewFolder = asyncHandler(async (req, res) => {
@@ -97,21 +151,35 @@ const renderNewFolder = asyncHandler(async (req, res) => {
   })
 })
 
-const handleNewFolder = asyncHandler(async (req, res) => {
+const handleNewFolder = asyncHandler(async (req, res, next) => {
   console.log(req.body)
-  return res.redirect('/new-folder')
+  if (req.formErrors) return renderNewFolder(req, res, next)
+  if (!req.user) throw new Error('User does not exist.')
+  const newFolder = await prisma.folder.create({
+    data: { 
+      name: req.body.name,
+      parentId: req.body.location === 'home' ? null : req.body.location,
+      authorId: req.user.id
+    }
+  })
+  return res.redirect(`/directory/${newFolder.id}`)
+  // consider: add flash for "successfully created" ?
 })
 
 router.route('/')
   .get(asyncHandler(async (req, res) => res.redirect('/directory')))
+
 router.route(['/directory', '/directory/:directoryId'])
   .get(renderDirectory)
+
 router.route('/new-file')
   .get(renderNewFile)
-  .post(handleNewFile)
+  .post(validateNewFile, handleValidationErrors, handleNewFile)
+
 router.route('/new-folder')
   .get(renderNewFolder)
-  .post(handleNewFolder)
+  .post(validateNewFolder, handleValidationErrors, handleNewFolder)
+
 router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
     req.logOut((err) => {

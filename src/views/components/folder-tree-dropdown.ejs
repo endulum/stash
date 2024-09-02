@@ -1,13 +1,18 @@
 <label for="location">Select location</label>
-  <div class="input">
-    <select 
-      name="location" 
-      id="location" 
-    >
-      <% folderTree.forEach(location => { %>
-        <option value=<%= location.id %>>
-          <%= location.name %>
-        </option>
-      <% }) %>
-    </select>
-  </div>
+<div class="input">
+  <select name="location" id="location">
+    <% folderTree.forEach(location=> { %>
+      <option value=<%=location.id || 'home' %>>
+        <%= location.name %>
+      </option>
+    <% }) %>
+  </select>
+  <% if (formErrors && 'location' in formErrors) { %>
+    <p>
+      <small class="error">
+        <b>Error: </b>
+        <%= formErrors['location'] %>
+      </small>
+    </p>
+  <% } %>
+</div>

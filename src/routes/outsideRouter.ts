@@ -5,6 +5,8 @@ import passport from 'passport';
 import { PrismaClient } from "@prisma/client";
 import bcrypt from 'bcryptjs'
 
+import handleValidationErrors from '../middleware/handleValidationErrors'
+
 const prisma = new PrismaClient()
 const router = express.Router();
 
@@ -27,18 +29,6 @@ const validateLoginForm = [
     .notEmpty().withMessage('Please enter a password.')
     .trim().escape()
 ]
-
-const handleValidationErrors = asyncHandler(async (req, res, next) => {
-  const errorsArray = validationResult(req).array()
-  if (errorsArray.length > 0) {
-    req.formErrors = {}
-    errorsArray.forEach(error => {
-      if (req.formErrors && error.type === 'field') 
-        req.formErrors[error.path] = error.msg
-    })
-  }
-  return next()
-})
 
 const handleLoginForm = asyncHandler(async (req, res, next) => {
   if (req.formErrors) return renderLogin(req, res, next)

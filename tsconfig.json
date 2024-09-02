@@ -4,7 +4,7 @@
   },
   "files": [
     "app.ts",
-    "src/index.d.ts"
+    "src/types.d.ts"
   ],
   "compilerOptions": {
     "sourceMap": true,
