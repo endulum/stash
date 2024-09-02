@@ -62,7 +62,7 @@ nav {
 
 h2 {
   text-align: center;
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
 }
 
 form {
@@ -107,4 +107,9 @@ table {
     font-family: monospace;
     font-size: 0.9rem;
   }
+}
+
+.alert {
+  font-style: italic;
+  text-align: center;
 }

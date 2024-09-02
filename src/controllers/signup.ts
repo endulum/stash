@@ -15,7 +15,6 @@ const signup: {
       title: 'Sign Up',
       prevForm: req.body,
       formErrors: req.formErrors,
-      formMessage: req.formMessage
     })
   }),
 
@@ -61,6 +60,8 @@ const signup: {
         }
       })
     })
+    req.flash('alert', 'Your account has been successfully created.')
+    req.flash('loginUsernamePrefill', req.body.username)
     return res.redirect('/login')
   })
 }

@@ -14,6 +14,9 @@ router.route('/signup')
   .get(signup.render)
   .post(signup.validate, handleValidationErrors, signup.submit)
 router.route('*')
-  .all(asyncHandler(async (req, res) => res.redirect('/login')))
+  .all(asyncHandler(async (req, res) => {
+    req.flash('alert', 'You must be logged in to access this page.')
+    res.redirect('/login')
+  }))
 
 export default router;

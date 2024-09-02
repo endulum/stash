@@ -184,7 +184,8 @@ router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
     req.logOut((err) => {
       if (err) return next(err)
-      return res.redirect('/')
+        req.flash('formMessage', 'You have been logged out. See you soon!')
+      return res.redirect('/login')
     })
   }))
 

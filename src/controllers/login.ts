@@ -8,13 +8,15 @@ const login: {
   validate: ValidationChain[],
   submit: RequestHandler
 } = {
-  render: asyncHandler(async (req, res, next) => {
+  render: asyncHandler(async (req, res) => {
     return res.render('layout', {
       page: 'pages/login',
       title: 'Log In',
-      prevForm: req.body,
+      prevForm: { 
+        ... req.body, 
+        username: 'username' in req.body ? req.body.username : req.flash('loginUsernamePrefill')
+      },
       formErrors: req.formErrors,
-      formMessage: req.formMessage
     })
   }),
 

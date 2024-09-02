@@ -2,6 +2,7 @@ import 'dotenv/config';
 import './config/passport';
 import path from 'path';
 import express from 'express';
+import flash from 'connect-flash';
 import asyncHandler from 'express-async-handler';
 import session from 'express-session';
 import passport from 'passport';
@@ -40,12 +41,14 @@ app.use(session({
     maxAge: 1000 * 60 * 60 * 24
   }
 }))
+app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())
 // app.use(logSession)
 
 app.use(asyncHandler(async (req, res, next) => {
   res.locals.user = req.user
+  res.locals.alert = req.flash('alert')
   return req.user ? insideRouter(req, res, next) : outsideRouter(req, res, next)
 }))
 

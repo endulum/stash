@@ -33,6 +33,9 @@
       </div>
     </header>
     <main>
+      <% if (locals.alert.length > 0) { %>
+        <p class="alert"><%= locals.alert[0] %></p>
+      <% } %>
       <h2><%= title %></h2>
       <%- include(`${page}`) %>
     </main>

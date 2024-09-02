@@ -1,7 +1,3 @@
-<% if (formMessage) { %>
-  <p class="form-message"><%= formMessage %></p>
-<% } %>
-
 <form action="/login" method="post">
   <%- include('../components/form-input', { 
     name: 'username',
