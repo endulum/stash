@@ -1,0 +1,14 @@
+<label for="location">Select location</label>
+  <div class="input">
+    <select 
+      name="location" 
+      id="location" 
+      value=<%= includePrevInput ? prevForm['location'] : '' %>
+    >
+      <% folderTree.forEach(location => { %>
+        <option value=<%= location.id %>>
+          <%= location.name %>
+        </option>
+      <% }) %>
+    </select>
+  </div>

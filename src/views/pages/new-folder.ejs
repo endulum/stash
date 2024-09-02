@@ -6,12 +6,9 @@
     includePrevInput: true
   }) %>
 
-  <label for="location">Select location</label>
-  <div class="input">
-    <select name="location" id="location">
-      <option value="/">/</option>
-    </select>
-  </div>
+  <%- include('../components/folder-tree-dropdown', {
+    includePrevInput: true
+  }) %>
 
   <button type="submit">Submit</button>
 </form>

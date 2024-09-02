@@ -9,13 +9,32 @@ const upload = multer()
 
 const router = express.Router();
 
+async function makeFolderTree(): Promise<Array<{ name: string, id: null | string }>> {
+  const queue: Array<{ name: string, id: null | string }> = [
+    { name: '/', id: null }
+  ]
+  const results: Array<{ name: string, id: null | string }> = []
+  do {
+    const currentFolder = queue.pop()
+    if (currentFolder) {
+      results.push(currentFolder)
+      const childFolders = await prisma.folder.findMany({
+        where: { parentId: currentFolder.id }
+      })
+      if (childFolders.length > 0) {
+        childFolders.forEach(child => {
+          queue.push({ name: currentFolder.name + child.name + '/', id: child.id })
+        })
+      }
+    }
+  } while (queue.length > 0)
+  return results
+}
+
 const renderFileDashboard = asyncHandler(async (req, res) => {
   const folders = (await prisma.folder.findMany({
-    where: {
-      parentId: null
-    },
+    where: { parentId: null },
   }))
-  console.log(folders)
   res.render('layout', {
     page: 'pages/files',
     title: 'Your Files',
@@ -27,6 +46,7 @@ const renderNewFile = asyncHandler(async (req, res) => {
   res.render('layout', {
     page: 'pages/new-file',
     title: 'Upload File',
+    folderTree: await makeFolderTree(),
     prevForm: req.body,
     formErrors: req.formErrors,
     formMessage: req.formMessage
@@ -37,6 +57,7 @@ const renderNewFolder = asyncHandler(async (req, res) => {
   res.render('layout', {
     page: 'pages/new-folder',
     title: 'Add New Folder',
+    folderTree: await makeFolderTree(),
     prevForm: req.body,
     formErrors: req.formErrors,
     formMessage: req.formMessage
@@ -44,8 +65,6 @@ const renderNewFolder = asyncHandler(async (req, res) => {
 })
 
 const handleFilePost = asyncHandler(async (req, res) => {
-  console.log(req.body)
-  console.log(req.file)
   return res.redirect('/files/new-file')
 })
 
@@ -54,6 +73,7 @@ const handleFolderPost = asyncHandler(async (req, res) => {
   await prisma.folder.create({
     data: {
       name: req.body.name,
+      parentId: req.body.location,
       authorId: req.user.id
     }
   })
