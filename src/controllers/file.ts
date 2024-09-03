@@ -4,6 +4,7 @@ import { ValidationChain, body } from "express-validator";
 
 import prisma from '../prisma'
 import buildFolderTree from '../functions/buildFolderTree'
+import buildFolderPath from "../functions/buildFolderPath";
 import locationValidation from '../functions/locationValidation'
 
 const file: {
@@ -52,9 +53,18 @@ const file: {
   }),
 
   view: asyncHandler(async (req, res) => {
+    let folderPath = null
+    if (req.currentFile.folderId !== null) {
+      const parentFolder = await prisma.folder.findUnique({
+        where: { id: req.currentFile.folderId }
+      })
+      folderPath = await buildFolderPath(parentFolder)
+      folderPath.push({ name: req.currentFile.name, id: req.currentFile.id })
+    }
     return res.render('layout', {
       page: 'pages/view-file',
-      title: `Viewing file: ${req.currentFile.name}`,
+      title: `File Details`,
+      directoryPath: folderPath ?? [{ name: req.currentFile.name, id: req.currentFile.id }],
       file: req.currentFile
     })
   }),

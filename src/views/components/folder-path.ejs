@@ -1,0 +1,14 @@
+<small>
+  <% if (directoryPath.length === 0) { %>
+    Viewing home directory
+  <% } else { %>
+    Viewing <a href="/directory/">home</a>
+    <% directoryPath.forEach((folder, index) => { %>
+      <% if (index === directoryPath.length - 1) { %>
+        > <%= folder.name %>
+      <% } else { %>
+        > <a href=<%= '/directory/' + folder.id %>> <%= folder.name %></a>
+      <% } %>
+    <% }) %>
+  <% } %>
+</small>
