@@ -1,10 +1,12 @@
+import { type File } from "@prisma/client"
+
 declare global {
   namespace Express {
     export interface Request {
       user?: User,
       prevForm?: Record<string, any>,
       formErrors?: Record<string, string>,
-      formMessage?: string
+      currentFile: File
     }
     export interface User {
       id: number,

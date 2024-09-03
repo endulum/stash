@@ -5,6 +5,8 @@ import { Prisma, PrismaClient, type Folder } from '@prisma/client';
 import multer from 'multer';
 import handleValidationErrors from '../middleware/handleValidationErrors';
 
+import file from '../controllers/file'
+
 const prisma = new PrismaClient();
 const upload = multer();
 const router = express.Router();
@@ -171,6 +173,9 @@ router.route('/')
 
 router.route(['/directory', '/directory/:directoryId'])
   .get(renderDirectory)
+
+router.route('/file/:fileId')
+  .get(file.exists, file.isYours, file.view)
 
 router.route('/new-file')
   .get(renderNewFile)
