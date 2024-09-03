@@ -5,8 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.ts",
-    "reset-db": "node src/database/reset.js"
+    "dev": "nodemon app.ts",
+    "reset": "nodemon prisma/reset.ts"
   },
   "keywords": [],
   "author": "",

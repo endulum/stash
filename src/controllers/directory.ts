@@ -4,6 +4,8 @@ import { ValidationChain, body } from "express-validator";
 
 import prisma from '../prisma'
 import buildFolderPath from '../functions/buildFolderPath'
+import buildFolderTree from "../functions/buildFolderTree";
+import locationValidation from "../functions/locationValidation";
 
 const directory: {
   // does the folder exist?
@@ -13,7 +15,18 @@ const directory: {
   // view a directory
   view: RequestHandler
   // view home directory
-  viewHome: RequestHandler
+  viewHome: RequestHandler,
+  // create a directory
+  renderNew: RequestHandler,
+  validateNew: ValidationChain[],
+  submitNew: RequestHandler
+  // // edit a directory
+  // renderEdit: RequestHandler,
+  // validateEdit: ValidationChain[],
+  // submitEdit: RequestHandler,
+  // // delete a directory
+  // renderDelete: RequestHandler,
+  // submitDelete: RequestHandler
 } = {
   exists: asyncHandler(async (req, res, next) => {
     const folder = await prisma.folder.findUnique({
@@ -75,6 +88,42 @@ const directory: {
       childFolders,
       childFiles
     })
+  }),
+
+  renderNew: asyncHandler(async (req, res) => {
+    res.render('layout', {
+      page: 'pages/new-folder',
+      title: 'Add New Folder',
+      folderTree: await buildFolderTree(),
+      prevForm: req.body,
+      formErrors: req.formErrors,
+    })
+  }),
+
+  validateNew: [
+    body('name')
+      .trim()
+      .notEmpty().withMessage('Please enter a name for this folder.').bail()
+      .isLength({ max: 32 })
+      .withMessage('Folder names cannot be longer than 64 characters.')
+      .matches(/^[A-Za-z0-9-_]+$/g)
+      .withMessage('Folder names must only consist of letters, numbers, hyphens, and underscores.'),
+    locationValidation
+  ],
+
+  submitNew: asyncHandler(async (req, res, next) => {
+    console.log(req.body)
+    if (req.formErrors) return directory.renderNew(req, res, next)
+    if (!req.user) throw new Error('User is not defined.')
+    const newFolder = await prisma.folder.create({
+      data: { 
+        name: req.body.name,
+        parentId: req.body.location === 'home' ? null : req.body.location,
+        authorId: req.user.id
+      }
+    })
+    req.flash('alert', 'New folder successfully created.')
+    return res.redirect(`/directory/${newFolder.id}`)
   })
 }
 
