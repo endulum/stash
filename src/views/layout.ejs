@@ -9,16 +9,19 @@
   </head>
   <body>
     <header>
-      <h1>File Uploader</h1>
+      <h1>
+        <span>File Uploader</span>
+        <a href="https://github.com/endulum/odin-uploader" target="_blank">
+          <img class="github" src="/assets/github.svg" alt="Link to this app's repository">
+        </a>
+      </h1>
       <div class="links">
         <% if (locals.user) { %>
           <p>
-            Logged in as 
-            <a href="/">
-              <%= locals.user.username %>
-            </a>
+            Logged in as <b><%= locals.user.username %></b>
           </p>
           <nav>
+            <a href="/">Home directory</a>
             <a href="/logout">Log out</a>
           </nav>
         <% } else { %>

@@ -21,6 +21,9 @@ a {
   border-bottom: 1px solid var(--black);
   color: var(--black);
   text-decoration: none;
+  &:has(img) {
+    border-bottom: none;
+  }
 }
 
 a:hover {
@@ -58,6 +61,21 @@ nav {
   display: flex;
   flex-direction: row;
   gap: 1rem;
+}
+
+h1 {
+  font-size: 2rem;
+}
+
+.github {
+  display: inline-block;
+  height: 2rem;
+  transform: translate(0.25rem, 0.375rem);
+  opacity: 0.25;
+  filter: drop-shadow(0px 1px 0px #ffffff);
+  &:hover {
+    opacity: 0.75;
+  }
 }
 
 h2 {
@@ -113,3 +131,4 @@ table {
   font-style: italic;
   text-align: center;
 }
+
