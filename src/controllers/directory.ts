@@ -95,6 +95,7 @@ const directory: {
       page: 'pages/new-folder',
       title: 'Add New Folder',
       folderTree: await buildFolderTree(),
+      //preDest: req.query.dest,
       prevForm: req.body,
       formErrors: req.formErrors,
     })

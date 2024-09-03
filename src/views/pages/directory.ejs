@@ -52,10 +52,10 @@
 </table>
 
 
-<a href='/new-file'>
-  Upload a File
+<a href=<%= '/new-file' + (currentFolder ? ('?dest=' + currentFolder.id) : '') %>>
+  Upload a File Here
 </a>
-
-<a href="/new-folder">
-  Add a Folder
+<br>
+<a href=<%= '/new-folder' + (currentFolder ? ('?dest=' + currentFolder.id) : '') %>>
+  Add a Folder Here
 </a>
