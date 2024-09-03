@@ -1,11 +1,24 @@
 import { type RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { ValidationChain, body } from "express-validator";
+import type { File } from "@prisma/client";
 
 import prisma from '../prisma'
 import buildFolderTree from '../functions/buildFolderTree'
 import buildFolderPath from "../functions/buildFolderPath";
 import locationValidation from '../functions/locationValidation'
+
+async function buildFilePath(file: File): Promise<Array<{ name: string, id: string | null }>> {
+  let folderPath = null
+  if (file.folderId !== null) {
+    const parentFolder = await prisma.folder.findUnique({
+      where: { id: file.folderId }
+    })
+    folderPath = await buildFolderPath(parentFolder)
+    folderPath.push({ name: file.name, id: file.id })
+  }
+  return folderPath ?? [{ name: file.name, id: file.id }]
+}
 
 const file: {
   // does the file exist?
@@ -22,9 +35,10 @@ const file: {
   renderEdit: RequestHandler,
   validateEdit: ValidationChain[],
   submitEdit: RequestHandler,
-  // // delete a file
-  // renderDelete: RequestHandler,
-  // submitDelete: RequestHandler
+  // delete a file
+  renderDelete: RequestHandler,
+  validateDelete: ValidationChain[],
+  submitDelete: RequestHandler
 } = {
   exists: asyncHandler(async (req, res, next) => {
     const file = await prisma.file.findUnique({
@@ -53,18 +67,11 @@ const file: {
   }),
 
   view: asyncHandler(async (req, res) => {
-    let folderPath = null
-    if (req.currentFile.folderId !== null) {
-      const parentFolder = await prisma.folder.findUnique({
-        where: { id: req.currentFile.folderId }
-      })
-      folderPath = await buildFolderPath(parentFolder)
-      folderPath.push({ name: req.currentFile.name, id: req.currentFile.id })
-    }
+    const filePath = await buildFilePath(req.currentFile)
     return res.render('layout', {
       page: 'pages/view-file',
       title: `File Details`,
-      directoryPath: folderPath ?? [{ name: req.currentFile.name, id: req.currentFile.id }],
+      directoryPath: filePath,
       file: req.currentFile
     })
   }),
@@ -111,8 +118,8 @@ const file: {
       title: 'Edit File',
       currentFile: req.currentFile,
       folderTree: await buildFolderTree(),
-      prevForm: { 
-        ... req.body,
+      prevForm: {
+        ...req.body,
         name: 'name' in req.body ? req.body.name : req.currentFile.name.split('.')[0]
       },
       formErrors: req.formErrors,
@@ -131,6 +138,7 @@ const file: {
   ],
 
   submitEdit: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return file.renderEdit(req, res, next)
     await prisma.file.update({
       where: { id: req.currentFile.id },
       data: {
@@ -140,6 +148,36 @@ const file: {
     })
     req.flash('alert', 'Your file has been successfully edited.')
     return res.redirect(`/file/${req.currentFile.id}`)
+  }),
+
+  renderDelete: asyncHandler(async (req, res) => {
+    const filePath = (await buildFilePath(req.currentFile)).map(loc => loc.name).join('/')
+    return res.render('layout', {
+      page: 'pages/delete-file',
+      title: 'Deleting File',
+      file: req.currentFile,
+      path: filePath,
+      formErrors: req.formErrors
+    })
+  }),
+
+  validateDelete: [
+    body('path')
+      .trim()
+      .custom(async (value, { req }) => {
+        const filePath = (await buildFilePath(req.currentFile)).map(loc => loc.name).join('/') // not very dry
+        if (value !== filePath) throw new Error('Incorrect path.')
+      })
+      .escape()
+  ],
+
+  submitDelete: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return file.renderDelete(req, res, next)
+    await prisma.file.delete({
+      where: { id: req.currentFile.id }
+    })
+    req.flash('alert', 'File successfully deleted.')
+    return res.redirect(`/directory/${req.currentFile.folderId ?? ''}`)
   })
 }
 

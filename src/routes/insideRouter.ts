@@ -25,6 +25,10 @@ router.route('/file/:fileId/edit')
   .get(file.exists, file.isYours, file.renderEdit)
   .post(file.exists, file.isYours, file.validateEdit, handleValidationErrors, file.submitEdit)
 
+router.route('/file/:fileId/delete')
+  .get(file.exists, file.isYours, file.renderDelete)
+  .post(file.exists, file.isYours, file.validateDelete, handleValidationErrors, file.submitDelete)
+
 router.route('/new-file')
   .get(file.renderNew)
   .post(upload.single('upload'), file.validateNew, handleValidationErrors, file.submitNew)

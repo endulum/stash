@@ -113,7 +113,6 @@ const directory: {
   ],
 
   submitNew: asyncHandler(async (req, res, next) => {
-    console.log(req.body)
     if (req.formErrors) return directory.renderNew(req, res, next)
     if (!req.user) throw new Error('User is not defined.')
     const newFolder = await prisma.folder.create({
