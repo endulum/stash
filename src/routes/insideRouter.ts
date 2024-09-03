@@ -21,6 +21,10 @@ router.route('/directory/:directoryId')
 router.route('/file/:fileId')
   .get(file.exists, file.isYours, file.view)
 
+router.route('/file/:fileId/edit')
+  .get(file.exists, file.isYours, file.renderEdit)
+  .post(file.exists, file.isYours, file.validateEdit, handleValidationErrors, file.submitEdit)
+
 router.route('/new-file')
   .get(file.renderNew)
   .post(upload.single('upload'), file.validateNew, handleValidationErrors, file.submitNew)

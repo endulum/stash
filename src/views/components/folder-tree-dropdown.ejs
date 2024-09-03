@@ -19,7 +19,23 @@
 
 <script defer>
   const locationDropdown = document.getElementById('location')
-  const urlParams = new URLSearchParams(window.location.search);
-  const dest = urlParams.get('dest');
-  locationDropdown.value = dest ?? 'home'
+  // FIRST, does prevForm have a folder id?
+  let value = '<%= locals.prevForm?.location %>'
+  if (value) {
+    locationDropdown.value = value
+    console.log('prefilled using prevForm')
+  } else {
+    // SECOND, does currentFile exist and does it have a folder id?
+    if (<%= "currentFile" in locals %>) {
+      value = '<%= locals.currentFile?.folderId %>'
+      locationDropdown.value = value === '' ? 'home' : value
+      console.log('prefilled using currentFile')
+    } else {
+      // THIRD, does our url param have a folder id?
+      const urlParams = new URLSearchParams(window.location.search);
+      const dest = urlParams.get('dest');
+      locationDropdown.value = dest ?? 'home'
+      console.log('prefilled using query')
+    }
+  }
 </script>

@@ -18,10 +18,10 @@ const file: {
   renderNew: RequestHandler,
   validateNew: ValidationChain[],
   submitNew: RequestHandler,
-  // // edit a file
-  // renderEdit: RequestHandler,
-  // validateEdit: ValidationChain[],
-  // submitEdit: RequestHandler,
+  // edit a file
+  renderEdit: RequestHandler,
+  validateEdit: ValidationChain[],
+  submitEdit: RequestHandler,
   // // delete a file
   // renderDelete: RequestHandler,
   // submitDelete: RequestHandler
@@ -73,6 +73,7 @@ const file: {
     res.render('layout', {
       page: 'pages/new-file',
       title: 'Upload File',
+      prevForm: req.body,
       folderTree: await buildFolderTree(),
       formErrors: req.formErrors,
     })
@@ -102,6 +103,43 @@ const file: {
     })
     req.flash('alert', 'New file successfully created.')
     return res.redirect(`/file/${newFile.id}`)
+  }),
+
+  renderEdit: asyncHandler(async (req, res) => {
+    res.render('layout', {
+      page: 'pages/edit-file',
+      title: 'Edit File',
+      currentFile: req.currentFile,
+      folderTree: await buildFolderTree(),
+      prevForm: { 
+        ... req.body,
+        name: 'name' in req.body ? req.body.name : req.currentFile.name.split('.')[0]
+      },
+      formErrors: req.formErrors,
+    })
+  }),
+
+  validateEdit: [
+    body('name')
+      .trim()
+      .notEmpty().withMessage('Please enter a name for this file.').bail()
+      .isLength({ max: 32 })
+      .withMessage('Folder names cannot be longer than 64 characters.')
+      .matches(/^[A-Za-z0-9-_]+$/g)
+      .withMessage('Folder names must only consist of letters, numbers, hyphens, and underscores.'),
+    locationValidation
+  ],
+
+  submitEdit: asyncHandler(async (req, res, next) => {
+    await prisma.file.update({
+      where: { id: req.currentFile.id },
+      data: {
+        name: req.body.name,
+        folderId: req.body.location === 'home' ? null : req.body.location,
+      }
+    })
+    req.flash('alert', 'Your file has been successfully edited.')
+    return res.redirect(`/file/${req.currentFile.id}`)
   })
 }
 
