@@ -15,9 +15,9 @@ async function buildFilePath(file: File): Promise<Array<{ name: string, id: stri
       where: { id: file.folderId }
     })
     folderPath = await buildFolderPath(parentFolder)
-    folderPath.push({ name: file.name, id: file.id })
+    folderPath.push({ name: file.name + '.' + file.ext, id: file.id })
   }
-  return folderPath ?? [{ name: file.name, id: file.id }]
+  return folderPath ?? [{ name: file.name + '.' + file.ext, id: file.id }]
 }
 
 const file: {
@@ -99,9 +99,24 @@ const file: {
     if (
       !req.file || !req.user
     ) throw new Error('Submitted file or current user is not defined.')
+
+    let newFileExt: string | null = null
+    let newFileName: string = req.file.originalname
+    if (req.file.originalname.lastIndexOf('.') > 0) {
+      newFileExt = req.file.originalname.substring(
+        req.file.originalname.lastIndexOf('.') + 1,
+        req.file.originalname.length
+      ).toLowerCase()
+      newFileName = req.file.originalname.substring(
+        0,
+        req.file.originalname.lastIndexOf('.'),
+      )
+    }
+
     const newFile = await prisma.file.create({
       data: {
-        name: req.file.originalname,
+        name: newFileName,
+        ext: newFileExt,
         type: req.file.mimetype,
         size: req.file.size,
         folderId: req.body.location === 'home' ? null : req.body.location,
@@ -120,7 +135,7 @@ const file: {
       folderTree: await buildFolderTree(),
       prevForm: {
         ...req.body,
-        name: 'name' in req.body ? req.body.name : req.currentFile.name.split('.')[0]
+        name: 'name' in req.body ? req.body.name : req.currentFile.name
       },
       formErrors: req.formErrors,
     })
@@ -132,8 +147,8 @@ const file: {
       .notEmpty().withMessage('Please enter a name for this file.').bail()
       .isLength({ max: 32 })
       .withMessage('Folder names cannot be longer than 64 characters.')
-      .matches(/^[A-Za-z0-9-_]+$/g)
-      .withMessage('Folder names must only consist of letters, numbers, hyphens, and underscores.'),
+      .matches(/^[A-Za-z0-9-._ ]+$/g)
+      .withMessage('Folder names must only consist of letters, numbers, hyphens, underscores, dots, and spaces.'),
     locationValidation
   ],
 

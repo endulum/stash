@@ -40,8 +40,7 @@
       <tr>
         <td>
           <a href=<%= '/file/' + file.id %>>
-            <%= file.name %>
-          </a>
+            <%= file.name %></a><%= '.' + file.ext %>
         </td>
         <td><%= file.type %></td>
         <td><%= file.size %> bytes</td>

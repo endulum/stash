@@ -37,6 +37,7 @@ model Folder {
 model File {
   id String @id @default(uuid())
   name String
+  ext String?
   type String
   size Float
   folder Folder? @relation("folderFiles", fields: [folderId], references: [id])
