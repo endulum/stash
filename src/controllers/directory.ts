@@ -18,15 +18,15 @@ const directory: {
   viewHome: RequestHandler,
   // create a directory
   renderNew: RequestHandler,
-  validateNew: ValidationChain[],
+  validate: ValidationChain[],
   submitNew: RequestHandler
-  // // edit a directory
-  // renderEdit: RequestHandler,
-  // validateEdit: ValidationChain[],
-  // submitEdit: RequestHandler,
+  // edit a directory
+  renderEdit: RequestHandler,
+  submitEdit: RequestHandler,
   // // delete a directory
-  // renderDelete: RequestHandler,
-  // submitDelete: RequestHandler
+  renderDelete: RequestHandler,
+  validateDelete: ValidationChain[],
+  submitDelete: RequestHandler
 } = {
   exists: asyncHandler(async (req, res, next) => {
     const folder = await prisma.folder.findUnique({
@@ -101,14 +101,14 @@ const directory: {
     })
   }),
 
-  validateNew: [
+  validate: [
     body('name')
       .trim()
       .notEmpty().withMessage('Please enter a name for this folder.').bail()
       .isLength({ max: 32 })
       .withMessage('Folder names cannot be longer than 64 characters.')
-      .matches(/^[A-Za-z0-9-_]+$/g)
-      .withMessage('Folder names must only consist of letters, numbers, hyphens, and underscores.'),
+      .matches(/^[A-Za-z0-9-_ ]+$/g)
+      .withMessage('Folder names must only consist of letters, numbers, hyphens, underscores, and spaces.'),
     locationValidation
   ],
 
@@ -124,6 +124,64 @@ const directory: {
     })
     req.flash('alert', 'New folder successfully created.')
     return res.redirect(`/directory/${newFolder.id}`)
+  }),
+
+  renderEdit: asyncHandler(async (req, res) => {
+    return res.render('layout', {
+      page: 'pages/edit-folder',
+      title: 'Editing Folder',
+      currentFolder: req.currentFolder,
+      folderTree: (await buildFolderTree()).filter(loc => loc.id !== req.currentFolder.id),
+      prevForm: {
+        ...req.body,
+        name: 'name' in req.body ? req.body.name : req.currentFolder.name,
+        location: 'location' in req.body ? req.body.location : req.currentFolder.parentId
+      },
+      formErrors: req.formErrors,
+    })
+  }),
+
+  submitEdit: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return directory.renderEdit(req, res, next)
+    await prisma.folder.update({
+      where: { id: req.currentFolder.id },
+      data: {
+        name: req.body.name,
+        parentId: req.body.location === 'home' ? null : req.body.location,
+      }
+    })
+    req.flash('alert', 'Your folder has been successfully edited.')
+    return res.redirect(`/directory/${req.currentFolder.id}`)
+  }),
+
+  renderDelete: asyncHandler(async (req, res) => {
+    const folderPath = (await buildFolderPath(req.currentFolder)).map(loc => loc.name).join('/') + '/'
+    return res.render('layout', {
+      page: 'pages/delete-folder',
+      title: 'Deleting Folder',
+      folder: req.currentFolder,
+      path: folderPath,
+      formErrors: req.formErrors
+    })
+  }),
+
+  validateDelete: [
+    body('path')
+      .trim()
+      .custom(async (value, { req }) => {
+        const folderPath = (await buildFolderPath(req.currentFolder)).map(loc => loc.name).join('/') + '/'
+        if (value !== folderPath) throw new Error('Incorrect path.')
+      })
+      .escape()
+  ],
+
+  submitDelete: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return directory.renderDelete(req, res, next)
+    await prisma.folder.delete({
+      where: { id: req.currentFolder.id }
+    })
+    req.flash('alert', 'Folder successfully deleted.')
+    return res.redirect(`/directory/${req.currentFolder.parentId ?? ''}`)
   })
 }
 

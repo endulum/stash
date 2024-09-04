@@ -62,3 +62,13 @@
 <a href=<%= '/new-folder' + (currentFolder ? ('?dest=' + currentFolder.id) : '') %>>
   Add a Folder Here
 </a>
+<br>
+<% if (currentFolder) { %>
+  <a href=<%= '/directory/' + currentFolder.id + '/edit' %>>
+    Edit this Folder
+  </a>
+  <br>
+  <a href=<%= '/directory/' + currentFolder.id + '/delete' %>>
+    Delete this Folder
+  </a>
+<% } %>

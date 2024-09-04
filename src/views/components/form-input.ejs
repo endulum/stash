@@ -6,7 +6,7 @@
     type=<%= type %> 
     name=<%= name %> 
     id=<%= name %> 
-    value=<%= includePrevInput ? prevForm[name] : '' %>
+    value="<%= includePrevInput && name in prevForm ? prevForm[name] : '' %>"
   >
   <% if (formErrors && name in formErrors) { %>
     <p>

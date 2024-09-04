@@ -18,6 +18,14 @@ router.route('/directory')
 router.route('/directory/:directoryId')
   .get(directory.exists, directory.isYours, directory.view)
 
+router.route('/directory/:directoryId/edit')
+  .get(directory.exists, directory.isYours, directory.renderEdit)
+  .post(directory.exists, directory.isYours, directory.validate, handleValidationErrors, directory.submitEdit)
+
+router.route('/directory/:directoryId/delete')
+  .get(directory.exists, directory.isYours, directory.renderDelete)
+  .post(directory.exists, directory.isYours, directory.validateDelete, handleValidationErrors, directory.submitDelete)
+
 router.route('/file/:fileId')
   .get(file.exists, file.isYours, file.view)
 
@@ -35,7 +43,7 @@ router.route('/new-file')
 
 router.route('/new-folder')
   .get(directory.renderNew)
-  .post(directory.validateNew, handleValidationErrors, directory.submitNew)
+  .post(directory.validate, handleValidationErrors, directory.submitNew)
 
 router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
