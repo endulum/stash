@@ -104,17 +104,20 @@ form {
 
 table {
   width: 100%;
+  max-width: 100%;
   border-collapse: collapse;
   margin-bottom: 1rem;
   td {
+    vertical-align: text-top;
     &:first-child {
       width: 100%;
     }
     &:nth-child(2) {
-      padding-right: 2rem;
+      padding-left: 2rem;
       white-space: nowrap;
     }
     &:nth-child(3) {
+      padding-left: 2rem;
       white-space: nowrap;
     }
   }
@@ -125,6 +128,25 @@ table {
     font-family: monospace;
     font-size: 0.9rem;
   }
+}
+
+.no-break-out {
+  /* These are technically the same, but use both */
+  overflow-wrap: break-word;
+  word-wrap: break-word;
+
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+ /* https://stackoverflow.com/questions/1236148/html-css-how-to-stop-a-table-cell-from-expanding */
 }
 
 .alert {

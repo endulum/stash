@@ -27,9 +27,11 @@
     <% childFolders.forEach(folder => { %>
       <tr>
         <td>
-          <a href=<%= '/directory/' + folder.id %>>
-            <%= folder.name + '/' %>
-          </a>
+          <div class="no-break-out">
+            <a href=<%= '/directory/' + folder.id %>>
+              <%= folder.name + '/' %>
+            </a>
+          </div>
         </td>
         <td>folder</td>
         <td>-</td>
@@ -39,8 +41,10 @@
     <% childFiles.forEach(file => { %>
       <tr>
         <td>
-          <a href=<%= '/file/' + file.id %>>
-            <%= file.name %></a><%= '.' + file.ext %>
+          <div class="no-break-out">
+            <a href=<%= '/file/' + file.id %>>
+              <%= file.name %></a><%= '.' + file.ext %>
+          </div>
         </td>
         <td><%= file.type %></td>
         <td><%= file.size %> bytes</td>
