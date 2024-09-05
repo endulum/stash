@@ -1,9 +1,9 @@
+import type { Folder } from '@prisma/client'
 import prisma from '../prisma'
 
-export default async function buildFolderTree(): Promise<Array<{ name: string, id: null | string }>> {
-  const queue: Array<{ name: string, id: null | string }> = [
-    { name: '/', id: null }
-  ]
+export default async function buildFolderTree(folder?: Folder): Promise<Array<{ name: string, id: null | string }>> {
+  const queue: Array<{ name: string, id: null | string }> = 
+    folder ? [{ name: folder.name + '/', id: folder.id }] : [{ name: '/', id: null }]
   const results: Array<{ name: string, id: null | string }> = []
   do {
     const currentFolder = queue.pop()

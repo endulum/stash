@@ -1,11 +1,49 @@
 import { type RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { ValidationChain, body } from "express-validator";
+import type { Folder } from "@prisma/client";
+import fs from 'fs'
+import stream from "stream";
+import streamBuffers from 'stream-buffers'
+import archiver from 'archiver'
+import Zip from 'adm-zip'
 
+import supabase from "../supabase";
 import prisma from '../prisma'
 import buildFolderPath from '../functions/buildFolderPath'
 import buildFolderTree from "../functions/buildFolderTree";
 import locationValidation from "../functions/locationValidation";
+
+async function buildZip(folder: Folder): Promise<Buffer> {
+  const zip = new Zip()
+
+  const folderTree = await buildFolderTree(folder)
+  for (let folderDetails of folderTree) {
+    if (!folderDetails.id) break;
+    const currentFolder = await prisma.folder.findUnique({
+      where: { id: folderDetails.id },
+      include: { files: true, children: true }
+    })
+    if (!currentFolder) break;
+    if (currentFolder.files.length === 0 && currentFolder.children.length === 0) {
+      zip.addFile(folderDetails.name + '/.keep', Buffer.from(''))
+    }
+    for (let file of currentFolder.files) {
+      const { data, error } = await supabase.storage
+        .from('uploader')
+        .download(file.id)
+      if (error) {
+        console.error(error)
+        throw new Error('Problem downloading this file.')
+      } else {
+        const buffer = Buffer.from(await data.arrayBuffer())
+        zip.addFile(folderDetails.name + file.name + '.' + file.ext, buffer)
+      }
+    }
+  }
+  const buffer = zip.toBuffer()
+  return buffer
+}
 
 const directory: {
   // does the folder exist?
@@ -13,7 +51,9 @@ const directory: {
   // does the folder belong to you?
   isYours: RequestHandler,
   // view a directory
-  view: RequestHandler
+  view: RequestHandler,
+  // download a directory
+  download: RequestHandler,
   // view home directory
   viewHome: RequestHandler,
   // create a directory
@@ -66,6 +106,24 @@ const directory: {
       childFolders: req.currentFolder.children,
       childFiles: req.currentFolder.files
     })
+  }),
+
+  download: asyncHandler(async (req, res) => {
+    try {
+      const buffer = await buildZip(req.currentFolder)
+      const readStream = new stream.PassThrough()
+      readStream.end(buffer)
+      res.set(
+        'Content-disposition', 
+        'attachment; filename=' + `${req.currentFolder.name}.zip`
+      )
+      res.set('Content-Type', 'application/x-zip-compressed')
+      readStream.pipe(res)
+    } catch (err) {
+      console.error(err)
+      req.flash('alert', 'Sorry, there was a problem downloading your folder.')
+      return res.redirect(`/directory/${req.currentFolder.id}`)
+    }
   }),
 
   viewHome: asyncHandler(async (req, res, next) => {

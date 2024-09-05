@@ -19,6 +19,9 @@ router.route('/directory')
 router.route('/directory/:directoryId')
   .get(directory.exists, directory.isYours, directory.view)
 
+router.route('/directory/:directoryId/download')
+  .get(directory.exists, directory.isYours, directory.download)
+
 router.route('/directory/:directoryId/edit')
   .get(directory.exists, directory.isYours, directory.renderEdit)
   .post(directory.exists, directory.isYours, directory.validate, handleValidationErrors, directory.submitEdit)

@@ -64,6 +64,10 @@
 </a>
 <br>
 <% if (currentFolder) { %>
+  <a href=<%= '/directory/' + currentFolder.id + '/download' %>>
+    Download this Folder
+  </a>
+  <br>
   <a href=<%= '/directory/' + currentFolder.id + '/edit' %>>
     Edit this Folder
   </a>
