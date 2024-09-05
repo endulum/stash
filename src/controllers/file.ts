@@ -2,6 +2,7 @@ import { type RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { ValidationChain, body } from "express-validator";
 import type { File } from "@prisma/client";
+import stream from "stream";
 
 import prisma from '../prisma'
 import supabase from '../supabase'
@@ -29,6 +30,8 @@ const file: {
   isYours: RequestHandler,
   // view a file
   view: RequestHandler,
+  // download a file
+  download: RequestHandler,
   // create a file
   renderNew: RequestHandler,
   validateNew: ValidationChain[],
@@ -76,6 +79,24 @@ const file: {
       directoryPath: filePath,
       file: req.currentFile
     })
+  }),
+
+  download: asyncHandler(async (req, res) => {
+    const { data, error } = await supabase.storage
+      .from('uploader')
+      .download(req.currentFile.id)
+    if (error) {
+      req.flash('alert', 'Sorry, there was a problem downloading your file.')
+      return res.redirect(`/file/${req.currentFile.id}`)
+    } else {
+      const filename = req.currentFile.name + '.' + req.currentFile.ext
+      const buffer = Buffer.from(await data.arrayBuffer())
+      const readStream = new stream.PassThrough()
+      readStream.end(buffer)
+      res.set('Content-disposition', 'attachment; filename=' + filename)
+      res.set('Content-Type', req.currentFile.type)
+      readStream.pipe(res)
+    }
   }),
 
   renderNew: asyncHandler(async (req, res) => {

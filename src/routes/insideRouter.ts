@@ -30,6 +30,9 @@ router.route('/directory/:directoryId/delete')
 router.route('/file/:fileId')
   .get(file.exists, file.isYours, file.view)
 
+router.route('/file/:fileId/download')
+  .get(file.exists, file.isYours, file.download)
+
 router.route('/file/:fileId/edit')
   .get(file.exists, file.isYours, file.renderEdit)
   .post(file.exists, file.isYours, file.validateEdit, handleValidationErrors, file.submitEdit)
