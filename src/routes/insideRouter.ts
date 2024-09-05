@@ -1,12 +1,13 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
 import multer from 'multer';
-import handleValidationErrors from '../middleware/handleValidationErrors';
 
+import handleValidationErrors from '../middleware/handleValidationErrors';
 import file from '../controllers/file'
 import directory from '../controllers/directory'
 
-const upload = multer();
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
 const router = express.Router();
 
 router.route('/')

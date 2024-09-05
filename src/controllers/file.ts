@@ -4,9 +4,11 @@ import { ValidationChain, body } from "express-validator";
 import type { File } from "@prisma/client";
 
 import prisma from '../prisma'
+import supabase from '../supabase'
 import buildFolderTree from '../functions/buildFolderTree'
 import buildFolderPath from "../functions/buildFolderPath";
 import locationValidation from '../functions/locationValidation'
+import { decode } from "base64-arraybuffer";
 
 async function buildFilePath(file: File): Promise<Array<{ name: string, id: string | null }>> {
   let folderPath = null
@@ -100,6 +102,7 @@ const file: {
       !req.file || !req.user
     ) throw new Error('Submitted file or current user is not defined.')
 
+    // first, parse out the file extension
     let newFileExt: string | null = null
     let newFileName: string = req.file.originalname
     if (req.file.originalname.lastIndexOf('.') > 0) {
@@ -113,6 +116,7 @@ const file: {
       )
     }
 
+    // then, create the file entry in the database
     const newFile = await prisma.file.create({
       data: {
         name: newFileName,
@@ -123,8 +127,32 @@ const file: {
         authorId: req.user.id
       }
     })
-    req.flash('alert', 'New file successfully created.')
-    return res.redirect(`/file/${newFile.id}`)
+
+    // then, attempt an upload to supabase. 
+    // we need a unique id pertaining to the created file entry,
+    // hence the file entry needed to be inserted first
+    const fileBase64 = decode(req.file.buffer.toString('base64'))
+    const { data, error } = await supabase.storage
+      .from('uploader')
+      .upload(newFile.id, fileBase64, { contentType: req.file.mimetype });
+
+    // delete the file entry if something goes wrong.
+    if (error) {
+      console.error(error)
+      await prisma.file.delete({ where: { id: newFile.id } })
+      req.flash('alert', 'Sorry, something went wrong when uploading your file.')
+      return res.redirect('/new-file')
+    } else {
+      const publicUrl = supabase.storage
+        .from('uploader')
+        .getPublicUrl(data?.path as string).data.publicUrl
+      await prisma.file.update({
+        where: { id: newFile.id },
+        data: { url: publicUrl }
+      })
+      req.flash('alert', 'New file successfully created.')
+      return res.redirect(`/file/${newFile.id}`)
+    }
   }),
 
   renderEdit: asyncHandler(async (req, res) => {
