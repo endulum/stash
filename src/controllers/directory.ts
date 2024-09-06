@@ -210,7 +210,10 @@ const directory: {
       prevForm: {
         ...req.body,
         name: 'name' in req.body ? req.body.name : req.currentFolder.name,
-        location: 'location' in req.body ? req.body.location : req.currentFolder.parentId
+        location: 'location' in req.body ? req.body.location : req.currentFolder.parentId,
+        shareUntil: 'shareUntil' in req.body 
+          ? req.body.shareUntil 
+          : req.currentFolder.shareUntil?.toISOString().substring(0, 10)
       },
       formErrors: req.formErrors,
     })
@@ -223,6 +226,7 @@ const directory: {
       data: {
         name: req.body.name,
         parentId: req.body.location === 'home' ? null : req.body.location,
+        shareUntil: req.body.shareUntil === '' ? null : new Date(req.body.shareUntil)
       }
     })
     req.flash('alert', 'Your folder has been successfully edited.')
@@ -256,7 +260,6 @@ const directory: {
     const { data, error } = await supabase.storage
       .from('uploader')
       .remove(filesToDelete)
-    console.log({ data, error })
     if (error) {
       console.error(error)
       req.flash('alert', 'Sorry, there was a problem deleting your folder.')

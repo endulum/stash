@@ -28,6 +28,7 @@ model Folder {
   name String
   files File[] @relation("folderFiles")
   parent Folder? @relation("parentFolder", fields: [parentId], references: [id], onDelete: Cascade)
+  shareUntil DateTime?
   parentId String?
   children Folder[] @relation("parentFolder")
   author User @relation("authorFolders", fields: [authorId], references: [id])
