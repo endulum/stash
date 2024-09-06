@@ -45,6 +45,23 @@ async function buildZip(folder: Folder): Promise<Buffer> {
   return buffer
 }
 
+async function findAllFilesOfFolder(folder: Folder) {
+  const folderTree = await buildFolderTree(folder)
+  const allFiles: string[] = []
+  for (let folderDetails of folderTree) {
+    if (!folderDetails.id) break;
+    const currentFolder = await prisma.folder.findUnique({
+      where: { id: folderDetails.id },
+      include: { files: true }
+    })
+    if (!currentFolder) break;
+    for (let file of currentFolder.files) {
+      allFiles.push(file.id)
+    }
+  }
+  return allFiles
+}
+
 const directory: {
   // does the folder exist?
   exists: RequestHandler,
@@ -235,11 +252,22 @@ const directory: {
 
   submitDelete: asyncHandler(async (req, res, next) => {
     if (req.formErrors) return directory.renderDelete(req, res, next)
-    await prisma.folder.delete({
-      where: { id: req.currentFolder.id }
-    })
-    req.flash('alert', 'Folder successfully deleted.')
-    return res.redirect(`/directory/${req.currentFolder.parentId ?? ''}`)
+    const filesToDelete = await findAllFilesOfFolder(req.currentFolder)
+    const { data, error } = await supabase.storage
+      .from('uploader')
+      .remove(filesToDelete)
+    console.log({ data, error })
+    if (error) {
+      console.error(error)
+      req.flash('alert', 'Sorry, there was a problem deleting your folder.')
+      return res.redirect(`/directory/${req.currentFolder.id}/delete`)
+    } else {
+      await prisma.folder.delete({
+        where: { id: req.currentFolder.id }
+      })
+      req.flash('alert', 'Folder successfully deleted.')
+      return res.redirect(`/directory/${req.currentFolder.parentId ?? ''}`)
+    }
   })
 }
 

@@ -237,11 +237,20 @@ const file: {
 
   submitDelete: asyncHandler(async (req, res, next) => {
     if (req.formErrors) return file.renderDelete(req, res, next)
-    await prisma.file.delete({
-      where: { id: req.currentFile.id }
-    })
-    req.flash('alert', 'File successfully deleted.')
-    return res.redirect(`/directory/${req.currentFile.folderId ?? ''}`)
+    const { data, error } = await supabase.storage
+      .from('uploader')
+      .remove([req.currentFile.id])
+    if (error) {
+      console.error(error)
+      req.flash('alert', 'Sorry, there was a problem deleting your file.')
+      return res.redirect(`/file/${req.currentFile.folderId}/delete`)
+    } else {
+      await prisma.file.delete({
+        where: { id: req.currentFile.id }
+      })
+      req.flash('alert', 'File successfully deleted.')
+      return res.redirect(`/directory/${req.currentFile.folderId ?? ''}`)
+    }
   })
 }
 
