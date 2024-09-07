@@ -158,7 +158,7 @@ const directory: {
       res.sendStatus(200)
     } else {
       directoryPath = await buildFolderPath(req.currentFolder)
-      console.log(directoryPath)
+      //console.log(directoryPath)
       return res.render('layout', {
         page: 'pages/directory',
         title: 'Your Files',
