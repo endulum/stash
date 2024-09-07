@@ -10,7 +10,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
 const router = express.Router();
 
-router.route('/')
+router.route(['/', '/login', '/signup'])
   .get(asyncHandler(async (req, res) => res.redirect('/directory')))
 
 router.route('/directory')

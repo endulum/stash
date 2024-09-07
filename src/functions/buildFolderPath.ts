@@ -11,5 +11,6 @@ export default async function buildFolderPath(folder: Folder | null): Promise<Ar
     })
     currentFolder = parentFolder
   }
+  //folderPath.unshift({ name: 'home', id: null })
   return folderPath
 }

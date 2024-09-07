@@ -67,6 +67,8 @@ const directory: {
   exists: RequestHandler,
   // does the folder belong to you?
   isYours: RequestHandler,
+  // is the folder publically shared?
+  isShared: RequestHandler,
   // view a directory
   view: RequestHandler,
   // download a directory
@@ -112,17 +114,61 @@ const directory: {
     return next()
   }),
 
-  view: asyncHandler(async (req, res, next) => {
-    const directoryPath = await buildFolderPath(req.currentFolder)
-    return res.render('layout', {
-      page: 'pages/directory',
-      title: 'Your Files',
-      directoryPath,
-      currentFolder: req.currentFolder,
-      parentFolder: req.currentFolder.parent,
-      childFolders: req.currentFolder.children,
-      childFiles: req.currentFolder.files
+  isShared: asyncHandler(async (req, res, next) => {
+    const sharedDirectory = await prisma.folder.findUnique({
+      where: {
+        id: req.params.sharedDirectoryId ?? '',
+        AND: [
+          { shareUntil: { not: null } },
+          { shareUntil: { gte: new Date() } }
+        ]
+      },
+      include: { children: true, files: true, parent: true }
     })
+
+    if (!sharedDirectory) {
+      return res.status(404).render('layout', {
+        page: 'pages/error',
+        title: 'Shared Folder Not found',
+        message: 'The shared folder you are looking for cannot be found.'
+      })
+    } else {
+      req.sharedFolder = sharedDirectory
+      return next()
+    }
+  }),
+
+  view: asyncHandler(async (req, res, next) => {
+    let directoryPath: Array<{ name: string, id: string | null }> = []
+    if (req.sharedFolder) { // /share/:sharedDirectoryId
+      if (req.currentFolder) { // /share/:sharedDirectoryId/directory/:directoryId
+        if (req.currentFolder.id === req.sharedFolder.id)
+          return res.redirect(`/share/${req.currentFolder.id}`)
+        else {
+          directoryPath = await buildFolderPath(req.currentFolder)
+          const sharedFolder = directoryPath.find(loc => loc.id === req.sharedFolder.id)
+          if (!sharedFolder) return res.redirect(`/directory/${req.currentFolder.id}`)
+          else directoryPath = directoryPath.slice(
+            directoryPath.indexOf(sharedFolder) + 1,
+            directoryPath.length
+          )
+        }
+      }
+      console.log(directoryPath)
+      res.sendStatus(200)
+    } else {
+      directoryPath = await buildFolderPath(req.currentFolder)
+      console.log(directoryPath)
+      return res.render('layout', {
+        page: 'pages/directory',
+        title: 'Your Files',
+        directoryPath,
+        currentFolder: req.currentFolder,
+        parentFolder: req.currentFolder.parent,
+        childFolders: req.currentFolder.children,
+        childFiles: req.currentFolder.files
+      })
+    }
   }),
 
   download: asyncHandler(async (req, res) => {
@@ -131,7 +177,7 @@ const directory: {
       const readStream = new stream.PassThrough()
       readStream.end(buffer)
       res.set(
-        'Content-disposition', 
+        'Content-disposition',
         'attachment; filename=' + `${req.currentFolder.name}.zip`
       )
       res.set('Content-Type', 'application/x-zip-compressed')
@@ -191,7 +237,7 @@ const directory: {
     if (req.formErrors) return directory.renderNew(req, res, next)
     if (!req.user) throw new Error('User is not defined.')
     const newFolder = await prisma.folder.create({
-      data: { 
+      data: {
         name: req.body.name,
         parentId: req.body.location === 'home' ? null : req.body.location,
         authorId: req.user.id
@@ -211,8 +257,8 @@ const directory: {
         ...req.body,
         name: 'name' in req.body ? req.body.name : req.currentFolder.name,
         location: 'location' in req.body ? req.body.location : req.currentFolder.parentId,
-        shareUntil: 'shareUntil' in req.body 
-          ? req.body.shareUntil 
+        shareUntil: 'shareUntil' in req.body
+          ? req.body.shareUntil
           : req.currentFolder.shareUntil?.toISOString().substring(0, 10)
       },
       formErrors: req.formErrors,

@@ -2,8 +2,12 @@ import { Prisma, type File, type Folder } from "@prisma/client"
 
 declare global {
   namespace Express {
-    type ExtendedFolder = Prisma.FolderGetPayload<{
+    type CurrentFolder = Prisma.FolderGetPayload<{
       include: { parent: true, children: true, files: true }
+    }>
+
+    type SharedFolder = Prisma.FolderGetPayload<{
+      include: { children: true, files: true }
     }>
 
     export interface Request {
@@ -11,7 +15,8 @@ declare global {
       prevForm?: Record<string, any>,
       formErrors?: Record<string, string>,
       currentFile: File,
-      currentFolder: ExtendedFolder
+      currentFolder: CurrentFolder,
+      sharedFolder: SharedFolder
     }
     export interface User {
       id: number,

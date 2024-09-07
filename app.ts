@@ -14,6 +14,7 @@ import errorHandler from './src/middleware/errorHandler';
 
 import outsideRouter from './src/routes/outsideRouter';
 import insideRouter from './src/routes/insideRouter';
+import shareRouter from './src/routes/shareRouter'
 
 const secret: string | undefined = process.env.SECRET
 if (secret === undefined) throw new Error('Secret is not defined.')
@@ -49,6 +50,10 @@ app.use(passport.session())
 app.use(asyncHandler(async (req, res, next) => {
   res.locals.user = req.user
   res.locals.alert = req.flash('alert')
+  return next()
+}))
+app.use(shareRouter)
+app.use(asyncHandler(async (req, res, next) => {
   return req.user ? insideRouter(req, res, next) : outsideRouter(req, res, next)
 }))
 
