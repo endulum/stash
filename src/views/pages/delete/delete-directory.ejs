@@ -1,0 +1,11 @@
+<p>To delete this directory, type <b><%= path %></b> below and submit. Deleting a directory will also delete all of its contents. This cannot be undone.</p>
+<br>
+<form method="post" action=<%= `/directory/${currentDirectory.id}/delete` %>>
+  <%- include('../../components/form-input', { 
+    name: 'path',
+    label: 'Directory path',
+    type: 'text',
+    includePrevInput: false
+  }) %>
+  <button type="submit">Submit</button>
+</form>

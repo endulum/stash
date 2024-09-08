@@ -1,50 +1,61 @@
 import { type RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
-import { ValidationChain, body } from "express-validator";
-import type { File } from "@prisma/client";
+import { body, type ValidationChain } from "express-validator";
+import { decode } from "base64-arraybuffer";
 import stream from "stream";
 
 import prisma from '../prisma'
 import supabase from '../supabase'
-import buildFolderTree from '../functions/buildFolderTree'
-import buildFolderPath from "../functions/buildFolderPath";
-import locationValidation from '../functions/locationValidation'
-import { decode } from "base64-arraybuffer";
 
-async function buildFilePath(file: File): Promise<Array<{ name: string, id: string | null }>> {
-  let folderPath = null
-  if (file.folderId !== null) {
-    const parentFolder = await prisma.folder.findUnique({
-      where: { id: file.folderId }
-    })
-    folderPath = await buildFolderPath(parentFolder)
-    folderPath.push({ name: file.name + '.' + file.ext, id: file.id })
-  }
-  return folderPath ?? [{ name: file.name + '.' + file.ext, id: file.id }]
+import createPath, { createFilePath } from "../functions/createPath";
+import createDirectoryTree from "../functions/createDirectoryTree";
+import locationValidation from "../functions/locationValidation";
+
+export const validation: Record<string, ValidationChain[]> = {
+  forCreate: [
+    body('upload')
+      .custom(async (value, { req }) => {
+        if (!req.file) throw new Error('Please upload a file.')
+      }),
+    locationValidation
+  ],
+
+  forUpdate: [
+    body('name')
+      .trim()
+      .notEmpty().withMessage('Please enter a name for this file.').bail()
+      .isLength({ max: 32 })
+      .withMessage('File names cannot be longer than 64 characters.')
+      .matches(/^[A-Za-z0-9-._ ]+$/g)
+      .withMessage('File names must only consist of letters, numbers, hyphens, underscores, dots, and spaces.')
+      .custom(async (value, { req }) => {
+        const duplicateFile = await prisma.file.findFirst({
+          where: {
+            name: value,
+            directoryId: 'location' in req.body
+              ? req.body.location
+              : req.currentFile.directoryId
+          }
+        })
+        if (duplicateFile && duplicateFile.id !== req.currentFile.id)
+          throw new Error('There already exists a file in the chosen location with this name. Files in the same location cannot have the same name.')
+      })
+      .escape(),
+    locationValidation
+  ],
+
+  forDelete: [
+    body('path')
+      .trim()
+      .custom(async (value, { req }) => {
+        const filePath = (await createFilePath(req.currentFile)).map(loc => loc.name).join('/')
+        if (value !== filePath) throw new Error('Incorrect path.')
+      })
+      .escape()
+  ]
 }
 
-const file: {
-  // does the file exist?
-  exists: RequestHandler,
-  // does the file belong to you?
-  isYours: RequestHandler,
-  // view a file
-  view: RequestHandler,
-  // download a file
-  download: RequestHandler,
-  // create a file
-  renderNew: RequestHandler,
-  validateNew: ValidationChain[],
-  submitNew: RequestHandler,
-  // edit a file
-  renderEdit: RequestHandler,
-  validateEdit: ValidationChain[],
-  submitEdit: RequestHandler,
-  // delete a file
-  renderDelete: RequestHandler,
-  validateDelete: ValidationChain[],
-  submitDelete: RequestHandler
-} = {
+export const controller: Record<string, RequestHandler> = {
   exists: asyncHandler(async (req, res, next) => {
     const file = await prisma.file.findUnique({
       where: { id: req.params.fileId }
@@ -71,57 +82,59 @@ const file: {
     return next()
   }),
 
-  view: asyncHandler(async (req, res) => {
-    const filePath = await buildFilePath(req.currentFile)
+  hasSharedRoot: asyncHandler(async (req, res, next) => {
+    let path = await createFilePath(req.currentFile)
+    const sharedRoot = path.find(loc => loc.id === req.sharedDirectory.id)
+    if (!sharedRoot)
+      return res.redirect('/file/' + req.currentFile.id)
+    path = path.slice(
+      path.indexOf(sharedRoot) + 1,
+      path.length
+    )
+    req.pathToSharedRoot = path
+    return next()
+  }),
+
+  renderRead: asyncHandler(async (req, res) => {
+    const path = await createFilePath(req.currentFile)
     return res.render('layout', {
-      page: 'pages/view-file',
-      title: `File Details`,
-      directoryPath: filePath,
+      page: 'pages/read/read-file',
+      title: 'Viewing File',
+      path,
       file: req.currentFile
     })
   }),
 
-  download: asyncHandler(async (req, res) => {
-    const { data, error } = await supabase.storage
-      .from('uploader')
-      .download(req.currentFile.id)
-    if (error) {
-      req.flash('alert', 'Sorry, there was a problem downloading your file.')
-      return res.redirect(`/file/${req.currentFile.id}`)
-    } else {
-      const filename = req.currentFile.name + '.' + req.currentFile.ext
-      const buffer = Buffer.from(await data.arrayBuffer())
-      const readStream = new stream.PassThrough()
-      readStream.end(buffer)
-      res.set('Content-disposition', 'attachment; filename=' + filename)
-      res.set('Content-Type', req.currentFile.type)
-      readStream.pipe(res)
-    }
+  renderReadShared: asyncHandler(async (req, res) => {
+    return res.render('layout', {
+      page: 'pages/read/read-shared-file',
+      title: 'Viewing Shared File',
+      path: req.pathToSharedRoot,
+      sharedDirectory: req.sharedDirectory,
+      file: req.currentFile
+    })
   }),
 
-  renderNew: asyncHandler(async (req, res) => {
+  renderCreate: asyncHandler(async (req, res) => {
     res.render('layout', {
-      page: 'pages/new-file',
+      page: 'pages/create/create-file',
       title: 'Upload File',
       prevForm: req.body,
-      folderTree: await buildFolderTree(),
+      directoryTree: await createDirectoryTree(),
       formErrors: req.formErrors,
     })
   }),
 
-  validateNew: [
-    body('upload')
-      .custom(async (value, { req }) => {
-        if (!req.file) throw new Error('Please upload a file.')
-      }),
-    locationValidation
-  ],
-
-  submitNew: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return file.renderNew(req, res, next)
-    if (
-      !req.file || !req.user
-    ) throw new Error('Submitted file or current user is not defined.')
+  submitCreate: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return controller.renderCreate(req, res, next)
+    if (!req.user) {
+      req.flash('You must be logged in to upload files..')
+      return res.redirect('/login')
+    }
+    if (!req.file) {
+      req.flash('Somehow, no file upload was provided. Try again?')
+      return controller.renderCreate(req, res, next)
+    }
 
     // first, parse out the file extension
     let newFileExt: string | null = null
@@ -144,7 +157,7 @@ const file: {
         ext: newFileExt,
         type: req.file.mimetype,
         size: req.file.size,
-        folderId: req.body.location === 'home' ? null : req.body.location,
+        directoryId: req.body.location === 'home' ? null : req.body.location,
         authorId: req.user.id
       }
     })
@@ -163,7 +176,7 @@ const file: {
       await prisma.file.delete({ where: { id: newFile.id } })
       req.flash('alert', 'Sorry, something went wrong when uploading your file.')
       return res.redirect('/new-file')
-    } else {
+    } else { // yay nothing went wrong!
       const publicUrl = supabase.storage
         .from('uploader')
         .getPublicUrl(data?.path as string).data.publicUrl
@@ -176,12 +189,12 @@ const file: {
     }
   }),
 
-  renderEdit: asyncHandler(async (req, res) => {
+  renderUpdate: asyncHandler(async (req, res) => {
     res.render('layout', {
-      page: 'pages/edit-file',
+      page: 'pages/update/update-file',
       title: 'Edit File',
       currentFile: req.currentFile,
-      folderTree: await buildFolderTree(),
+      directoryTree: await createDirectoryTree(),
       prevForm: {
         ...req.body,
         name: 'name' in req.body ? req.body.name : req.currentFile.name
@@ -190,24 +203,13 @@ const file: {
     })
   }),
 
-  validateEdit: [
-    body('name')
-      .trim()
-      .notEmpty().withMessage('Please enter a name for this file.').bail()
-      .isLength({ max: 32 })
-      .withMessage('Folder names cannot be longer than 64 characters.')
-      .matches(/^[A-Za-z0-9-._ ]+$/g)
-      .withMessage('Folder names must only consist of letters, numbers, hyphens, underscores, dots, and spaces.'),
-    locationValidation
-  ],
-
-  submitEdit: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return file.renderEdit(req, res, next)
+  submitUpdate: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return controller.renderEdit(req, res, next)
     await prisma.file.update({
       where: { id: req.currentFile.id },
       data: {
         name: req.body.name,
-        folderId: req.body.location === 'home' ? null : req.body.location,
+        directoryId: req.body.location === 'home' ? null : req.body.location,
       }
     })
     req.flash('alert', 'Your file has been successfully edited.')
@@ -215,9 +217,9 @@ const file: {
   }),
 
   renderDelete: asyncHandler(async (req, res) => {
-    const filePath = (await buildFilePath(req.currentFile)).map(loc => loc.name).join('/')
+    const filePath = (await createFilePath(req.currentFile)).map(loc => loc.name).join('/')
     return res.render('layout', {
-      page: 'pages/delete-file',
+      page: 'pages/delete/delete-file',
       title: 'Deleting File',
       file: req.currentFile,
       path: filePath,
@@ -225,33 +227,39 @@ const file: {
     })
   }),
 
-  validateDelete: [
-    body('path')
-      .trim()
-      .custom(async (value, { req }) => {
-        const filePath = (await buildFilePath(req.currentFile)).map(loc => loc.name).join('/') // not very dry
-        if (value !== filePath) throw new Error('Incorrect path.')
-      })
-      .escape()
-  ],
-
   submitDelete: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return file.renderDelete(req, res, next)
+    if (req.formErrors) return controller.renderDelete(req, res, next)
     const { data, error } = await supabase.storage
       .from('uploader')
       .remove([req.currentFile.id])
     if (error) {
       console.error(error)
       req.flash('alert', 'Sorry, there was a problem deleting your file.')
-      return res.redirect(`/file/${req.currentFile.folderId}/delete`)
+      return res.redirect(`/file/${req.currentFile.directoryId}/delete`)
     } else {
       await prisma.file.delete({
         where: { id: req.currentFile.id }
       })
       req.flash('alert', 'File successfully deleted.')
-      return res.redirect(`/directory/${req.currentFile.folderId ?? ''}`)
+      return res.redirect(`/directory/${req.currentFile.directoryId ?? ''}`)
     }
-  })
-}
+  }),
 
-export default file
+  download: asyncHandler(async (req, res) => {
+    const { data, error } = await supabase.storage
+      .from('uploader')
+      .download(req.currentFile.id)
+    if (error) {
+      req.flash('alert', 'Sorry, there was a problem downloading your file.')
+      return res.redirect(`/file/${req.currentFile.id}`)
+    } else {
+      const filename = req.currentFile.name + '.' + req.currentFile.ext
+      const buffer = Buffer.from(await data.arrayBuffer())
+      const readStream = new stream.PassThrough()
+      readStream.end(buffer)
+      res.set('Content-disposition', 'attachment; filename=' + filename)
+      res.set('Content-Type', req.currentFile.type)
+      readStream.pipe(res)
+    }
+  }),
+}

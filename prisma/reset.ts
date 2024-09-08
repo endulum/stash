@@ -2,25 +2,25 @@ import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient({ log: ['query'] });
 
 async function main() {
-  await prisma.folder.deleteMany()
+  await prisma.directory.deleteMany()
   await prisma.file.deleteMany()
-  const picturesFolder = await prisma.folder.create({
+  const picturesDirectory = await prisma.directory.create({
     data: { name: 'pictures', parentId: null, authorId: 1 }
   })
-  await prisma.folder.createMany({
+  await prisma.directory.createMany({
     data: [
-      { name: 'my_pets', parentId: picturesFolder.id, authorId: 1 },
-      { name: 'screenshots', parentId: picturesFolder.id, authorId: 1 }
+      { name: 'my_pets', parentId: picturesDirectory.id, authorId: 1 },
+      { name: 'screenshots', parentId: picturesDirectory.id, authorId: 1 }
     ]
   })
-  const documentsFolder = await prisma.folder.create({
+  const documentsDirectory = await prisma.directory.create({
     data: { name: 'documents', parentId: null, authorId: 1 }
   })
-  await prisma.folder.createMany({
+  await prisma.directory.createMany({
     data: [
-      { name: 'homework', parentId: documentsFolder.id, authorId: 1 },
-      { name: 'logs', parentId: documentsFolder.id, authorId: 1 },
-      { name: 'legal', parentId: documentsFolder.id, authorId: 1 }
+      { name: 'homework', parentId: documentsDirectory.id, authorId: 1 },
+      { name: 'logs', parentId: documentsDirectory.id, authorId: 1 },
+      { name: 'legal', parentId: documentsDirectory.id, authorId: 1 }
     ]
   })
 }

@@ -1,0 +1,12 @@
+<form action="/directory/new" method="post">
+  <%- include('../../components/form-input', { 
+    name: 'name',
+    label: 'Directory name',
+    type: 'text',
+    includePrevInput: true
+  }) %>
+
+  <%- include('../../components/directory-dropdown') %>
+
+  <button type="submit">Submit</button>
+</form>

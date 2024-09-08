@@ -1,0 +1,60 @@
+<%- include('../../components/directory-path') %>
+
+<table>
+  <thead>
+    <tr> <td>Name</td> <td>Type</td> <td>Size</td> </tr>
+  </thead>
+
+  <!-- ".." link to parent directory -->
+  <% if (currentDirectory) { %>
+    <tr>
+      <td>
+        <a href=<%= currentDirectory.parentId 
+          ? '/share/' + sharedDirectory.id + '/directory/' +  currentDirectory.parentId
+          : '/share/' + sharedDirectory.id %>>
+          ..
+        </a>
+      </td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  <% } %>
+
+  <!-- first, list directories -->
+
+  <% directories.forEach(directory => { %>
+    <tr>
+      <td>
+        <div class="no-break-out">
+          <a href=<%= '/share/' + sharedDirectory.id + '/directory/' + directory.id %>>
+            <%= directory.name + '/' %>
+          </a>
+        </div>
+      </td>
+      <td>directory</td>
+      <td>-</td>
+    </tr>
+  <% }) %>
+
+  <!-- then, list child files -->
+
+  <% files.forEach(file => { %>
+    <tr>
+      <td>
+        <div class="no-break-out">
+          <a href=<%= '/share/' + sharedDirectory.id + '/file/' + file.id %>>
+            <%= file.name %></a><%= '.' + file.ext %>
+        </div>
+      </td>
+      <td><%= file.type %></td>
+      <td><%= file.size %> bytes</td>
+    </tr>
+  <% }) %>
+
+</table>
+
+<a href=<%=
+  '/share/' + sharedDirectory.id 
+  + (currentDirectory ? ('/directory/' + currentDirectory.id) : '') 
+  + '/download'
+%>>Download Directory</a>

@@ -1,121 +1,85 @@
-import { type RequestHandler } from "express";
+import { RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
-import { ValidationChain, body } from "express-validator";
-import type { Folder } from "@prisma/client";
-import fs from 'fs'
+import { body, type ValidationChain } from "express-validator";
 import stream from "stream";
-import streamBuffers from 'stream-buffers'
-import archiver from 'archiver'
-import Zip from 'adm-zip'
 
-import supabase from "../supabase";
 import prisma from '../prisma'
-import buildFolderPath from '../functions/buildFolderPath'
-import buildFolderTree from "../functions/buildFolderTree";
+import supabase from "../supabase";
+
+import createDirectoryTree from "../functions/createDirectoryTree";
+import createPath from "../functions/createPath";
+import findAllFilesOfDirectory from '../functions/findAllFilesOfDirectory'
+import buildZipFromDirectory from '../functions/buildZipFromDirectory'
 import locationValidation from "../functions/locationValidation";
 
-async function buildZip(folder: Folder): Promise<Buffer> {
-  const zip = new Zip()
+export const validation: Record<string, ValidationChain[]> = {
+  forCreateOrUpdate: [
+    body('name')
+      .trim()
+      .notEmpty()
+      .withMessage('Please enter a name for this directory.').bail()
+      .isLength({ max: 32 })
+      .withMessage('Directory names cannot be longer than 64 characters.').bail()
+      .matches(/^[A-Za-z0-9-_ ]+$/g)
+      .withMessage('Directory names must only consist of letters, numbers, hyphens, underscores, and spaces.').bail()
+      .custom(async (value, { req }) => {
+        const duplicateDirectory = await prisma.directory.findFirst({
+          where: {
+            name: value,
+            parentId: 'location' in req.body
+              ? req.body.location
+              : req.currentDirectory.parentId
+          }
+        })
+        if (duplicateDirectory && duplicateDirectory.id !== req.currentDirectory.id)
+          throw new Error('There already exists a directory in the chosen location with this name. Directories in the same location cannot have the same name.')
+      })
+      .escape(),
+    locationValidation
+  ],
 
-  const folderTree = await buildFolderTree(folder)
-  for (let folderDetails of folderTree) {
-    if (!folderDetails.id) break;
-    const currentFolder = await prisma.folder.findUnique({
-      where: { id: folderDetails.id },
-      include: { files: true, children: true }
-    })
-    if (!currentFolder) break;
-    if (currentFolder.files.length === 0 && currentFolder.children.length === 0) {
-      zip.addFile(folderDetails.name + '/.keep', Buffer.from(''))
-    }
-    for (let file of currentFolder.files) {
-      const { data, error } = await supabase.storage
-        .from('uploader')
-        .download(file.id)
-      if (error) {
-        console.error(error)
-        throw new Error('Problem downloading this file.')
-      } else {
-        const buffer = Buffer.from(await data.arrayBuffer())
-        zip.addFile(folderDetails.name + file.name + '.' + file.ext, buffer)
-      }
-    }
-  }
-  const buffer = zip.toBuffer()
-  return buffer
+  forDelete: [
+    body('path')
+      .trim()
+      .custom(async (value, { req }) => {
+        const path = (await createPath(req.currentDirectory))
+          .map(loc => loc.name).join('/') + '/'
+        if (value !== path) throw new Error('Incorrect path.')
+      })
+      .escape()
+  ]
 }
 
-async function findAllFilesOfFolder(folder: Folder) {
-  const folderTree = await buildFolderTree(folder)
-  const allFiles: string[] = []
-  for (let folderDetails of folderTree) {
-    if (!folderDetails.id) break;
-    const currentFolder = await prisma.folder.findUnique({
-      where: { id: folderDetails.id },
-      include: { files: true }
-    })
-    if (!currentFolder) break;
-    for (let file of currentFolder.files) {
-      allFiles.push(file.id)
-    }
-  }
-  return allFiles
-}
-
-const directory: {
-  // does the folder exist?
-  exists: RequestHandler,
-  // does the folder belong to you?
-  isYours: RequestHandler,
-  // is the folder publically shared?
-  isShared: RequestHandler,
-  // view a directory
-  view: RequestHandler,
-  // download a directory
-  download: RequestHandler,
-  // view home directory
-  viewHome: RequestHandler,
-  // create a directory
-  renderNew: RequestHandler,
-  validate: ValidationChain[],
-  submitNew: RequestHandler
-  // edit a directory
-  renderEdit: RequestHandler,
-  submitEdit: RequestHandler,
-  // // delete a directory
-  renderDelete: RequestHandler,
-  validateDelete: ValidationChain[],
-  submitDelete: RequestHandler
-} = {
+export const controller: Record<string, RequestHandler> = {
   exists: asyncHandler(async (req, res, next) => {
-    const folder = await prisma.folder.findUnique({
-      where: { id: req.params.directoryId },
-      include: { parent: true, children: true, files: true }
+    const directory = await prisma.directory.findUnique({
+      where: { id: req.params.directoryId ?? '' },
+      include: { files: true, directories: true, parent: true }
     })
-    if (!folder) return res.status(404).render('layout', {
+    if (!directory) return res.status(404).render('layout', {
       page: 'pages/error',
-      title: 'Folder Not Found',
-      message: 'The folder you are looking for cannot be found.'
+      title: 'Directory Not Found',
+      message: 'The directory you requested could not be found.'
     })
-    req.currentFolder = folder
+    req.currentDirectory = directory
     return next()
   }),
 
   isYours: asyncHandler(async (req, res, next) => {
     if (!req.user) {
-      req.flash('You must be logged in to view folders.')
+      req.flash('You must be logged in to view directories.')
       return res.redirect('/login')
     }
-    if (req.currentFolder.authorId !== req.user.id) return res.status(403).render('layout', {
+    if (req.currentDirectory.authorId !== req.user.id) return res.status(403).render('layout', {
       page: 'pages/error',
-      title: 'Folder Not Yours',
-      message: 'You cannot view folders that do not belong to you.'
+      title: 'Directory Not Yours',
+      message: 'You cannot access directories that do not belong to you.'
     })
     return next()
   }),
 
   isShared: asyncHandler(async (req, res, next) => {
-    const sharedDirectory = await prisma.folder.findUnique({
+    const sharedDirectory = await prisma.directory.findUnique({
       where: {
         id: req.params.sharedDirectoryId ?? '',
         AND: [
@@ -123,201 +87,187 @@ const directory: {
           { shareUntil: { gte: new Date() } }
         ]
       },
-      include: { children: true, files: true, parent: true }
+      include: { directories: true, files: true }
     })
 
-    if (!sharedDirectory) {
-      return res.status(404).render('layout', {
-        page: 'pages/error',
-        title: 'Shared Folder Not found',
-        message: 'The shared folder you are looking for cannot be found.'
-      })
-    } else {
-      req.sharedFolder = sharedDirectory
-      return next()
-    }
+    if (!sharedDirectory) return res.status(404).render('layout', {
+      page: 'pages/error',
+      title: 'Shared Directory Not found',
+      message: 'The shared directory you are looking for cannot be found.'
+    })
+
+    if (req.user && sharedDirectory.authorId === req.user.id)
+      return res.redirect('/directory/' + sharedDirectory.id)
+
+    req.sharedDirectory = sharedDirectory
+    return next()
   }),
 
-  view: asyncHandler(async (req, res, next) => {
-    let directoryPath: Array<{ name: string, id: string | null }> = []
-    if (req.sharedFolder) { // /share/:sharedDirectoryId
-      if (req.currentFolder) { // /share/:sharedDirectoryId/directory/:directoryId
-        if (req.currentFolder.id === req.sharedFolder.id)
-          return res.redirect(`/share/${req.currentFolder.id}`)
-        else {
-          directoryPath = await buildFolderPath(req.currentFolder)
-          const sharedFolder = directoryPath.find(loc => loc.id === req.sharedFolder.id)
-          if (!sharedFolder) return res.redirect(`/directory/${req.currentFolder.id}`)
-          else directoryPath = directoryPath.slice(
-            directoryPath.indexOf(sharedFolder) + 1,
-            directoryPath.length
-          )
-        }
-      }
-      console.log(directoryPath)
-      res.sendStatus(200)
-    } else {
-      directoryPath = await buildFolderPath(req.currentFolder)
-      //console.log(directoryPath)
-      return res.render('layout', {
-        page: 'pages/directory',
-        title: 'Your Files',
-        directoryPath,
-        currentFolder: req.currentFolder,
-        parentFolder: req.currentFolder.parent,
-        childFolders: req.currentFolder.children,
-        childFiles: req.currentFolder.files
-      })
-    }
-  }),
-
-  download: asyncHandler(async (req, res) => {
-    try {
-      const buffer = await buildZip(req.currentFolder)
-      const readStream = new stream.PassThrough()
-      readStream.end(buffer)
-      res.set(
-        'Content-disposition',
-        'attachment; filename=' + `${req.currentFolder.name}.zip`
+  hasSharedRoot: asyncHandler(async (req, res, next) => {
+    let path: Array<{ name: string, id: string | null }> = []
+    if (req.currentDirectory) {
+      if (req.currentDirectory.id === req.sharedDirectory.id)
+        return res.redirect('/share/' + req.currentDirectory.id)
+      path = await createPath(req.currentDirectory)
+      const sharedRoot = path.find(loc => loc.id === req.sharedDirectory.id)
+      if (!sharedRoot)
+        return res.redirect('/directory/' + req.currentDirectory.id)
+      path = path.slice(
+        path.indexOf(sharedRoot) + 1,
+        path.length
       )
-      res.set('Content-Type', 'application/x-zip-compressed')
-      readStream.pipe(res)
-    } catch (err) {
-      console.error(err)
-      req.flash('alert', 'Sorry, there was a problem downloading your folder.')
-      return res.redirect(`/directory/${req.currentFolder.id}`)
     }
+    req.pathToSharedRoot = path
+    return next()
   }),
 
-  viewHome: asyncHandler(async (req, res, next) => {
-    if (!req.user) {
-      req.flash('You must be logged in to view folders.')
-      return res.redirect('/login')
-    }
-    const childFolders = await prisma.folder.findMany({
-      where: { authorId: req.user.id, parentId: null },
-    })
-    const childFiles = await prisma.file.findMany({
-      where: { authorId: req.user.id, folderId: null }
-    })
+  renderRead: asyncHandler(async (req, res) => {
+    let path: Array<{ name: string, id: string | null }> = []
+    if (req.currentDirectory) path = await createPath(req.currentDirectory)
     return res.render('layout', {
-      page: 'pages/directory',
+      page: 'pages/read/read-directory',
       title: 'Your Files',
-      directoryPath: [],
-      currentFolder: null,
-      parentFolder: null,
-      childFolders,
-      childFiles
+      path,
+      currentDirectory: req.currentDirectory,
+      files: req.currentDirectory 
+        ? req.currentDirectory.files
+        : await prisma.file.findMany({ where: { directoryId: null } }),
+      directories: req.currentDirectory
+        ? req.currentDirectory.directories
+        : await prisma.directory.findMany({ where: { parentId: null } })
     })
   }),
 
-  renderNew: asyncHandler(async (req, res) => {
+  renderReadShared: asyncHandler(async (req, res) => {
+    return res.render('layout', {
+      page: 'pages/read/read-shared-directory',
+      title: 'Shared Directory',
+      path: req.pathToSharedRoot ?? [],
+      currentDirectory: req.currentDirectory,
+      sharedDirectory: req.sharedDirectory,
+      files: req.currentDirectory 
+        ? req.currentDirectory.files
+        : req.sharedDirectory.files,
+      directories: req.currentDirectory
+        ? req.currentDirectory.directories
+        : req.sharedDirectory.directories
+    })
+  }),
+
+  renderCreate: asyncHandler(async (req, res) => {
     res.render('layout', {
-      page: 'pages/new-folder',
-      title: 'Add New Folder',
-      folderTree: await buildFolderTree(),
-      //preDest: req.query.dest,
+      page: 'pages/create/create-directory',
+      title: 'Add New Directory',
+      directoryTree: await createDirectoryTree(),
       prevForm: req.body,
       formErrors: req.formErrors,
     })
   }),
 
-  validate: [
-    body('name')
-      .trim()
-      .notEmpty().withMessage('Please enter a name for this folder.').bail()
-      .isLength({ max: 32 })
-      .withMessage('Folder names cannot be longer than 64 characters.')
-      .matches(/^[A-Za-z0-9-_ ]+$/g)
-      .withMessage('Folder names must only consist of letters, numbers, hyphens, underscores, and spaces.'),
-    locationValidation
-  ],
-
-  submitNew: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return directory.renderNew(req, res, next)
-    if (!req.user) throw new Error('User is not defined.')
-    const newFolder = await prisma.folder.create({
+  submitCreate: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return controller.renderCreate(req, res, next)
+    if (!req.user) {
+      req.flash('You must be logged in to create directories.')
+      return res.redirect('/login')
+    }
+    const newDirectory = await prisma.directory.create({
       data: {
         name: req.body.name,
         parentId: req.body.location === 'home' ? null : req.body.location,
         authorId: req.user.id
       }
     })
-    req.flash('alert', 'New folder successfully created.')
-    return res.redirect(`/directory/${newFolder.id}`)
+    req.flash('alert', 'New directory successfully created.')
+    return res.redirect(`/directory/${newDirectory.id}`)
   }),
 
-  renderEdit: asyncHandler(async (req, res) => {
+  renderUpdate: asyncHandler(async (req, res) => {
     return res.render('layout', {
-      page: 'pages/edit-folder',
-      title: 'Editing Folder',
-      currentFolder: req.currentFolder,
-      folderTree: (await buildFolderTree()).filter(loc => loc.id !== req.currentFolder.id),
+      page: 'pages/update/update-directory',
+      title: 'Editing Directory',
+      currentDirectory: req.currentDirectory,
+      directoryTree: (await createDirectoryTree())
+        .filter(loc => loc.id !== req.currentDirectory.id),
       prevForm: {
         ...req.body,
-        name: 'name' in req.body ? req.body.name : req.currentFolder.name,
-        location: 'location' in req.body ? req.body.location : req.currentFolder.parentId,
+        name: 'name' in req.body ? req.body.name : req.currentDirectory.name,
+        location: 'location' in req.body ? req.body.location : req.currentDirectory.parentId,
         shareUntil: 'shareUntil' in req.body
           ? req.body.shareUntil
-          : req.currentFolder.shareUntil?.toISOString().substring(0, 10)
+          : req.currentDirectory.shareUntil?.toISOString().substring(0, 10)
       },
-      formErrors: req.formErrors,
+      formErrors: req.formErrors
     })
   }),
 
-  submitEdit: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return directory.renderEdit(req, res, next)
-    await prisma.folder.update({
-      where: { id: req.currentFolder.id },
+  submitUpdate: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return controller.renderUpdate(req, res, next)
+    await prisma.directory.update({
+      where: { id: req.currentDirectory.id },
       data: {
         name: req.body.name,
         parentId: req.body.location === 'home' ? null : req.body.location,
         shareUntil: req.body.shareUntil === '' ? null : new Date(req.body.shareUntil)
       }
     })
-    req.flash('alert', 'Your folder has been successfully edited.')
-    return res.redirect(`/directory/${req.currentFolder.id}`)
+    req.flash('alert', 'Your directory has been successfully edited.')
+    return res.redirect(`/directory/${req.currentDirectory.id}`)
   }),
 
   renderDelete: asyncHandler(async (req, res) => {
-    const folderPath = (await buildFolderPath(req.currentFolder)).map(loc => loc.name).join('/') + '/'
     return res.render('layout', {
-      page: 'pages/delete-folder',
-      title: 'Deleting Folder',
-      folder: req.currentFolder,
-      path: folderPath,
+      page: 'pages/delete/delete-directory',
+      title: 'Deleting Directory',
+      currentDirectory: req.currentDirectory,
+      path: (await createPath(req.currentDirectory))
+        .map(loc => loc.name).join('/') + '/',
       formErrors: req.formErrors
     })
   }),
 
-  validateDelete: [
-    body('path')
-      .trim()
-      .custom(async (value, { req }) => {
-        const folderPath = (await buildFolderPath(req.currentFolder)).map(loc => loc.name).join('/') + '/'
-        if (value !== folderPath) throw new Error('Incorrect path.')
-      })
-      .escape()
-  ],
-
   submitDelete: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return directory.renderDelete(req, res, next)
-    const filesToDelete = await findAllFilesOfFolder(req.currentFolder)
-    const { data, error } = await supabase.storage
-      .from('uploader')
-      .remove(filesToDelete)
-    if (error) {
-      console.error(error)
-      req.flash('alert', 'Sorry, there was a problem deleting your folder.')
-      return res.redirect(`/directory/${req.currentFolder.id}/delete`)
-    } else {
-      await prisma.folder.delete({
-        where: { id: req.currentFolder.id }
-      })
-      req.flash('alert', 'Folder successfully deleted.')
-      return res.redirect(`/directory/${req.currentFolder.parentId ?? ''}`)
+    if (req.formErrors) return controller.renderDelete(req, res, next)
+    const filesToDelete = await findAllFilesOfDirectory(req.currentDirectory)
+    if (filesToDelete.length > 0) {
+      const { data, error } = await supabase.storage
+        .from('uploader')
+        .remove(filesToDelete)
+      if (error) {
+        console.error(error)
+        req.flash('alert', 'Sorry, there was a problem deleting your directory.')
+        return res.redirect(`/directory/${req.currentDirectory.id}/delete`)
+      }
+    }
+    await prisma.directory.delete({
+      where: { id: req.currentDirectory.id }
+    })
+    req.flash('alert', 'Directory successfully deleted.')
+    return res.redirect(`/directory/${req.currentDirectory.parentId ?? ''}`)
+  }),
+
+  download: asyncHandler(async (req, res) => {
+    if (req.sharedDirectory && !req.currentDirectory) {
+      req.currentDirectory = { ...req.sharedDirectory, parent: null }
+    }
+    try {
+      const buffer = await buildZipFromDirectory(req.currentDirectory)
+      const readStream = new stream.PassThrough()
+      readStream.end(buffer)
+      res.set(
+        'Content-disposition',
+        'attachment; filename=' + `${req.currentDirectory.name}.zip`
+      )
+      res.set('Content-Type', 'application/x-zip-compressed')
+      readStream.pipe(res)
+    } catch (err) {
+      console.error(err)
+      req.flash('alert', 'Sorry, there was a problem downloading this directory.')
+      if (req.sharedDirectory) {
+        return res.redirect(
+          '/share/' + req.sharedDirectory.id
+          + (req.currentDirectory ? ('/directory/' + req.currentDirectory.id) : '')
+        )
+      } else return res.redirect('/directory/' + req.currentDirectory.id)
     }
   })
 }
-
-export default directory

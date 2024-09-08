@@ -1,13 +1,13 @@
-import { Prisma, type File, type Folder } from "@prisma/client"
+import { Prisma, type File } from "@prisma/client"
 
 declare global {
   namespace Express {
-    type CurrentFolder = Prisma.FolderGetPayload<{
-      include: { parent: true, children: true, files: true }
+    type CurrentDirectory = Prisma.DirectoryGetPayload<{
+      include: { parent: true, directories: true, files: true }
     }>
 
-    type SharedFolder = Prisma.FolderGetPayload<{
-      include: { children: true, files: true }
+    type SharedDirectory = Prisma.DirectoryGetPayload<{
+      include: { directories: true, files: true }
     }>
 
     export interface Request {
@@ -15,8 +15,9 @@ declare global {
       prevForm?: Record<string, any>,
       formErrors?: Record<string, string>,
       currentFile: File,
-      currentFolder: CurrentFolder,
-      sharedFolder: SharedFolder
+      currentDirectory: CurrentDirectory,
+      sharedDirectory: SharedDirectory,
+      pathToSharedRoot: Array<{ name: string, id: string | null }>
     }
     export interface User {
       id: number,

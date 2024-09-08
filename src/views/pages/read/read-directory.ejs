@@ -1,0 +1,79 @@
+<%- include('../../components/directory-path') %>
+
+<table>
+  <thead>
+    <tr> <td>Name</td> <td>Type</td> <td>Size</td> </tr>
+  </thead>
+
+  <!-- ".." link to parent directory -->
+  <% if (currentDirectory) { %>
+    <tr>
+      <td>
+        <a href=<%= currentDirectory.parentId 
+          ? '/directory/' +  currentDirectory.parentId
+          : '/directory' %>>
+          ..
+        </a>
+      </td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+  <% } %>
+
+  <!-- first, list directories -->
+
+  <% directories.forEach(directory => { %>
+    <tr>
+      <td>
+        <div class="no-break-out">
+          <a href=<%= '/directory/' + directory.id %>>
+            <%= directory.name + '/' %>
+          </a>
+        </div>
+      </td>
+      <td>directory</td>
+      <td>-</td>
+    </tr>
+  <% }) %>
+
+  <!-- then, list child files -->
+
+  <% files.forEach(file => { %>
+    <tr>
+      <td>
+        <div class="no-break-out">
+          <a href=<%= '/file/' + file.id %>>
+            <%= file.name %></a><%= '.' + file.ext %>
+        </div>
+      </td>
+      <td><%= file.type %></td>
+      <td><%= file.size %> bytes</td>
+    </tr>
+  <% }) %>
+
+</table>
+
+<a href=<%= '/file/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
+  Upload a File Here
+</a>
+<br>
+<a href=<%= '/directory/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
+  Add a Directory Here
+</a>
+<br>
+<% if (currentDirectory) { %>
+  <a href=<%= '/directory/' + currentDirectory.id + '/download' %>>Download Directory</a>
+  <a href=<%= '/directory/' + currentDirectory.id + '/edit' %>>Edit Directory</a>
+  <a href=<%= '/directory/' + currentDirectory.id + '/delete' %>>Delete Directory</a>
+<% } %>
+
+<% if (
+    currentDirectory &&
+    currentDirectory.shareUntil && 
+    Date.parse(currentDirectory.shareUntil) > Date.parse(new Date())
+  ) { %>
+    <p style="grid-column: 1 / 3;">
+      This directory is public. You can share this directory with others using the link below.
+    </p>
+    <input type="text" value=<%= `localhost:3000/share/${currentDirectory.id}` %>>
+  <% } %>

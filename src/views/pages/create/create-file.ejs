@@ -1,0 +1,12 @@
+<form action="/file/new" enctype="multipart/form-data" method="post">
+  <%- include('../../components/form-input', { 
+    name: 'upload',
+    label: 'Upload',
+    type: 'file',
+    includePrevInput: false
+  }) %>
+
+  <%- include('../../components/directory-dropdown') %>
+
+  <button type="submit">Submit</button>
+</form>

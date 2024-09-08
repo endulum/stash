@@ -1,12 +1,12 @@
 <form action=<%= '/file/' + currentFile.id + '/edit' %> method="post">
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'name',
     label: 'File name',
     type: 'text',
     includePrevInput: true
   }) %>
 
-  <%- include('../components/folder-tree-dropdown') %>
+  <%- include('../../components/directory-dropdown') %>
 
   <button type="submit">Submit</button>
 </form>

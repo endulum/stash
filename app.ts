@@ -9,12 +9,11 @@ import passport from 'passport';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 
-import logSession from './src/middleware/logSession';
-import errorHandler from './src/middleware/errorHandler';
+// import errorHandler from './src/middleware/errorHandler'
 
-import outsideRouter from './src/routes/outsideRouter';
-import insideRouter from './src/routes/insideRouter';
-import shareRouter from './src/routes/shareRouter'
+import authRouter from './src/routes/auth';
+import mainRouter from './src/routes/main';
+import shareRouter from './src/routes/share'
 
 const secret: string | undefined = process.env.SECRET
 if (secret === undefined) throw new Error('Secret is not defined.')
@@ -45,16 +44,17 @@ app.use(session({
 app.use(flash())
 app.use(passport.initialize())
 app.use(passport.session())
-// app.use(logSession)
 
 app.use(asyncHandler(async (req, res, next) => {
   res.locals.user = req.user
   res.locals.alert = req.flash('alert')
   return next()
 }))
-app.use(shareRouter)
+
+app.use('/share', shareRouter)
+
 app.use(asyncHandler(async (req, res, next) => {
-  return req.user ? insideRouter(req, res, next) : outsideRouter(req, res, next)
+  return req.user ? mainRouter(req, res, next) : authRouter(req, res, next)
 }))
 
 // app.use(errorHandler)

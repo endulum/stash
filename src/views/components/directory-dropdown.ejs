@@ -1,7 +1,7 @@
 <label for="location">Select location</label>
 <div class="input">
   <select name="location" id="location">
-    <% folderTree.forEach(location=> { %>
+    <% directoryTree.forEach(location => { %>
       <option value=<%=location.id || 'home' %>>
         <%= location.name %>
       </option>
@@ -19,19 +19,19 @@
 
 <script defer>
   const locationDropdown = document.getElementById('location')
-  // FIRST, does prevForm have a folder id?
+  // FIRST, does prevForm have a directory id?
   let value = '<%= locals.prevForm?.location %>'
   if (value) {
     locationDropdown.value = value
     console.log('prefilled using prevForm')
   } else {
-    // SECOND, does currentFile exist and does it have a folder id?
+    // SECOND, does currentFile exist and does it have a directory id?
     if (<%= "currentFile" in locals %>) {
-      value = '<%= locals.currentFile?.folderId %>'
+      value = '<%= locals.currentFile?.directoryId %>'
       locationDropdown.value = value === '' ? 'home' : value
       console.log('prefilled using currentFile')
     } else {
-      // THIRD, does our url param have a folder id?
+      // THIRD, does our url param have a directory id?
       const urlParams = new URLSearchParams(window.location.search);
       const dest = urlParams.get('dest');
       locationDropdown.value = dest ?? 'home'

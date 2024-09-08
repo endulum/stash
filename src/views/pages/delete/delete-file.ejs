@@ -1,7 +1,7 @@
 <p>To delete this file, type <b><%= path %></b> below and submit. Deleting a file is permanent and cannot be undone.</p>
 <br>
 <form method="post" action=<%= `/file/${file.id}/delete` %>>
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'path',
     label: 'File path',
     type: 'text',

@@ -6,15 +6,13 @@ const locationValidation = body('location')
   .notEmpty().withMessage('Please choose a location for this file.').bail()
   .custom(async (value, { req }) => {
     if (value !== 'home') {
-      const existingFolder = await prisma.folder.findUnique({
+      const existingDirectory = await prisma.directory.findUnique({
         where: { id: value, authorId: req.user.id }
       })
-      if (!existingFolder) throw new Error('Selected location could not be found or does not belong to you.')
-      else {
-        if (req.currentFolder) {
-          if (value === req.currentFolder.id) throw new Error('A folder cannot be a parent of itself.')
-        }
-      }
+      if (!existingDirectory)
+        throw new Error('Selected location could not be found or does not belong to you.')
+      if (req.currentDirectory && value === req.currentDirectory.id)
+        throw new Error('A directory cannot be a parent of itself.')
     }
   })
   .escape()

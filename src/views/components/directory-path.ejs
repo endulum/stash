@@ -1,0 +1,27 @@
+<small>
+  <% if (path.length === 0) { %>
+    Viewing root <%= 'sharedDirectory' in locals ? 'of shared directory' : 'of your filesystem'%>
+  <% } else { %>
+
+    Viewing <a href=<%= 
+      'sharedDirectory' in locals 
+        ? ('/share/' + sharedDirectory.id) 
+        : '/directory' %>><%= 'sharedDirectory' in locals ? 'shared ' : ''
+    %>root</a>
+
+    <% path.forEach((directory, index) => { %>
+      <% if (index === path.length - 1) { %>
+        > <b><%= directory.name %></b>
+      <% } else { %>
+
+        > <a href=<%= 
+          ('sharedDirectory' in locals 
+            ? ('/share/' + sharedDirectory.id) 
+            : '') 
+          + '/directory/' + directory.id 
+        %>> <%= directory.name %></a>
+        
+      <% } %>
+    <% }) %>
+  <% } %>
+</small>

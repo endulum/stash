@@ -15,37 +15,37 @@ model Session {
 }
 
 model User {
-  id       Int    @id @default(autoincrement())
-  username String @unique @db.VarChar(32)
-  password String @db.VarChar(255)
-  role     Role   @default(BASIC)
-  files File[] @relation("authorFiles")
-  folders Folder[] @relation("authorFolders")
+  id          Int         @id @default(autoincrement())
+  username    String      @unique @db.VarChar(32)
+  password    String      @db.VarChar(255)
+  role        Role        @default(BASIC)
+  files       File[]      @relation("authorFiles")
+  directories Directory[] @relation("authorDirectories")
 }
 
-model Folder {
-  id String @id @default(nanoid(6))
-  name String
-  files File[] @relation("folderFiles")
-  parent Folder? @relation("parentFolder", fields: [parentId], references: [id], onDelete: Cascade)
-  shareUntil DateTime?
-  parentId String?
-  children Folder[] @relation("parentFolder")
-  author User @relation("authorFolders", fields: [authorId], references: [id])
-  authorId Int
+model Directory {
+  id          String      @id @default(nanoid(6))
+  name        String
+  shareUntil  DateTime?
+  files       File[]      @relation("directoryFiles")
+  directories Directory[] @relation("parentDirectory")
+  parent      Directory?  @relation("parentDirectory", fields: [parentId], references: [id], onDelete: Cascade)
+  parentId    String?
+  author      User        @relation("authorDirectories", fields: [authorId], references: [id])
+  authorId    Int
 }
 
 model File {
-  id String @id @default(nanoid(6))
-  name String
-  ext String?
-  type String
-  size Float
-  url String?
-  folder Folder? @relation("folderFiles", fields: [folderId], references: [id], onDelete: Cascade)
-  folderId String?
-  author User @relation("authorFiles", fields: [authorId], references: [id])
-  authorId Int
+  id          String     @id @default(nanoid(6))
+  name        String
+  ext         String?
+  type        String
+  size        Float
+  url         String?
+  directory   Directory? @relation("directoryFiles", fields: [directoryId], references: [id], onDelete: Cascade)
+  directoryId String?
+  author      User       @relation("authorFiles", fields: [authorId], references: [id])
+  authorId    Int
 }
 
 enum Role {
