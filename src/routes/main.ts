@@ -61,7 +61,7 @@ router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
     req.logOut((err) => {
       if (err) return next(err)
-        req.flash('alert', 'You have been logged out. See you soon!')
+        req.flash('success', 'You have been logged out. See you soon!')
       return res.redirect('/login')
     })
   }))

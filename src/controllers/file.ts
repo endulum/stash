@@ -71,7 +71,7 @@ export const controller: Record<string, RequestHandler> = {
 
   isYours: asyncHandler(async (req, res, next) => {
     if (!req.user) {
-      req.flash('You must be logged in to view files.')
+      req.flash('warning', 'You must be logged in to view files.')
       return res.redirect('/login')
     }
     if (req.currentFile.authorId !== req.user.id) return res.status(403).render('layout', {
@@ -128,11 +128,11 @@ export const controller: Record<string, RequestHandler> = {
   submitCreate: asyncHandler(async (req, res, next) => {
     if (req.formErrors) return controller.renderCreate(req, res, next)
     if (!req.user) {
-      req.flash('You must be logged in to upload files..')
+      req.flash('warning', 'You must be logged in to upload files.')
       return res.redirect('/login')
     }
     if (!req.file) {
-      req.flash('Somehow, no file upload was provided. Try again?')
+      req.flash('warning', 'Somehow, no file upload was provided. Try again?')
       return controller.renderCreate(req, res, next)
     }
 
@@ -174,7 +174,7 @@ export const controller: Record<string, RequestHandler> = {
     if (error) {
       console.error(error)
       await prisma.file.delete({ where: { id: newFile.id } })
-      req.flash('alert', 'Sorry, something went wrong when uploading your file.')
+      req.flash('warning', 'Sorry, something went wrong when uploading your file.')
       return res.redirect('/new-file')
     } else { // yay nothing went wrong!
       const publicUrl = supabase.storage
@@ -184,7 +184,7 @@ export const controller: Record<string, RequestHandler> = {
         where: { id: newFile.id },
         data: { url: publicUrl }
       })
-      req.flash('alert', 'New file successfully created.')
+      req.flash('success', 'New file successfully created.')
       return res.redirect(`/file/${newFile.id}`)
     }
   }),
@@ -212,7 +212,7 @@ export const controller: Record<string, RequestHandler> = {
         directoryId: req.body.location === 'home' ? null : req.body.location,
       }
     })
-    req.flash('alert', 'Your file has been successfully edited.')
+    req.flash('success', 'Your file has been successfully edited.')
     return res.redirect(`/file/${req.currentFile.id}`)
   }),
 
@@ -234,13 +234,13 @@ export const controller: Record<string, RequestHandler> = {
       .remove([req.currentFile.id])
     if (error) {
       console.error(error)
-      req.flash('alert', 'Sorry, there was a problem deleting your file.')
+      req.flash('warning', 'Sorry, there was a problem deleting your file.')
       return res.redirect(`/file/${req.currentFile.directoryId}/delete`)
     } else {
       await prisma.file.delete({
         where: { id: req.currentFile.id }
       })
-      req.flash('alert', 'File successfully deleted.')
+      req.flash('success', 'File successfully deleted.')
       return res.redirect(`/directory/${req.currentFile.directoryId ?? ''}`)
     }
   }),
@@ -250,7 +250,7 @@ export const controller: Record<string, RequestHandler> = {
       .from('uploader')
       .download(req.currentFile.id)
     if (error) {
-      req.flash('alert', 'Sorry, there was a problem downloading your file.')
+      req.flash('warning', 'Sorry, there was a problem downloading your file.')
       return res.redirect(`/file/${req.currentFile.id}`)
     } else {
       const filename = req.currentFile.name + '.' + req.currentFile.ext

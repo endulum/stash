@@ -17,7 +17,7 @@ router.route('/signup')
   .post(signup.validate, handleValidationErrors, signup.submit)
 router.route('*')
   .all(asyncHandler(async (req, res) => {
-    req.flash('alert', 'You must be logged in to access this page.')
+    req.flash('warning', 'You must be logged in to access this page.')
     res.redirect('/login')
   }))
 

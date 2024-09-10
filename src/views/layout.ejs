@@ -49,14 +49,25 @@
 
     <main>
       <div class="main-body">
-        <% if (locals.alert.length > 0) { %>
-          <div class="alert warning">
-            <%- include('svg/warning.svg') %>
+        <!-- success alerts -->
+        <% if (locals.success.length > 0) { %>
+          <div class="alert success">
+            <%- include('svg/success.svg') %>
             <p>
-              <%= locals.alert[0] %>
+              <%= locals.success[0] %>
             </p>
           </div>
         <% } %>
+        <!-- warning alerts -->
+        <% if (locals.warning.length > 0) { %>
+          <div class="alert warning">
+            <%- include('svg/warning.svg') %>
+            <p>
+              <%= locals.warning[0] %>
+            </p>
+          </div>
+        <% } %>
+
         <h2><%= title %></h2>
         <%- include(`${page}`) %>
       </div>

@@ -60,7 +60,7 @@ const signup: {
         }
       })
     })
-    req.flash('alert', 'Your account has been successfully created.')
+    req.flash('success', 'Your account has been successfully created.')
     req.flash('loginUsernamePrefill', req.body.username)
     return res.redirect('/login')
   })

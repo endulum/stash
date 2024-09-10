@@ -67,7 +67,7 @@ export const controller: Record<string, RequestHandler> = {
 
   isYours: asyncHandler(async (req, res, next) => {
     if (!req.user) {
-      req.flash('You must be logged in to view directories.')
+      req.flash('warning', 'You must be logged in to view directories.')
       return res.redirect('/login')
     }
     if (req.currentDirectory.authorId !== req.user.id) return res.status(403).render('layout', {
@@ -167,7 +167,7 @@ export const controller: Record<string, RequestHandler> = {
   submitCreate: asyncHandler(async (req, res, next) => {
     if (req.formErrors) return controller.renderCreate(req, res, next)
     if (!req.user) {
-      req.flash('You must be logged in to create directories.')
+      req.flash('warning', 'You must be logged in to create directories.')
       return res.redirect('/login')
     }
     const newDirectory = await prisma.directory.create({
@@ -177,7 +177,7 @@ export const controller: Record<string, RequestHandler> = {
         authorId: req.user.id
       }
     })
-    req.flash('alert', 'New directory successfully created.')
+    req.flash('success', 'New directory successfully created.')
     return res.redirect(`/directory/${newDirectory.id}`)
   }),
 
@@ -210,7 +210,7 @@ export const controller: Record<string, RequestHandler> = {
         shareUntil: req.body.shareUntil === '' ? null : new Date(req.body.shareUntil)
       }
     })
-    req.flash('alert', 'Your directory has been successfully edited.')
+    req.flash('success', 'Your directory has been successfully edited.')
     return res.redirect(`/directory/${req.currentDirectory.id}`)
   }),
 
@@ -234,14 +234,14 @@ export const controller: Record<string, RequestHandler> = {
         .remove(filesToDelete)
       if (error) {
         console.error(error)
-        req.flash('alert', 'Sorry, there was a problem deleting your directory.')
+        req.flash('warning', 'Sorry, there was a problem deleting your directory.')
         return res.redirect(`/directory/${req.currentDirectory.id}/delete`)
       }
     }
     await prisma.directory.delete({
       where: { id: req.currentDirectory.id }
     })
-    req.flash('alert', 'Directory successfully deleted.')
+    req.flash('success', 'Directory successfully deleted.')
     return res.redirect(`/directory/${req.currentDirectory.parentId ?? ''}`)
   }),
 
@@ -261,7 +261,7 @@ export const controller: Record<string, RequestHandler> = {
       readStream.pipe(res)
     } catch (err) {
       console.error(err)
-      req.flash('alert', 'Sorry, there was a problem downloading this directory.')
+      req.flash('warning', 'Sorry, there was a problem downloading this directory.')
       if (req.sharedDirectory) {
         return res.redirect(
           '/share/' + req.sharedDirectory.id
