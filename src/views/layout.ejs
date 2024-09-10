@@ -5,41 +5,61 @@
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
     <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="/style.css">
+    <link rel="stylesheet" href="/fonts/fonts.css">
   </head>
   <body>
     <header>
-      <h1>
-        <span>File Uploader</span>
-        <a href="https://github.com/endulum/odin-uploader" target="_blank">
-          <img class="github" src="/assets/github.svg" alt="Link to this app's repository">
-        </a>
-      </h1>
-      <div class="links">
-        <% if (locals.user) { %>
-          <p>
-            Logged in as <b><%= locals.user.username %></b>
-          </p>
-          <nav>
-            <a href="/">Home directory</a>
-            <a href="/logout">Log out</a>
-          </nav>
-        <% } else { %>
-          <p>
-            Not logged in
-          </p>
-          <nav>
-            <a href="/login">Log in</a>
-            <a href="/signup">Sign up</a> 
-          </nav>
-        <% } %>
+      <div class="header-body">
+        <h1>
+          <b>Stash</b>
+        </h1>
+        <div class="header-row">
+          <% if (locals.user) { %>
+            <p>
+              Logged in as <b><%= locals.user.username %></b>
+            </p>
+            <nav>
+              <a type="button" href="/">
+                <%- include('svg/home.svg') %>
+                <span>Home directory</span>
+              </a>
+              <a type="button" href="/logout">
+                <%- include('svg/logout.svg') %>
+                <span>Log out</span>
+              </a>
+            </nav>
+          <% } else { %>
+            <p>
+              Not logged in
+            </p>
+            <nav>
+              <a type="button" href="/login">
+                <%- include('svg/login.svg') %>
+                <span>Log in</span>
+              </a>
+              <a type="button" class="success" href="/signup">
+                <%- include('svg/star.svg') %>
+                <span>Sign up</span>
+              </a> 
+            </nav>
+          <% } %>
+        </div>
       </div>
     </header>
+
     <main>
-      <% if (locals.alert.length > 0) { %>
-        <p class="alert"><%= locals.alert[0] %></p>
-      <% } %>
-      <h2><%= title %></h2>
-      <%- include(`${page}`) %>
+      <div class="main-body">
+        <% if (locals.alert.length > 0) { %>
+          <div class="alert warning">
+            <%- include('svg/warning.svg') %>
+            <p>
+              <%= locals.alert[0] %>
+            </p>
+          </div>
+        <% } %>
+        <h2><%= title %></h2>
+        <%- include(`${page}`) %>
+      </div>
     </main>
   </body>
 </html>

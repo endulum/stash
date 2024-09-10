@@ -1,13 +1,32 @@
-<label for=<%= name %>>
-  <%= label %>
-</label>
 <div class="input">
+  <!-- top left: where label goes -->
+  <label style="grid-column: 1 / 2;" for=<%= name %>>
+    <%= label %>
+  </label>
+  <!-- top right: where errors belong -->
+  <p style="grid-column: 2 / 3;">
+    <% if (formErrors && name in formErrors) { %>
+      <small class="error">
+        <b>Error: </b>
+        <%= formErrors[name] %>
+      </small>
+    <% } %>
+  </p>
+  <!-- bottom: where input goes -->
   <input 
+    style="grid-column: 1 / 3;"
     type=<%= type %> 
     name=<%= name %> 
     id=<%= name %> 
     value="<%= includePrevInput && name in prevForm ? prevForm[name] : '' %>"
   >
+</div>
+
+<!-- <label for=<%= name %>>
+  <%= label %>
+</label>
+<div class="input">
+  
   <% if (formErrors && name in formErrors) { %>
     <p>
       <small class="error">
@@ -16,4 +35,4 @@
       </small>
     </p>
   <% } %>
-</div>
+</div> -->

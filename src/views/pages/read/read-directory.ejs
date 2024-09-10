@@ -1,18 +1,18 @@
 <%- include('../../components/directory-path') %>
 
-<table>
+<table cellpadding="0" cellspacing="0">
   <thead>
-    <tr> <td>Name</td> <td>Type</td> <td>Size</td> </tr>
+    <tr> <td><span>Name</span></td> <td>Type</td> <td>Size</td> </tr>
   </thead>
 
   <!-- ".." link to parent directory -->
   <% if (currentDirectory) { %>
     <tr>
       <td>
-        <a href=<%= currentDirectory.parentId 
+        <a class="entry-link" href=<%= currentDirectory.parentId 
           ? '/directory/' +  currentDirectory.parentId
           : '/directory' %>>
-          ..
+          <span>..</span>
         </a>
       </td>
       <td>-</td>
@@ -25,11 +25,11 @@
   <% directories.forEach(directory => { %>
     <tr>
       <td>
-        <div class="no-break-out">
-          <a href=<%= '/directory/' + directory.id %>>
-            <%= directory.name + '/' %>
-          </a>
-        </div>
+        <a class="entry-link" href=<%= '/directory/' + directory.id %>>
+          <span>
+            <b><%= directory.name %></b>/
+          </span>
+        </a>
       </td>
       <td>directory</td>
       <td>-</td>
@@ -41,10 +41,11 @@
   <% files.forEach(file => { %>
     <tr>
       <td>
-        <div class="no-break-out">
-          <a href=<%= '/file/' + file.id %>>
-            <%= file.name %></a><%= '.' + file.ext %>
-        </div>
+        <a class="entry-link" href=<%= '/file/' + file.id %>>
+          <span>
+            <b><%= file.name %></b>.<%= file.ext %>
+          </span>
+        </a>
       </td>
       <td><%= file.type %></td>
       <td><%= file.size %> bytes</td>
