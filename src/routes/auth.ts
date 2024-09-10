@@ -7,6 +7,8 @@ import handleValidationErrors from '../middleware/handleValidationErrors'
 
 const router = express.Router();
 
+router.route('/')
+  .get(asyncHandler(async (req, res) => res.redirect('/login')))
 router.route('/login')
   .get(login.render)
   .post(login.validate, handleValidationErrors, login.submit)
