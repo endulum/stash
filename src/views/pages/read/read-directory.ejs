@@ -8,7 +8,15 @@
     <%- include('../../svg/info.svg') %>
     <p>
       This directory is <b>public</b>. You can share this directory with others using the link below.
-      <input style="width: 100%; margin-top: 0.5rem;" type="text" value=<%= `localhost:3000/share/${currentDirectory.id}` %>>
+      <input 
+        style="width: 100%; margin-top: 0.5rem;" 
+        type="text" 
+        value=<%= 
+          (process.env.DEPLOYMENT_URL ?? 'localhost:3000')
+          + '/share/'
+          + currentDirectory.id
+        %>
+      >
     </p>
   </div>
 <% } %>
