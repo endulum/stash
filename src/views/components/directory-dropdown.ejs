@@ -1,20 +1,25 @@
-<label for="location">Select location</label>
 <div class="input">
-  <select name="location" id="location">
+  <!-- top left: where label goes -->
+  <label style="grid-column: 1 / 2;" for="location">
+    Select location
+  </label>
+  <!-- top right: where errors belong -->
+  <p style="grid-column: 2 / 3;">
+    <% if (formErrors && 'location' in formErrors) { %>
+      <small class="error">
+        <b>Error: </b>
+        <%= formErrors['location'] %>
+      </small>
+    <% } %>
+  </p>
+  <!-- bottom: where input goes -->
+  <select style="grid-column: 1 / 3;" name="location" id="location">
     <% directoryTree.forEach(location => { %>
       <option value=<%=location.id || 'home' %>>
         <%= location.name %>
       </option>
     <% }) %>
   </select>
-  <% if (formErrors && 'location' in formErrors) { %>
-    <p>
-      <small class="error">
-        <b>Error: </b>
-        <%= formErrors['location'] %>
-      </small>
-    </p>
-  <% } %>
 </div>
 
 <script defer>
