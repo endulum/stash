@@ -115,7 +115,7 @@ a, a[type="button"], button {
 .alert {
   padding: 0.75rem;
   margin-bottom: 1rem;
-  align-items: center;
+  align-items: start;
   svg {
     height: 1.5rem;
     min-width: 1.75rem;
@@ -180,17 +180,18 @@ form {
   flex-direction: column;
   align-items: flex-end;
   gap: 1.5rem;
-  input, select {
-    appearance: none;
-    background-color: oklch(from var(--fg) l c h / 0.125);
-    border: 1px solid oklch(from var(--fg) l c h / 0.25);
-    padding: 0.25rem 0.5rem;
-    margin-bottom: 0.25rem;
-    border-radius: 5px;
-  }
   button {
     min-width: 100px;
   }
+}
+
+input, select {
+  appearance: none;
+  background-color: oklch(from var(--fg) l c h / 0.125);
+  border: 1px solid oklch(from var(--fg) l c h / 0.25);
+  padding: 0.25rem 0.5rem;
+  margin-bottom: 0.25rem;
+  border-radius: 5px;
 }
 
 .input {
@@ -314,4 +315,16 @@ table {
 
 .entry-link, thead td:first-of-type span {
   padding: 0.25rem 0.5rem;
+}
+
+.controls {
+  width: 100%;
+  display: flex;
+  flex-direction: row;
+  justify-content: end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  a {
+    min-width: max-content;
+  }
 }

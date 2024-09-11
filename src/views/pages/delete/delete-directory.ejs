@@ -1,4 +1,9 @@
-<p>To delete this directory, type <b><%= path %></b> below and submit. Deleting a directory will also delete all of its contents. This cannot be undone.</p>
+<div class="alert warning" style="margin-top: 1rem;">
+  <%- include('../../svg/warning.svg') %>
+  <p>Deleting a directory will also delete all of its contents. This is permanent and cannot be undone.</p>
+</div>
+
+<p>To delete this directory, type <b><%= path %></b> below and submit.</p>
 <br>
 <form method="post" action=<%= `/directory/${currentDirectory.id}/delete` %>>
   <%- include('../../components/form-input', { 

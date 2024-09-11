@@ -1,4 +1,9 @@
-<p>To delete this file, type <b><%= path %></b> below and submit. Deleting a file is permanent and cannot be undone.</p>
+<div class="alert warning" style="margin-top: 1rem;">
+  <%- include('../../svg/warning.svg') %>
+  <p>Deleting a file is permanent and cannot be undone.</p>
+</div>
+
+<p>To delete this file, type <b><%= path %></b> below and submit.</p>
 <br>
 <form method="post" action=<%= `/file/${file.id}/delete` %>>
   <%- include('../../components/form-input', { 

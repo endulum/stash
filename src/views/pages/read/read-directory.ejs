@@ -1,3 +1,18 @@
+<% if (
+    currentDirectory &&
+    currentDirectory.shareUntil && 
+    Date.parse(currentDirectory.shareUntil) > Date.parse(new Date())
+  ) { 
+%>
+  <div class="alert" style="margin-top: 0.5rem;">
+    <%- include('../../svg/info.svg') %>
+    <p>
+      This directory is <b>public</b>. You can share this directory with others using the link below.
+      <input style="width: 100%; margin-top: 0.5rem;" type="text" value=<%= `localhost:3000/share/${currentDirectory.id}` %>>
+    </p>
+  </div>
+<% } %>
+
 <div class="path-row">
   <%- include('../../components/directory-path') %>
 
@@ -69,26 +84,28 @@
 
 </table>
 
-<a href=<%= '/file/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
-  Upload a File Here
-</a>
-<br>
-<a href=<%= '/directory/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
-  Add a Directory Here
-</a>
-<br>
-<% if (currentDirectory) { %>
-  <a href=<%= '/directory/' + currentDirectory.id + '/edit' %>>Edit Directory</a>
-  <a href=<%= '/directory/' + currentDirectory.id + '/delete' %>>Delete Directory</a>
-<% } %>
+<div class="controls">
+  <a type="button" class="success" href=<%= '/directory/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
+    <%- include('../../svg/folder-create.svg') %>
+    <span>Add Directory</span>
+  </a>
 
-<% if (
-    currentDirectory &&
-    currentDirectory.shareUntil && 
-    Date.parse(currentDirectory.shareUntil) > Date.parse(new Date())
-  ) { %>
-    <p style="grid-column: 1 / 3;">
-      This directory is public. You can share this directory with others using the link below.
-    </p>
-    <input type="text" value=<%= `localhost:3000/share/${currentDirectory.id}` %>>
+  <a type="button" class="success" href=<%= '/file/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>
+    <%- include('../../svg/file-create.svg') %>
+    <span>Add File</span>
+  </a>
+
+  <% if (currentDirectory) { %>
+    <a type="button" href=<%= '/directory/' + currentDirectory.id + '/edit' %>>
+      <%- include('../../svg/folder-update.svg') %>
+      <span>Edit Directory</span>
+    </a>
+
+    <a type="button" class="warning" href=<%= '/directory/' + currentDirectory.id + '/delete' %>>
+      <%- include('../../svg/folder-delete.svg') %>
+      <span>Delete Directory</span>
+    </a>
   <% } %>
+</div>
+
+
