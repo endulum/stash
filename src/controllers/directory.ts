@@ -91,7 +91,7 @@ export const controller: Record<string, RequestHandler> = {
           { shareUntil: { gte: new Date() } }
         ]
       },
-      include: { directories: true, files: true }
+      include: { author: true, directories: true, files: true }
     })
 
     if (!sharedDirectory) return res.status(404).render('layout', {
