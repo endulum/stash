@@ -20,6 +20,9 @@ router.route('/directory/new')
   .get(directory.renderCreate)
   .post(directoryValidation.forCreateOrUpdate, handleValidationErrors, directory.submitCreate)
 
+router.route('/directory/download')
+  .get(directory.download)
+
 router.route('/directory')
   .get(directory.renderRead)
 

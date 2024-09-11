@@ -2,7 +2,7 @@ import type { Directory } from '@prisma/client'
 import prisma from '../prisma'
 
 export default async function createDirectoryTree(
-  directory?: Directory
+  directory: Directory | null
 ): Promise<Array<{ name: string, id: null | string }>> {
   const queue: Array<{ name: string, id: null | string }> = directory 
     ? [{ name: directory.name + '/', id: directory.id }] 
@@ -21,6 +21,6 @@ export default async function createDirectoryTree(
         })
       }
     }
-  } while (queue.length > 0)
+  } while (queue.length > 0);
   return results
 }

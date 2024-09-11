@@ -5,13 +5,13 @@ import prisma from '../prisma';
 import supabase from '../supabase'
 import createDirectoryTree from './createDirectoryTree';
 
-async function buildZipFromDirectory(directory: Directory): Promise<Buffer> {
+async function buildZipFromDirectory(directory: Directory | null): Promise<Buffer> {
   const zip = new Zip()
 
   const directoryTree = await createDirectoryTree(directory)
 
   for (let directoryDetails of directoryTree) {
-    if (!directoryDetails.id) break;
+    if (!directoryDetails.id) continue;
     const currentDirectory = await prisma.directory.findUnique({
       where: { id: directoryDetails.id },
       include: { files: true, directories: true }

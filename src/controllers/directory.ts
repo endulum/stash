@@ -162,7 +162,7 @@ export const controller: Record<string, RequestHandler> = {
     res.render('layout', {
       page: 'pages/create/create-directory',
       title: 'Add New Directory',
-      directoryTree: await createDirectoryTree(),
+      directoryTree: await createDirectoryTree(null),
       prevForm: req.body,
       formErrors: req.formErrors,
     })
@@ -190,7 +190,7 @@ export const controller: Record<string, RequestHandler> = {
       page: 'pages/update/update-directory',
       title: 'Editing Directory',
       currentDirectory: req.currentDirectory,
-      directoryTree: (await createDirectoryTree())
+      directoryTree: (await createDirectoryTree(null))
         .filter(loc => loc.id !== req.currentDirectory.id),
       prevForm: {
         ...req.body,
@@ -254,12 +254,16 @@ export const controller: Record<string, RequestHandler> = {
       req.currentDirectory = { ...req.sharedDirectory, parent: null }
     }
     try {
-      const buffer = await buildZipFromDirectory(req.currentDirectory)
+      const buffer = await buildZipFromDirectory(
+        req.currentDirectory ? req.currentDirectory : null
+      )
       const readStream = new stream.PassThrough()
       readStream.end(buffer)
       res.set(
         'Content-disposition',
-        'attachment; filename=' + `${req.currentDirectory.name}.zip`
+        'attachment; filename=' + `${req.currentDirectory 
+          ? req.currentDirectory.name
+          : 'home' }.zip`
       )
       res.set('Content-Type', 'application/x-zip-compressed')
       readStream.pipe(res)
@@ -271,7 +275,9 @@ export const controller: Record<string, RequestHandler> = {
           '/share/' + req.sharedDirectory.id
           + (req.currentDirectory ? ('/directory/' + req.currentDirectory.id) : '')
         )
-      } else return res.redirect('/directory/' + req.currentDirectory.id)
+      } else return res.redirect('/directory/' + (req.currentDirectory 
+        ? req.currentDirectory.id
+        : ''))
     }
   })
 }

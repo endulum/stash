@@ -133,7 +133,7 @@ export const controller: Record<string, RequestHandler> = {
       page: 'pages/create/create-file',
       title: 'Upload File',
       prevForm: req.body,
-      directoryTree: await createDirectoryTree(),
+      directoryTree: await createDirectoryTree(null),
       formErrors: req.formErrors,
     })
   }),
@@ -207,7 +207,7 @@ export const controller: Record<string, RequestHandler> = {
       page: 'pages/update/update-file',
       title: 'Edit File',
       currentFile: req.currentFile,
-      directoryTree: await createDirectoryTree(),
+      directoryTree: await createDirectoryTree(null),
       prevForm: {
         ...req.body,
         name: 'name' in req.body ? req.body.name : req.currentFile.name
