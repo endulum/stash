@@ -27,12 +27,16 @@ export const validation: Record<string, ValidationChain[]> = {
           where: {
             name: value,
             parentId: 'location' in req.body
-              ? req.body.location
+              ? req.body.location === 'home' 
+                ? null 
+                : req.body.location
               : req.currentDirectory.parentId
           }
         })
-        if (duplicateDirectory && duplicateDirectory.id !== req.currentDirectory.id)
-          throw new Error('There already exists a directory in the chosen location with this name. Directories in the same location cannot have the same name.')
+        if (duplicateDirectory) {
+          if (req.currentDirectory && duplicateDirectory.id === req.currentDirectory.id) {}
+          else throw new Error('There already exists a directory in the chosen location with this name. Directories in the same location cannot have the same name.')
+        }
       })
       .escape(),
     locationValidation

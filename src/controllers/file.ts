@@ -16,6 +16,19 @@ export const validation: Record<string, ValidationChain[]> = {
     body('upload')
       .custom(async (value, { req }) => {
         if (!req.file) throw new Error('Please upload a file.')
+        const duplicateFile = await prisma.file.findFirst({
+          where: {
+            name: req.file.originalname.substring(
+              0,
+              req.file.originalname.lastIndexOf('.'),
+            ),
+            directoryId: 'location' in req.body
+              ? req.body.location
+              : req.currentFile.directoryId
+          }
+        })
+        if (duplicateFile)
+          throw new Error('There already exists a file in the chosen location with this name. Files in the same location cannot have the same name. Try changing the name of the file you are uploading, and upload it again.')
       }),
     locationValidation
   ],
@@ -204,7 +217,7 @@ export const controller: Record<string, RequestHandler> = {
   }),
 
   submitUpdate: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return controller.renderEdit(req, res, next)
+    if (req.formErrors) return controller.renderUpdate(req, res, next)
     await prisma.file.update({
       where: { id: req.currentFile.id },
       data: {
