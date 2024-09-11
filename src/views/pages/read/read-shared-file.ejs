@@ -1,4 +1,14 @@
-<%- include('../../components/directory-path') %>
-<a href=<%=
-  '/share/' + sharedDirectory.id + '/file/' + file.id + '/download'
-%>> Download this file</a>
+<div class="path-row">
+  <%- include('../../components/directory-path') %>
+
+  <a 
+    type="button" 
+    class="info" 
+    href=<%=
+      '/share/' + sharedDirectory.id + '/file/' + file.id + '/download'
+    %>
+  >
+    <%- include('../../svg/download.svg') %>
+    <span>Download</span>
+  </a>
+</div>

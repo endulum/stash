@@ -1,7 +1,17 @@
-<%- include('../../components/directory-path') %>
+<div class="path-row">
+  <%- include('../../components/directory-path') %>
+
+  <a 
+    type="button" 
+    class="info" 
+    href=<%= `/file/${file.id}/download` %>
+  >
+    <%- include('../../svg/download.svg') %>
+    <span>Download</span>
+  </a>
+</div>
+
 <br>
 <a href=<%= `/file/${file.id}/edit` %>>Edit this file</a>
 <br>
 <a href=<%= `/file/${file.id}/delete` %>>Delete this file</a>
-<br>
-<a href=<%= `/file/${file.id}/download` %>> Download this file</a>
