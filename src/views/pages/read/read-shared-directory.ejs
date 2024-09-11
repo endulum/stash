@@ -47,6 +47,7 @@
     <tr>
       <td>
         <a class="entry-link" href=<%= '/share/' + sharedDirectory.id + '/directory/' + directory.id %>>
+          <%- include('../../svg/folder.svg') %>
           <span>
             <b><%= directory.name %></b>/
           </span>
@@ -63,6 +64,7 @@
     <tr>
       <td>
         <a class="entry-link" href=<%= '/share/' + sharedDirectory.id + '/file/' + file.id %>>
+          <%- include('../../svg/file.svg') %>
           <span>
             <b><%= file.name %></b>.<%= file.ext %>
           </span>
