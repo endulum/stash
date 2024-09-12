@@ -31,7 +31,7 @@ model Directory {
   directories Directory[] @relation("parentDirectory")
   parent      Directory?  @relation("parentDirectory", fields: [parentId], references: [id], onDelete: Cascade)
   parentId    String?
-  author      User        @relation("authorDirectories", fields: [authorId], references: [id])
+  author      User        @relation("authorDirectories", fields: [authorId], references: [id], onDelete: Cascade)
   authorId    Int
 }
 
@@ -44,7 +44,7 @@ model File {
   url         String?
   directory   Directory? @relation("directoryFiles", fields: [directoryId], references: [id], onDelete: Cascade)
   directoryId String?
-  author      User       @relation("authorFiles", fields: [authorId], references: [id])
+  author      User       @relation("authorFiles", fields: [authorId], references: [id], onDelete: Cascade)
   authorId    Int
 }
 
