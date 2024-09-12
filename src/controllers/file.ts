@@ -109,19 +109,28 @@ export const controller: Record<string, RequestHandler> = {
   }),
 
   renderRead: asyncHandler(async (req, res) => {
-    const { data, error } = await supabase.storage.from('uploader')
-      .download(req.currentFile.id ?? '')
-    let base64 = ''
-    if (!error) {
-      base64 = Buffer.from(await data.arrayBuffer()).toString('base64')
-    } else console.error(error)
+    const previewTypes = ['image', 'text']
+    let fileDataString = ''
+    if (previewTypes.includes(req.currentFile.type.split('/')[0])) {
+      const { data, error } = await supabase.storage.from('uploader')
+        .download(req.currentFile.id ?? '')
+      if (error) console.error(error);
+      else {
+        if (req.currentFile.type.startsWith('image')) {
+          fileDataString = Buffer.from(await data.arrayBuffer()).toString('base64')
+        }
+        if (req.currentFile.type.startsWith('text')) {
+          fileDataString = await data.text()
+        }
+      }
+    }
     const path = await createFilePath(req.currentFile)
     return res.render('layout', {
       page: 'pages/read/read-file',
       title: 'Viewing File',
       path,
       file: req.currentFile,
-      base64
+      fileDataString
     })
   }),
 
