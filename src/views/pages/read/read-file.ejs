@@ -11,6 +11,10 @@
   </a>
 </div>
 
+<div id="preview">
+  <p><i>No preview is available for this file.</i></p>
+</div>
+
 <div class="controls">
   <a type="button" href=<%= `/file/${file.id}/edit` %>>
     <%- include('../../svg/file-update.svg') %>
@@ -22,3 +26,16 @@
     <span>Delete this file</span>
   </a>
 </div>
+
+<script defer>
+  const previewBox = document.getElementById('preview')
+  const fileType = '<%= file.type %>'
+  
+  if (fileType.startsWith('image')) {
+    const imageUrl = 'data:<%= file.type %>;base64,' + '<%= base64 %>'
+    const imageElement = document.createElement('img')
+    imageElement.src = imageUrl
+    previewBox.textContent = ''
+    previewBox.appendChild(imageElement)
+  }
+</script>

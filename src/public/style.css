@@ -328,3 +328,18 @@ table {
     min-width: max-content;
   }
 }
+
+#preview {
+  background-color: oklch(from var(--fg) l c h / 0.125);
+  border: 1px solid oklch(from var(--fg) l c h / 0.25);
+  border-radius: 5px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  img {
+    width: 100%;
+    max-width: 300px;
+  }
+}

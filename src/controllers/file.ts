@@ -109,12 +109,19 @@ export const controller: Record<string, RequestHandler> = {
   }),
 
   renderRead: asyncHandler(async (req, res) => {
+    const { data, error } = await supabase.storage.from('uploader')
+      .download(req.currentFile.id ?? '')
+    let base64 = ''
+    if (!error) {
+      base64 = Buffer.from(await data.arrayBuffer()).toString('base64')
+    } else console.error(error)
     const path = await createFilePath(req.currentFile)
     return res.render('layout', {
       page: 'pages/read/read-file',
       title: 'Viewing File',
       path,
-      file: req.currentFile
+      file: req.currentFile,
+      base64
     })
   }),
 
