@@ -47,7 +47,7 @@ router.route('/file/new')
   .post(upload.single('upload'), fileValidation.forCreate, handleValidationErrors, file.submitCreate)
 
 router.route('/file/:fileId')
-  .get(file.exists, file.isYours, file.renderRead)
+  .get(file.exists, file.isYours, file.getFileDataString, file.renderRead)
 
 router.route('/file/:fileId/download')
   .get(file.exists, file.isYours, file.download)

@@ -1,0 +1,29 @@
+<div id="preview">
+  <p><i>No preview is available for this file.</i></p>
+</div>
+
+<script defer>
+  const previewBox = document.getElementById('preview')
+  <% if (file.type.startsWith('image')) { %>
+    const imageUrl = 'data:<%= file.type %>;base64,' + '<%= fileDataString %>'
+    const imageElement = document.createElement('img')
+    imageElement.src = imageUrl
+    previewBox.textContent = ''
+    previewBox.appendChild(imageElement)
+  <% } %>
+
+  <% if (file.type.startsWith('text')) { %>
+    const textareaElement = document.createElement('textarea')
+    const unescapedDataString = (`<%= fileDataString %>`)
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&#34;/g, '"')
+      .replace(/&#39;|&#x27;/g, "'")
+      .replace(/&#x2F;/g, '/')
+      .replace(/&amp;/g, '&')
+    textareaElement.value = unescapedDataString
+    previewBox.textContent = ''
+    previewBox.appendChild(textareaElement)
+    textareaElement.style.height = textareaElement.scrollHeight + "px"
+  <% } %>
+</script>

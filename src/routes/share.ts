@@ -21,7 +21,7 @@ router.route('/:sharedDirectoryId/directory/:directoryId/download')
 // FILES IN SHARED DIRECTORIES
 
 router.route('/:sharedDirectoryId/file/:fileId')
-  .get(directory.isShared, file.exists, file.hasSharedRoot, file.renderReadShared)
+  .get(directory.isShared, file.exists, file.hasSharedRoot, file.getFileDataString, file.renderReadShared)
 
 router.route('/:sharedDirectoryId/file/:fileId/download')
   .get(directory.isShared, file.exists, file.hasSharedRoot, file.download)

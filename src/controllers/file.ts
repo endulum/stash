@@ -108,29 +108,33 @@ export const controller: Record<string, RequestHandler> = {
     return next()
   }),
 
-  renderRead: asyncHandler(async (req, res) => {
+  getFileDataString: asyncHandler(async (req, res, next) => {
     const previewTypes = ['image', 'text']
-    let fileDataString = ''
+    req.fileDataString = ''
     if (previewTypes.includes(req.currentFile.type.split('/')[0])) {
       const { data, error } = await supabase.storage.from('uploader')
         .download(req.currentFile.id ?? '')
       if (error) console.error(error);
       else {
         if (req.currentFile.type.startsWith('image')) {
-          fileDataString = Buffer.from(await data.arrayBuffer()).toString('base64')
+          req.fileDataString = Buffer.from(await data.arrayBuffer()).toString('base64')
         }
         if (req.currentFile.type.startsWith('text')) {
-          fileDataString = await data.text()
+          req.fileDataString = await data.text()
         }
       }
     }
+    return next()
+  }),
+
+  renderRead: asyncHandler(async (req, res) => {
     const path = await createFilePath(req.currentFile)
     return res.render('layout', {
       page: 'pages/read/read-file',
       title: 'Viewing File',
       path,
       file: req.currentFile,
-      fileDataString
+      fileDataString: req.fileDataString
     })
   }),
 
@@ -140,7 +144,8 @@ export const controller: Record<string, RequestHandler> = {
       title: 'Viewing Shared File',
       path: req.pathToSharedRoot,
       sharedDirectory: req.sharedDirectory,
-      file: req.currentFile
+      file: req.currentFile,
+      fileDataString: req.fileDataString
     })
   }),
 

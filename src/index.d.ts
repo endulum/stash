@@ -17,7 +17,8 @@ declare global {
       currentFile: File,
       currentDirectory: CurrentDirectory,
       sharedDirectory: SharedDirectory,
-      pathToSharedRoot: Array<{ name: string, id: string | null }>
+      pathToSharedRoot: Array<{ name: string, id: string | null }>,
+      fileDataString: string
     }
     export interface User {
       id: number,
