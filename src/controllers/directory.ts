@@ -126,6 +126,10 @@ export const controller: Record<string, RequestHandler> = {
   }),
 
   renderRead: asyncHandler(async (req, res) => {
+    if (!req.user) {
+      req.flash('warning', 'You must be logged in to view your filesystem.')
+      return res.redirect('/login')
+    }
     let path: Array<{ name: string, id: string | null }> = []
     if (req.currentDirectory) path = await createPath(req.currentDirectory)
     return res.render('layout', {
@@ -135,10 +139,16 @@ export const controller: Record<string, RequestHandler> = {
       currentDirectory: req.currentDirectory,
       files: req.currentDirectory 
         ? req.currentDirectory.files
-        : await prisma.file.findMany({ where: { directoryId: null } }),
+        : await prisma.file.findMany({ where: { 
+          directoryId: null, 
+          authorId: req.user.id 
+      } }),
       directories: req.currentDirectory
         ? req.currentDirectory.directories
-        : await prisma.directory.findMany({ where: { parentId: null } })
+        : await prisma.directory.findMany({ where: { 
+          parentId: null,
+          authorId: req.user.id 
+        } })
     })
   }),
 
