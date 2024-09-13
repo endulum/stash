@@ -16,7 +16,7 @@ A minimal implementation of a personal storage service.
 - File names and locations can be edited
 - Files of types `text` and `image` are previewed on the page when viewing them
 - Directories can be downloaded as .zip files, files can be downloaded individually
-- **TODO** Search page to allow searching using file and directory names, given locations, or shared status
+- Basic search page to allow searching using name and content type
 
 ## Technologies
 - Written in **Typescript**, to enhance dev experience with type safety and IntelliSense
@@ -28,10 +28,14 @@ A minimal implementation of a personal storage service.
 ## Concerns of Improvement
 - Accessibility - does the interface provide an acceptable accessibility experience?
 - Vulnerability - are some forms, routes, previews prone to attacks?
+- Styling - additions to the CSS have been somewhat slapdash. Can the CSS be made more modular easier to manage?
 
 ### Miscellaneous TODOs
 - Add repo link to header
-- Change Supabase file names to include user IDs too
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
-- Can header adopt different layout on mobile width?
+- Have header adopt different layout when narrow
+- Can there be a total storage limit per user?
+- Add date added and date modified to directories and files
+- Format dates on views in a more reader-friendly way
+

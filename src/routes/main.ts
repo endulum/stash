@@ -1,15 +1,14 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
-import { body } from 'express-validator';
 import multer from 'multer';
-import bcrypt from 'bcryptjs'
-import prisma from '../prisma';
 
 import handleValidationErrors from '../middleware/handleValidationErrors';
-import usernameValidation from '../functions/usernameValidation';
 import { 
   controller as account, 
   validation as accountValidation } from '../controllers/account'
+import {
+  controller as search,
+  validation as searchValidation } from '../controllers/search'
 import { 
   controller as directory, 
   validation as directoryValidation } from '../controllers/directory'
@@ -33,6 +32,11 @@ router.route('/account')
 router.route('/delete')
   .get(account.renderDelete)
   .post(accountValidation.forDelete, handleValidationErrors, account.submitDelete)
+
+// FILE SEARCH
+
+router.route('/search')
+  .get(searchValidation, search.renderSearch)
 
 // DIRECTORY CRUD
 
