@@ -30,6 +30,10 @@ router.route('/account')
   .get(account.renderUpdate)
   .post(accountValidation.forUpdate, handleValidationErrors, account.submitUpdate)
 
+router.route('/delete')
+  .get(account.renderDelete)
+  .post(accountValidation.forDelete, handleValidationErrors, account.submitDelete)
+
 // DIRECTORY CRUD
 
 router.route('/directory/new')

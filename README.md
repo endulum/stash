@@ -7,7 +7,7 @@ A minimal implementation of a personal storage service.
 ### Users
 - User accounts can be created and logged into
 - User account usernames and passwords can be edited
-- **TODO** Users can delete their own accounts and content
+- Users can delete their own accounts and content
 ### Files and Directories
 - Users can create directories and navigate among them, similarly to a file explorer
 - Directory names and locations can be edited
