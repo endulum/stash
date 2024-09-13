@@ -24,7 +24,8 @@ export const validation: Record<string, ValidationChain[]> = {
             ),
             directoryId: 'location' in req.body
               ? req.body.location
-              : req.currentFile.directoryId
+              : req.currentFile.directoryId,
+            authorId: req.user.id
           }
         })
         if (duplicateFile)
@@ -47,7 +48,8 @@ export const validation: Record<string, ValidationChain[]> = {
             name: value,
             directoryId: 'location' in req.body
               ? req.body.location
-              : req.currentFile.directoryId
+              : req.currentFile.directoryId,
+            authorId: req.user.id
           }
         })
         if (duplicateFile && duplicateFile.id !== req.currentFile.id)

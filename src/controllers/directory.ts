@@ -30,7 +30,8 @@ export const validation: Record<string, ValidationChain[]> = {
               ? req.body.location === 'home' 
                 ? null 
                 : req.body.location
-              : req.currentDirectory.parentId
+              : req.currentDirectory.parentId,
+            authorId: req.user.id
           }
         })
         if (duplicateDirectory) {
