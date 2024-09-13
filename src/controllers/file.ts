@@ -15,7 +15,10 @@ export const validation: Record<string, ValidationChain[]> = {
   forCreate: [
     body('upload')
       .custom(async (value, { req }) => {
-        if (!req.file) throw new Error('Please upload a file.')
+        if (!req.file) throw new Error('Please upload a file.');
+        if (req.file.size > 5242880) {
+          throw new Error('Files cannot be larger than 5 megabytes (5,242,880 bytes) in size.')
+        }
         const duplicateFile = await prisma.file.findFirst({
           where: {
             name: req.file.originalname.substring(
