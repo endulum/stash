@@ -6,7 +6,7 @@ A minimal implementation of a personal storage service.
 ## Features
 ### Users
 - User accounts can be created and logged into
-- **TODO** User account usernames and passwords can be edited
+- User account usernames and passwords can be edited
 - **TODO** Users can delete their own accounts and content
 ### Files and Directories
 - Users can create directories and navigate among them, similarly to a file explorer

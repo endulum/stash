@@ -1,11 +1,21 @@
 import express from 'express';
 import asyncHandler from 'express-async-handler';
+import { body } from 'express-validator';
 import multer from 'multer';
+import bcrypt from 'bcryptjs'
+import prisma from '../prisma';
 
 import handleValidationErrors from '../middleware/handleValidationErrors';
-//import file from '../controllers/file'
-import { controller as directory, validation as directoryValidation } from '../controllers/directory'
-import { controller as file, validation as fileValidation } from '../controllers/file'
+import usernameValidation from '../functions/usernameValidation';
+import { 
+  controller as account, 
+  validation as accountValidation } from '../controllers/account'
+import { 
+  controller as directory, 
+  validation as directoryValidation } from '../controllers/directory'
+import { 
+  controller as file, 
+  validation as fileValidation } from '../controllers/file'
 
 const storage = multer.memoryStorage();
 const upload = multer({ storage: storage });
@@ -13,6 +23,12 @@ const router = express.Router();
 
 router.route(['/', '/login', '/signup'])
   .get(asyncHandler(async (req, res) => res.redirect('/directory')))
+
+// USER SETTINGS
+
+router.route('/account')
+  .get(account.renderUpdate)
+  .post(accountValidation.forUpdate, handleValidationErrors, account.submitUpdate)
 
 // DIRECTORY CRUD
 
@@ -64,7 +80,7 @@ router.route('/logout')
   .get(asyncHandler(async (req, res, next) => {
     req.logOut((err) => {
       if (err) return next(err)
-        req.flash('success', 'You have been logged out. See you soon!')
+      req.flash('success', 'You have been logged out. See you soon!')
       return res.redirect('/login')
     })
   }))

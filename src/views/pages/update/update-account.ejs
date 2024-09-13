@@ -1,0 +1,36 @@
+<form action="/account" method="post">
+  <%- include('../../components/form-input', { 
+    name: 'username',
+    label: 'Username',
+    type: 'text',
+    includePrevInput: true
+  }) %>
+
+  <div style="width: 100%;">
+    <h3>Password</h3>
+    <p>Leave this area blank if you would not like to change your password.</p>
+  </div>
+  
+  <%- include('../../components/form-input', { 
+    name: 'password',
+    label: 'New password',
+    type: 'password',
+    includePrevInput: false
+  }) %>
+
+  <%- include('../../components/form-input', { 
+    name: 'confirmPassword',
+    label: 'Confirm password',
+    type: 'password',
+    includePrevInput: false
+  }) %>
+
+  <%- include('../../components/form-input', { 
+    name: 'currentPassword',
+    label: 'Current password',
+    type: 'password',
+    includePrevInput: false
+  }) %>
+
+  <button type="submit">Submit</button>
+</form>
