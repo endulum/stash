@@ -37,6 +37,8 @@ nav {
   display: flex;
   flex-direction: row;
   gap: 0.5rem;
+  flex-wrap: wrap;
+  justify-content: end;
 }
 
 .header-body {
@@ -58,7 +60,10 @@ nav {
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
-  align-items: center;
+  align-items: top;
+  p {
+    min-width: max-content;
+  }
 }
 
 h1 {
@@ -133,6 +138,7 @@ a[type="button"], button {
   }
   svg {
     width: 1rem;
+    min-width: 1rem;
     transition: fill 0.25s ease;
   }
   &:hover {
