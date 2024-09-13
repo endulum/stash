@@ -24,73 +24,95 @@
 <div class="path-row">
   <%- include('../../components/directory-path') %>
 
-  <a 
-    type="button" 
-    class="info" 
-    href=<%= '/directory/' + (currentDirectory 
-      ? (currentDirectory.id + '/download')
-      : 'download') %>
-  >
-    <%- include('../../svg/download.svg') %>
-    <span>Download</span>
-  </a>
+  <%
+  if (
+    currentDirectory ||
+    directories.length > 0 ||
+    files.length > 0
+  ) { %> 
+    <a 
+      type="button" 
+      class="info" 
+      href=<%= '/directory/' + (currentDirectory 
+        ? (currentDirectory.id + '/download')
+        : 'download') %>
+    >
+      <%- include('../../svg/download.svg') %>
+      <span>Download</span>
+    </a>
+  <% } %>
 </div>
 
-<table cellpadding="0" cellspacing="0">
-  <thead>
-    <tr> <td><span>Name</span></td> <td>Type</td> <td>Size</td> </tr>
-  </thead>
-
-  <!-- ".." link to parent directory -->
-  <% if (currentDirectory) { %>
-    <tr>
-      <td>
-        <a class="entry-link" href=<%= currentDirectory.parentId 
-          ? '/directory/' +  currentDirectory.parentId
-          : '/directory' %>>
-          <span>..</span>
-        </a>
-      </td>
-      <td>-</td>
-      <td>-</td>
-    </tr>
-  <% } %>
-
-  <!-- first, list directories -->
-
-  <% directories.forEach(directory => { %>
-    <tr>
-      <td>
-        <a class="entry-link" href=<%= '/directory/' + directory.id %>>
-          <%- include('../../svg/folder.svg') %>
-          <span>
-            <b><%= directory.name %></b>/
-          </span>
-        </a>
-      </td>
-      <td>directory</td>
-      <td>-</td>
-    </tr>
-  <% }) %>
-
-  <!-- then, list child files -->
-
-  <% files.forEach(file => { %>
-    <tr>
-      <td>
-        <a class="entry-link" href=<%= '/file/' + file.id %>>
-          <%- include('../../svg/file.svg') %>
-          <span>
-            <b><%= file.name %></b>.<%= file.ext %>
-          </span>
-        </a>
-      </td>
-      <td><%= file.type %></td>
-      <td><%= file.size %> bytes</td>
-    </tr>
-  <% }) %>
-
-</table>
+<%
+  if (
+    !currentDirectory &&
+    directories.length === 0 &&
+    files.length === 0
+  ) {
+%>
+  <div class="alert" style="margin-top: 1rem;">
+    <%- include('../../svg/info.svg') %>
+    <p>
+      Your filesystem is currently empty. You can get started on creating your filesystem with the <b>Add Directory</b> and <b>Add File</b> links below. Files and directories you create will be shown here in a table.
+    </p>
+  </div>
+<% } else { %>
+  <table cellpadding="0" cellspacing="0">
+    <thead>
+      <tr> <td><span>Name</span></td> <td>Type</td> <td>Size</td> </tr>
+    </thead>
+  
+    <!-- ".." link to parent directory -->
+    <% if (currentDirectory) { %>
+      <tr>
+        <td>
+          <a class="entry-link" href=<%= currentDirectory.parentId 
+            ? '/directory/' +  currentDirectory.parentId
+            : '/directory' %>>
+            <span>..</span>
+          </a>
+        </td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    <% } %>
+  
+    <!-- first, list directories -->
+  
+    <% directories.forEach(directory => { %>
+      <tr>
+        <td>
+          <a class="entry-link" href=<%= '/directory/' + directory.id %>>
+            <%- include('../../svg/folder.svg') %>
+            <span>
+              <b><%= directory.name %></b>/
+            </span>
+          </a>
+        </td>
+        <td>directory</td>
+        <td>-</td>
+      </tr>
+    <% }) %>
+  
+    <!-- then, list child files -->
+  
+    <% files.forEach(file => { %>
+      <tr>
+        <td>
+          <a class="entry-link" href=<%= '/file/' + file.id %>>
+            <%- include('../../svg/file.svg') %>
+            <span>
+              <b><%= file.name %></b>.<%= file.ext %>
+            </span>
+          </a>
+        </td>
+        <td><%= file.type %></td>
+        <td><%= file.size %> bytes</td>
+      </tr>
+    <% }) %>
+  
+  </table>
+<% } %>
 
 <div class="controls">
   <a type="button" class="success" href=<%= '/directory/new' + (currentDirectory ? ('?dest=' + currentDirectory.id) : '') %>>

@@ -32,6 +32,5 @@ A minimal implementation of a personal storage service.
 ### Miscellaneous TODOs
 - Add repo link to header
 - Change Supabase file names to include user IDs too
-- Different directory table layout if there is nothing in user's root filesystem
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
