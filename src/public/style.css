@@ -22,7 +22,7 @@
     border-bottom: 1px solid oklch(from var(--fg) l c h / 0.25);
   }
 
-  a[type="button"], button, .alert, input, select, textarea {
+  a[type="button"], button, .alert, .search-result, input, select, textarea {
     border: 1px solid oklch(from var(--fg) l c h / 0.25);
     background-color: oklch(from var(--fg) l c h / 0.125);
     svg {
