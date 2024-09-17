@@ -18,7 +18,8 @@ body, a, a[type="button"], button, input, select {
 
 header {
   background-color: oklch(from var(--fg) l c h / 0.125);
-  border-bottom: 1px solid oklch(from var(--fg) l c h / 0.25)
+  border-bottom: 1px solid oklch(from var(--fg) l c h / 0.25);
+  padding-top: 2.5%;
 }
 
 main {
@@ -30,19 +31,8 @@ header, main {
   flex-direction: column;
   justify-content: start;
   align-items: center;
-  padding: 0 2rem;
-}
-
-nav {
-  display: flex;
-  flex-direction: row;
-  gap: 0.5rem;
-  flex-wrap: wrap;
-  justify-content: end;
-}
-
-.header-body {
-  margin-top: 2.5%;
+  padding-left: 2rem;
+  padding-right: 2rem;
 }
 
 .main-body {
@@ -55,14 +45,47 @@ nav {
   padding: 1rem 0;
 }
 
-.header-row {
+.header-body {
+  display: flex;
+  flex-direction: column;
+  container: header / inline-size;
+}
+
+.header-userstatus {
+  align-self: flex-end; 
+}
+
+.header-main {
   display: flex;
   flex-direction: row;
-  width: 100%;
+  align-items: end;
   justify-content: space-between;
-  align-items: top;
-  p {
-    min-width: max-content;
+  margin-top: 0.5rem;
+}
+
+h1 {
+  line-height: 2.5rem;
+}
+
+nav {
+  display: flex;
+  flex-direction: row;
+  gap: 0.5rem;
+}
+
+@container header (width < 550px) {
+  .header-main {
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+  }
+
+  nav {
+    width: 100%;
+  }
+
+  nav a {
+    width: calc(25% - 0.125rem);
   }
 }
 

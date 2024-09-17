@@ -10,15 +10,21 @@
   <body>
     <header>
       <div class="header-body">
-        <h1>
-          <b>Stash</b>
-        </h1>
-        <div class="header-row">
-          <% if (locals.user) { %>
-            <p>
-              Logged in as <b><%= locals.user.username %></b>
-            </p>
-            <nav>
+        <div class="header-userstatus">
+          <p>
+            <% if (locals.user) { %>
+              <p>
+                Logged in as <b><%= locals.user.username %></b>
+              </p>
+            <% } else { %>
+              Not currently logged in
+            <% } %>
+          </p>
+        </div>
+        <div class="header-main">
+          <h1><b>Stash</b></h1>
+          <nav>
+            <% if (locals.user) { %>
               <a type="button" href="/">
                 <%- include('svg/file-tree.svg') %>
                 <span>Files</span>
@@ -35,12 +41,7 @@
                 <%- include('svg/logout.svg') %>
                 <span>Log out</span>
               </a>
-            </nav>
-          <% } else { %>
-            <p>
-              Not logged in
-            </p>
-            <nav>
+            <% } else { %>
               <a type="button" href="/login">
                 <%- include('svg/login.svg') %>
                 <span>Log in</span>
@@ -49,8 +50,8 @@
                 <%- include('svg/star.svg') %>
                 <span>Sign up</span>
               </a> 
-            </nav>
-          <% } %>
+            <% } %>
+          </nav>
         </div>
       </div>
     </header>
