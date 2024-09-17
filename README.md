@@ -31,10 +31,10 @@ A minimal implementation of a personal storage service.
 - Styling - additions to the CSS have been somewhat slapdash. Can the CSS be made more modular easier to manage?
 
 ### Miscellaneous TODOs
+- Button to copy share link
 - Add repo link to header
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
-- Have header adopt different layout when narrow
 - Can there be a total storage limit per user?
 - Add date added and date modified to directories and files
 - Format dates on views in a more reader-friendly way

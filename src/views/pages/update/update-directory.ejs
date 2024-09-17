@@ -12,11 +12,11 @@
     currentDirectory.shareUntil && 
     Date.parse(currentDirectory.shareUntil) > Date.parse(new Date())
   ) { %>
-    <p style="grid-column: 1 / 3;">
+    <p>
       Currently, this directory is <b>public</b>. It can be seen by anyone until <%= currentDirectory.shareUntil %>. You can change the end date in the field below, or clear the date to make this directory private again.
     </p>
   <% } else { %>
-    <p style="grid-column: 1 / 3;">
+    <p>
       Currently, this directory is <b>private</b>. It cannot be seen by anyone other than you. You can make this directory publically visible by entering a future date below. The directory can be seen by anyone until the entered date.
     </p>
   <% } %>

@@ -1,26 +1,30 @@
 <small class="path-links">
   <% if (path.length === 0) { %>
-    <span>
-      Viewing root <%= 'sharedDirectory' in locals ? 'of shared directory' : 'of your filesystem'%>
-    </span>
+      At root <%= 'sharedDirectory' in locals ? 'of shared directory' : 'of your filesystem'%>
   <% } else { %>
 
-    <span>Viewing</span> <a class="path-link" href=<%= 
+    <a class="path-link" href=<%= 
       'sharedDirectory' in locals 
         ? ('/share/' + sharedDirectory.id) 
-        : '/directory' %>><%= 'sharedDirectory' in locals ? 'shared ' : ''
-    %>root</a>
+        : '/directory' %>>(<%= 'sharedDirectory' in locals ? 'shared ' : ''
+    %>root)</a>
 
     <% path.forEach((directory, index) => { %>
       <% if (index === path.length - 1) { %>
-        <%- include('../svg/path-arrow.svg') %>  <b><%= directory.name %></b>
+
+          <%- include('../svg/path-arrow.svg') %>  
+          <b><%= directory.name %></b>
+        
       <% } else { %>
-        <%- include('../svg/path-arrow.svg') %> <a class="path-link" href=<%= 
-          ('sharedDirectory' in locals 
-            ? ('/share/' + sharedDirectory.id) 
-            : '') 
-          + '/directory/' + directory.id 
-        %>> <%= directory.name %></a>
+
+          <%- include('../svg/path-arrow.svg') %> 
+          <a class="path-link" href=<%= 
+            ('sharedDirectory' in locals 
+              ? ('/share/' + sharedDirectory.id) 
+              : '') 
+            + '/directory/' + directory.id 
+          %>> <%= directory.name %></a>
+        
       <% } %>
     <% }) %>
   <% } %>

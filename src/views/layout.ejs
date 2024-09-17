@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="dark">
   <head>
     <title><%= title %></title>
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
@@ -10,19 +10,15 @@
   <body>
     <header>
       <div class="header-body">
-        <div class="header-userstatus">
-          <p>
-            <% if (locals.user) { %>
-              <p>
-                Logged in as <b><%= locals.user.username %></b>
-              </p>
-            <% } else { %>
-              Not currently logged in
-            <% } %>
-          </p>
-        </div>
+        <p class="header-userstatus">
+          <% if (locals.user) { %>
+            Logged in as <b><%= locals.user.username %></b>
+          <% } else { %>
+            Not currently logged in
+          <% } %>
+        </p>
         <div class="header-main">
-          <h1><b>Stash</b></h1>
+          <h1>Stash</h1>
           <nav>
             <% if (locals.user) { %>
               <a type="button" href="/">
