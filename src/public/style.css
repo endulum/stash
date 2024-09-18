@@ -1,150 +1,215 @@
-/* THEMING */
+* {
+  transition: background-color 0.25s ease, border-color 0.25s ease;
+}
 
-/* dark theme */
+/* THEMING START */
 
-[data-theme="dark"] {
-  --bg: rgb(20, 20, 25);
-  --fg: rgb(230, 230, 230);
+:root {
   --success: yellowgreen;
   --info: cadetblue;
   --warning: crimson;
+}
 
-  body {
-    background-color: oklch(from var(--bg) l c h);
-  }
-
-  body, a, a[type="button"], button, input, select, textarea {
-    color: oklch(from var(--fg) l c h)
-  }
+[data-theme="light"] {
+  --bg: rgb(252, 252, 252);
+  --fg: rgb(50, 50, 55);
+  --neutral-border: oklch(from var(--fg) l c h / 0.25);
+  --neutral-background: oklch(from var(--fg) l c h / 0.125);
+  --neutral-hover-border: oklch(from var(--fg) l c h / 0.5);
+  --neutral-hover-background: var(--bg);
 
   header {
-    background-color: oklch(from var(--fg) l c h / 0.125);
-    border-bottom: 1px solid oklch(from var(--fg) l c h / 0.25);
+    background-color: oklch(from var(--fg) l c h / 0.0625);
   }
 
   a[type="button"], button, .alert, .search-result, input, select, textarea {
-    border: 1px solid oklch(from var(--fg) l c h / 0.25);
-    background-color: oklch(from var(--fg) l c h / 0.125);
-    svg {
-      fill: oklch(from var(--fg) l c h / 0.25);
-    }
-
-    &.success {
-      border-color: oklch(from var(--success) l c h / 0.75);
-      background-color: oklch(from var(--success) l c h / 0.25);
-      svg {
-        fill: oklch(from var(--success) l c h / 0.75);
-      }
-    }
-  
-    &.info {
-      border-color: oklch(from var(--info) l c h / 0.75);
-      background-color: oklch(from var(--info) l c h / 0.25);
-      svg {
-        fill: oklch(from var(--info) l c h / 0.75);
-      }
-    }
-  
-    &.warning {
-      border-color: oklch(from var(--warning) l c h / 0.75);
-      background-color: oklch(from var(--warning) l c h / 0.25);
-      svg {
-        fill: oklch(from var(--warning) l c h / 0.75);
-      }
-    }
-  }
-
-  a[type="button"]:hover, button:hover {
-    border-color: oklch(from var(--fg) l c h / 0.5);
-    background-color: oklch(from var(--fg) l c h / 0.25);
-    svg {
-      fill: oklch(from var(--fg) l c h / 0.5);
-    }
-
-    &.success {
-      border-color: oklch(from var(--success) l c h / 1);
-      background-color: oklch(from var(--success) l c h / 0.5);
-      svg {
-        fill: oklch(from var(--success) l c h / 1);
-      }
-    }
-  
-    &.info {
-      border-color: oklch(from var(--info) l c h / 1);
-      background-color: oklch(from var(--info) l c h / 0.5);
-      svg {
-        fill: oklch(from var(--info) l c h / 1);
-      }
-    }
-  
-    &.warning {
-      border-color: oklch(from var(--warning) l c h / 1);
-      background-color: oklch(from var(--warning) l c h / 0.5);
-      svg {
-        fill: oklch(from var(--warning) l c h / 1);
-      }
-    }
-  }
-
-  .input:has(.error) {
-    input, select {
-      background-color: oklch(from var(--warning) l c h / 0.25);
-      border: 1px solid oklch(from var(--warning) l c h / 0.5);
-    }
+    background-color: var(--neutral-hover-background);
   }
 
   .path-links {
     svg {
-      fill: oklch(from var(--fg) l c h / 0.5)
+      fill: var(--neutral-border)
     }
   }
-
+  
   .path-link {
-    background-color: oklch(from var(--fg) l c h / 0.125);
+    background-color: var(--neutral-background);
     &:hover {
-      background-color: oklch(from var(--fg) l c h / 0.25);
+      background-color: var(--neutral-border)
     }
   }
 
-  table {
-    border: 1px solid oklch(from var(--fg) l c h / 0.25);
-    td {
-      border-bottom: 1px solid oklch(from var(--fg) l c h / 0.25);
-    }
-    thead {
-      background-color: oklch(from var(--fg) l c h / 0.125);
-      td {
-        border-bottom: 1px solid oklch(from var(--fg) l c h / 0.125);
-      }
-    }
-  }
-
-  .entry-link {
-    svg {
-      fill: oklch(from var(--fg) l c h / 0.25);
-    }
-    &:hover {
-      background-color: oklch(from var(--fg) l c h / 0.125);
-      svg {
-        fill: oklch(from var(--fg) l c h / 0.5);
-      }
-    }
-  }
-
-  #preview {
-    border: 1px solid oklch(from var(--fg) l c h / 0.25);
-    background-color: oklch(from var(--fg) l c h / 0.125);
+  thead {
+    background-color: oklch(from var(--fg) l c h / 0.0625);
   }
 }
 
+[data-theme="dark"] {
+  --bg: rgb(20, 20, 25);
+  --fg: rgb(230, 230, 230);
+  --neutral-border: oklch(from var(--fg) l c h / 0.25);
+  --neutral-background: oklch(from var(--fg) l c h / 0.125);
+  --neutral-hover-border: oklch(from var(--fg) l c h / 0.5);
+  --neutral-hover-background: oklch(from var(--fg) l c h / 0.25);
+
+  header {
+    background-color: oklch(from var(--fg) l c h / 0.125);
+  }
+
+  a[type="button"], button, .alert, .search-result, input, select, textarea {
+    background-color: var(--neutral-background);
+    &.success {
+      background-color: oklch(from var(--success) l c h / 0.25);
+    }
+    &.info {
+      background-color: oklch(from var(--info) l c h / 0.25);
+    }
+    &.warning {
+      background-color: oklch(from var(--warning) l c h / 0.25);
+    }
+  }
+
+  a[type="button"]:hover, button:hover {
+    &.success {
+      background-color: oklch(from var(--success) l c h / 0.5);
+    }
+    &.info {
+      background-color: oklch(from var(--info) l c h / 0.5);
+    }
+    &.warning {
+      background-color: oklch(from var(--warning) l c h / 0.5);
+    } 
+  }
+
+  .path-links {
+    svg {
+      fill: var(--neutral-hover-background)
+    }
+  }
+  
+  .path-link {
+    background-color: var(--neutral-background);
+    &:hover {
+      background-color: var(--neutral-hover-background)
+    }
+  }
+
+  thead {
+    background-color: var(--neutral-background);
+  }
+
+  #preview {
+    background-color: var(--neutral-background);
+  }
+}
+
+body, a, a[type="button"], button, input, select, textarea {
+  color: var(--fg);
+}
+
+a[type="button"], button, .alert, .search-result, input, select, textarea {
+  border-color: var(--neutral-border);
+  svg {
+    fill: var(--neutral-border);
+  }
+
+  &.success {
+    border-color: oklch(from var(--success) l c h / 0.75);
+    svg {
+      fill: oklch(from var(--success) l c h / 0.75);
+    }
+  }
+
+  &.info {
+    border-color: oklch(from var(--info) l c h / 0.75);
+    svg {
+      fill: oklch(from var(--info) l c h / 0.75);
+    }
+  }
+
+  &.warning {
+    border-color: oklch(from var(--warning) l c h / 0.75);
+    svg {
+      fill: oklch(from var(--warning) l c h / 0.75);
+    }
+  }
+}
+
+a[type="button"]:hover, button:hover {
+  border-color: var(--neutral-hover-border);
+  background-color: var(--neutral-hover-background);
+  svg {
+    fill: var(--neutral-hover-border);
+  }
+
+  &.success {
+    border-color: oklch(from var(--success) l c h / 1);
+    svg {
+      fill: oklch(from var(--success) l c h / 1);
+    }
+  }
+
+  &.info {
+    border-color: oklch(from var(--info) l c h / 1);
+    svg {
+      fill: oklch(from var(--info) l c h / 1);
+    }
+  }
+
+  &.warning {
+    border-color: oklch(from var(--warning) l c h / 1);
+    svg {
+      fill: oklch(from var(--warning) l c h / 1);
+    }
+  }
+}
+
+.input:has(.error) {
+  input, select {
+    background-color: oklch(from var(--warning) l c h / 0.25);
+    border: 1px solid oklch(from var(--warning) l c h / 0.5);
+  }
+}
+
+table {
+  border-color: var(--neutral-border);
+  td {
+    border-color: var(--neutral-border);
+  }
+  thead {
+    td {
+      border-color: oklch(from var(--fg) l c h / 0.1875);
+    }
+  }
+}
+
+.entry-link {
+  svg {
+    fill: var(--neutral-border);
+  }
+  &:hover {
+    background-color: var(--neutral-background);
+    svg {
+      fill: var(--neutral-hover-border);
+    }
+  }
+}
+
+#preview {
+  border-color: var(--neutral-border);
+}
 
 body {
+  background-color: var(--bg);
   display: flex;
   flex-direction: column;
 }
 
 header {
+  border-bottom-color: var(--neutral-border);
   padding-top: max(5%, 2rem);
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
 }
 
 main {
@@ -155,6 +220,8 @@ header, main {
   padding-left: 2rem;
   padding-right: 2rem;
 }
+
+/* THEMING END */
 
 /* header area */
 
@@ -244,7 +311,9 @@ a[type="button"], button {
   }
 }
 
-a[type="button"], button, input, select {
+.alert, a[type="button"], button, input, select, textarea {
+  border-width: 1px;
+  border-style: solid;
   font-size: 0.875rem;
 }
 
@@ -271,7 +340,7 @@ a[type="button"], button, input, select {
     align-items: center;
   }
   svg {
-    width: 1rem;
+    width: 1.5rem;
   }
 }
 
@@ -283,12 +352,16 @@ a[type="button"], button, input, select {
 /* table */
 
 table {
+  border-width: 1px;
+  border-style: solid;
   width: 100%;
   max-width: 100%;
   border-collapse: separate;
   border-radius: 5px;
   overflow: hidden;
   td {
+    border-bottom-width: 1px;
+    border-bottom-style: solid;
     &:first-child {
       padding: 0.375rem;
       width: 100%;
@@ -320,6 +393,7 @@ table {
   hyphens: auto;
   /* https://stackoverflow.com/questions/1236148/html-css-how-to-stop-a-table-cell-from-expanding */
 
+  transition: none;
   display: inline-block;
   width: 100%;
   border-radius: 5px;
@@ -413,6 +487,8 @@ input, select {
 }
 
 .search-result {
+  border-width: 1px;
+  border-style: solid;
   padding: 0.5rem;
   border-radius: 5px;
   display: flex;
@@ -435,6 +511,8 @@ input, select {
 /* file preview area */
 
 #preview {
+  border-width: 1px;
+  border-style: solid;
   border-radius: 5px;
   padding: 1rem;
   img {
@@ -444,6 +522,7 @@ input, select {
   }
   textarea {
     appearance: none;
+    border: none;
     background: transparent;
     font-family: monospace;
     width: 100%;
