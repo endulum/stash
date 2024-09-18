@@ -34,7 +34,6 @@ A minimal implementation of a personal storage service.
 
 ### Miscellaneous TODOs
 - Button to copy share link
-- Add repo link to header
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
 - Can there be a total storage limit per user?
