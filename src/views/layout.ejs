@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
   <head>
     <title><%= title %></title>
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
@@ -16,6 +16,8 @@
           <% } else { %>
             Not currently logged in
           <% } %>
+          |
+          <a href="#" id="theme-toggle"></a>
         </p>
         <div class="header-main">
           <h1>Stash</h1>
@@ -77,5 +79,27 @@
         <%- include(`${page}`) %>
       </div>
     </main>
+
+    <script defer>
+      const themeToggle = document.getElementById('theme-toggle');
+      const html = document.querySelector('html');
+      const currentTheme = () => html.dataset['theme'];
+
+      function changeToggleText() {
+        if (currentTheme() === 'light') {
+        themeToggle.innerText = 'Lights off'
+        } else if (currentTheme() === 'dark') {
+          themeToggle.innerText = 'Lights on'
+        }
+      }
+
+      changeToggleText()
+      
+      themeToggle.addEventListener('click', () => {
+        html.dataset['theme'] = currentTheme() === 'light' 
+          ? 'dark' : 'light';
+        changeToggleText()
+      })
+    </script>
   </body>
 </html>
