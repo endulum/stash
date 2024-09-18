@@ -21,7 +21,6 @@ export const controller: Record<string, RequestHandler> = {
       req.flash('warning', 'You must be logged in to search your files.')
       return res.redirect('/login')
     }
-    console.log(req.query)
     let results: Array<File | Directory> = []
     const defaultParams = { 
       name: { contains: req.query.name as string },
@@ -62,8 +61,6 @@ export const controller: Record<string, RequestHandler> = {
           })
       }
     }
-
-    console.log(results)
 
     // prepare the Unique Types dropdown
     const fileTypes = (await prisma.file.findMany({
