@@ -328,6 +328,14 @@ h1 {
   line-height: 2rem;
 }
 
+h2 {
+  font-size: 2rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+}
+
 a, a[type="button"], button {
   text-decoration: none;
   cursor: pointer;
