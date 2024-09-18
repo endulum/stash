@@ -17,6 +17,8 @@ A minimal implementation of a personal storage service.
 - Files of types `text` and `image` are previewed on the page when viewing them
 - Directories can be downloaded as .zip files, files can be downloaded individually
 - Basic search page to allow searching using name and content type
+### UI
+- Toggleable light and dark themes, with preference stored
 
 ## Technologies
 - Written in **Typescript**, to enhance dev experience with type safety and IntelliSense

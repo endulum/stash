@@ -203,6 +203,11 @@ body {
   background-color: var(--bg);
   display: flex;
   flex-direction: column;
+  /* &.block-transitions, .block-transitions * {
+    -webkit-transition: none!important;
+    -moz-transition: none!important;
+    transition: none!important;
+  } */
 }
 
 header {

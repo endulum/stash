@@ -1,11 +1,28 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
   <head>
     <title><%= title %></title>
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
     <link rel="stylesheet" href="/reset.css">
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/fonts/fonts.css">
+
+    <script>
+      html = document.querySelector('html');
+      const themePreference = localStorage.getItem('theme-preference')
+
+      if (themePreference) { // first, is there a saved theme preference?
+        html.dataset['theme'] = themePreference
+      } else if (window.matchMedia) { // second, does the browser prefer a theme?
+        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          html.dataset['theme'] = 'dark'
+        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+          html.dataset['theme'] = 'light'
+        }
+      } else {
+        html.dataset['theme'] = 'light'
+      }
+    </script>
   </head>
   <body>
     <header>
@@ -82,7 +99,6 @@
 
     <script defer>
       const themeToggle = document.getElementById('theme-toggle');
-      const html = document.querySelector('html');
       const currentTheme = () => html.dataset['theme'];
 
       function changeToggleText() {
@@ -96,9 +112,12 @@
       changeToggleText()
       
       themeToggle.addEventListener('click', () => {
-        html.dataset['theme'] = currentTheme() === 'light' 
+        const prevTheme = currentTheme()
+        html.dataset['theme'] = prevTheme === 'light' 
           ? 'dark' : 'light';
         changeToggleText()
+        localStorage.setItem('theme-preference', prevTheme === 'light' 
+          ? 'dark' : 'light')
       })
     </script>
   </body>
