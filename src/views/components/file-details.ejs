@@ -1,0 +1,29 @@
+<h3>File Details</h3>
+<ul>
+  <li>
+    <b>Type: </b>
+    <%= file.type %>
+  </li>
+  <li>
+    <b>Size: </b>
+    <%= file.size %> bytes
+  </li>
+  <li>
+    <b>Uploaded: </b>
+    <%= 
+      file.createdAt.toLocaleString('default', { 
+        month: 'long', day: 'numeric', year: 'numeric', time: 'numeric'
+      })
+    %>
+  </li>
+  <li>
+    <b>Last modified: </b>
+    <%= 
+      file.updatedAt
+        ? file.updatedAt.toLocaleString('default', { 
+            month: 'long', day: 'numeric', year: 'numeric', time: 'numeric'
+          })
+        : 'Never'
+    %>
+  </li>
+</ul>
