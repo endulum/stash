@@ -402,6 +402,10 @@ a[type="button"], button {
 
 /* table */
 
+.table-wrapper {
+  container: directory / inline-size;
+}
+
 table {
   border-width: 1px;
   border-style: solid;
@@ -424,6 +428,12 @@ table {
   }
   tbody tr:last-of-type td {
     border-bottom: none;
+  }
+}
+
+@container directory (width < 600px) {
+  td:nth-child(2) {
+    display: none;
   }
 }
 
