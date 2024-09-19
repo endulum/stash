@@ -56,61 +56,75 @@
     </p>
   </div>
 <% } else { %>
-  <table cellpadding="0" cellspacing="0">
-    <thead>
-      <tr> <td><span>Name</span></td> <td>Type</td> <td>Size</td> </tr>
-    </thead>
-  
-    <!-- ".." link to parent directory -->
-    <% if (currentDirectory) { %>
-      <tr>
-        <td>
-          <a class="entry-link" href=<%= currentDirectory.parentId 
-            ? '/directory/' +  currentDirectory.parentId
-            : '/directory' %>>
-            <span>..</span>
-          </a>
-        </td>
-        <td>-</td>
-        <td>-</td>
-      </tr>
-    <% } %>
-  
-    <!-- first, list directories -->
-  
-    <% directories.forEach(directory => { %>
-      <tr>
-        <td>
-          <a class="entry-link" href=<%= '/directory/' + directory.id %>>
-            <%- include('../../svg/folder.svg') %>
-            <span>
-              <b><%= directory.name %></b>/
-            </span>
-          </a>
-        </td>
-        <td>directory</td>
-        <td>-</td>
-      </tr>
-    <% }) %>
-  
-    <!-- then, list child files -->
-  
-    <% files.forEach(file => { %>
-      <tr>
-        <td>
-          <a class="entry-link" href=<%= '/file/' + file.id %>>
-            <%- include('../../svg/file.svg') %>
-            <span>
-              <b><%= file.name %></b>.<%= file.ext %>
-            </span>
-          </a>
-        </td>
-        <td><%= file.type %></td>
-        <td><%= file.size %> bytes</td>
-      </tr>
-    <% }) %>
-  
-  </table>
+  <div class="table-wrapper">
+    <table cellpadding="0" cellspacing="0">
+      <thead>
+        <tr> 
+          <td><span>Name</span></td> 
+          <td>Type</td> 
+          <td>Size</td> 
+          <td>Uploaded</td>
+        </tr>
+      </thead>
+    
+      <!-- ".." link to parent directory -->
+      <% if (currentDirectory) { %>
+        <tr>
+          <td>
+            <a class="entry-link" href=<%= currentDirectory.parentId 
+              ? '/directory/' +  currentDirectory.parentId
+              : '/directory' %>>
+              <span>..</span>
+            </a>
+          </td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      <% } %>
+    
+      <!-- first, list directories -->
+    
+      <% directories.forEach(directory => { %>
+        <tr>
+          <td>
+            <a class="entry-link" href=<%= '/directory/' + directory.id %>>
+              <%- include('../../svg/folder.svg') %>
+              <span>
+                <b><%= directory.name %></b>/
+              </span>
+            </a>
+          </td>
+          <td>directory</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      <% }) %>
+    
+      <!-- then, list child files -->
+    
+      <% files.forEach(file => { %>
+        <tr>
+          <td>
+            <a class="entry-link" href=<%= '/file/' + file.id %>>
+              <%- include('../../svg/file.svg') %>
+              <span>
+                <b><%= file.name %></b>.<%= file.ext %>
+              </span>
+            </a>
+          </td>
+          <td><%= file.type %></td>
+          <td><%= file.size %> bytes</td>
+          <td><%= 
+            file.createdAt.toLocaleString('default', { 
+              month: 'numeric', day: 'numeric', year: 'numeric'
+            })
+          %></td>
+        </tr>
+      <% }) %>
+    
+    </table>
+  </div>
 <% } %>
 
 <div class="controls">
