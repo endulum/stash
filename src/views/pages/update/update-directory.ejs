@@ -13,7 +13,9 @@
     Date.parse(currentDirectory.shareUntil) > Date.parse(new Date())
   ) { %>
     <p>
-      Currently, this directory is <b>public</b>. It can be seen by anyone until <%= currentDirectory.shareUntil %>. You can change the end date in the field below, or clear the date to make this directory private again.
+      Currently, this directory is <b>public</b>. It can be seen by anyone until <%= currentDirectory.shareUntil.toLocaleString('default', { 
+        month: 'long', day: 'numeric', year: 'numeric'
+      }) %>. You can change the end date in the field below, or clear the date to make this directory private again.
     </p>
   <% } else { %>
     <p>

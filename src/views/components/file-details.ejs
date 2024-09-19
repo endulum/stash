@@ -12,7 +12,7 @@
     <b>Uploaded: </b>
     <%= 
       file.createdAt.toLocaleString('default', { 
-        month: 'long', day: 'numeric', year: 'numeric', time: 'numeric'
+        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
       })
     %>
   </li>
@@ -21,7 +21,7 @@
     <%= 
       file.updatedAt
         ? file.updatedAt.toLocaleString('default', { 
-            month: 'long', day: 'numeric', year: 'numeric', time: 'numeric'
+            month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZoneName: 'short'
           })
         : 'Never'
     %>
