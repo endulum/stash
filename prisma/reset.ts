@@ -19,7 +19,7 @@ const supabase = createClient(
 
 async function main() {
   await clearDatabase()
-  await fillDatabaseWithSamples()
+  //await fillDatabaseWithSamples()
 }
 
 async function clearDatabase() {
