@@ -249,6 +249,7 @@ export const controller: Record<string, RequestHandler> = {
       data: {
         name: req.body.name,
         directoryId: req.body.location === 'home' ? null : req.body.location,
+        updatedAt: new Date()
       }
     })
     req.flash('success', 'Your file has been successfully edited.')
