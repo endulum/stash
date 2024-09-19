@@ -1,5 +1,6 @@
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
+import bcrypt from 'bcryptjs'
 import fs from 'fs/promises'
 import path from 'path'
 import mime from 'mime-types'
@@ -19,10 +20,12 @@ const supabase = createClient(
 
 async function main() {
   await clearDatabase()
+  await generateAdmin()
   //await fillDatabaseWithSamples()
 }
 
 async function clearDatabase() {
+  await prisma.user.deleteMany()
   await prisma.directory.deleteMany()
   await prisma.file.deleteMany()
   const { data, error } = await supabase.storage.emptyBucket('uploader')
@@ -30,6 +33,19 @@ async function clearDatabase() {
     console.error(error)
     throw new Error('Something went wrong trying to empty the bucket.')
   }
+}
+
+async function generateAdmin() {
+  if (!process.env.ADMINPASS) return;
+  const salt = await bcrypt.genSalt(10)
+  const hashedPassword = await bcrypt.hash(process.env.ADMINPASS, salt)
+  await prisma.user.create({
+    data: {
+      username: 'admin',
+      password: hashedPassword,
+      role: 'ADMIN'
+    }
+  })
 }
 
 async function fillDatabaseWithSamples() {
