@@ -21,7 +21,7 @@ const supabase = createClient(
 async function main() {
   await clearDatabase()
   await generateAdmin()
-  //await fillDatabaseWithSamples()
+  await fillDatabaseWithSamples()
 }
 
 async function clearDatabase() {
@@ -43,6 +43,7 @@ async function generateAdmin() {
     data: {
       username: 'admin',
       password: hashedPassword,
+      id: 1,
       role: 'ADMIN'
     }
   })

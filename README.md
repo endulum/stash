@@ -30,13 +30,13 @@ A minimal implementation of a personal storage service.
 ## Concerns of Improvement
 - Accessibility - does the interface provide an acceptable accessibility experience?
 - Vulnerability - are some forms, routes, previews prone to attacks?
-- Styling - additions to the CSS have been somewhat slapdash. Can the CSS be made more modular easier to manage?
 
 ### Miscellaneous TODOs
+- **Add date added and date modified to directories and files**
+- **Enforce total storage limit per user**
 - Button to copy share link
+- Add simple captcha to registration?
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
-- Can there be a total storage limit per user?
-- Add date added and date modified to directories and files
 - Format dates on views in a more reader-friendly way
 
