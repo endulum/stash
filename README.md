@@ -32,11 +32,8 @@ A minimal implementation of a personal storage service.
 - Vulnerability - are some forms, routes, previews prone to attacks?
 
 ### Miscellaneous TODOs
-- **Add date added and date modified to directories and files**
 - **Enforce total storage limit per user**
 - Button to copy share link
 - Add simple captcha to registration?
 - See if `read` and `read-shared` files can be combined?
 - What other kinds of file types can be previewed?
-- Format dates on views in a more reader-friendly way
-

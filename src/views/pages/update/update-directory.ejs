@@ -14,7 +14,7 @@
   ) { %>
     <p>
       Currently, this directory is <b>public</b>. It can be seen by anyone until <%= currentDirectory.shareUntil.toLocaleString('default', { 
-        month: 'long', day: 'numeric', year: 'numeric'
+        month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC', timeZoneName: 'short'
       }) %>. You can change the end date in the field below, or clear the date to make this directory private again.
     </p>
   <% } else { %>

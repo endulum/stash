@@ -117,7 +117,7 @@
           <td><%= file.size %> bytes</td>
           <td><%= 
             file.createdAt.toLocaleString('default', { 
-              month: 'numeric', day: 'numeric', year: 'numeric'
+              month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
             })
           %></td>
         </tr>

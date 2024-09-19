@@ -46,8 +46,8 @@
                     Date.parse(result.shareUntil) > Date.parse(new Date())
                   ) { %>
                     Public directory (until <%= result.shareUntil.toLocaleString('default', { 
-                      month: 'long', day: 'numeric', year: 'numeric'
-                    }) 
+                      month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC', timeZoneName: 'short'
+                    })
                   %>)
                   <% } else { %>
                     Private directory
