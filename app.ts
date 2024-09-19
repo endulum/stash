@@ -9,7 +9,7 @@ import passport from 'passport';
 import { PrismaSessionStore } from '@quixo3/prisma-session-store';
 import { PrismaClient } from '@prisma/client';
 
-// import errorHandler from './src/middleware/errorHandler'
+import errorHandler from './src/middleware/errorHandler'
 
 import authRouter from './src/routes/auth';
 import mainRouter from './src/routes/main';
@@ -58,6 +58,6 @@ app.use(asyncHandler(async (req, res, next) => {
   return req.user ? mainRouter(req, res, next) : authRouter(req, res, next)
 }))
 
-// app.use(errorHandler)
+app.use(errorHandler)
 
 app.listen(3000)

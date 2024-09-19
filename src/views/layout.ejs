@@ -79,7 +79,7 @@
     <main>
       <div class="main-body">
         <!-- success alerts -->
-        <% if (locals.success.length > 0) { %>
+        <% if ('success' in locals && locals.success.length > 0) { %>
           <div class="alert success">
             <%- include('svg/success.svg') %>
             <p>
@@ -88,7 +88,7 @@
           </div>
         <% } %>
         <!-- warning alerts -->
-        <% if (locals.warning.length > 0) { %>
+        <% if ('warning' in locals && locals.warning.length > 0) { %>
           <div class="alert warning">
             <%- include('svg/warning.svg') %>
             <p>
