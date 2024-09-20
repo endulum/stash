@@ -6,7 +6,7 @@ import path from 'path'
 import mime from 'mime-types'
 
 import dotenv from 'dotenv'
-dotenv.config({ path: '.env.development' })
+dotenv.config({ path: '.env.' + process.env.ENV })
 
 const prisma = new PrismaClient({ 
   log: ['query'],
@@ -23,23 +23,30 @@ const supabase = createClient(
   }
 )
 
+const SUPABASE_FOLDER = process.env.ENV === 'production' 
+? 'production/' 
+: 'development/'
+
 async function main() {
   await clearDatabase()
   await generateAdmin()
-  // await fillDatabaseWithSamples()
+  await fillDatabaseWithSamples()
 }
 
 async function clearDatabase() {
   await prisma.user.deleteMany()
   await prisma.directory.deleteMany()
   await prisma.file.deleteMany()
+  await prisma.session.deleteMany()
   const { data, error } = await supabase.storage.from('uploader')
-    .list('development/')
+    .list(SUPABASE_FOLDER)
   if (error) {
     console.error(error)
-    throw new Error('Something went wrong trying to empty the development folder.')
+    throw new Error(
+      'Something went wrong trying to list contents of "' + SUPABASE_FOLDER + '"'
+    )
   } else {
-    await supabaseRemoveFiles(data.map(file => 'development/' + file.name))
+    if (data.length > 0) await supabaseRemoveFiles(data.map(file => SUPABASE_FOLDER + file.name))
   }
 }
 
@@ -49,7 +56,7 @@ async function supabaseRemoveFiles(list: string[]) {
     .remove(list)
   if (error) {
     console.error(error)
-    throw new Error('Something went wrong trying to empty the development folder.')
+    throw new Error('Something went wrong trying to empty "' + SUPABASE_FOLDER + '"')
   }
 }
 
@@ -125,7 +132,7 @@ async function fillDatabaseWithSamples() {
       // then, upload the contents of the file to supabase
       const read = await fs.readFile(itemPath);
       const { data, error } = await supabase.storage.from('uploader')
-        .upload('development/' + newFile.id, read, { contentType: type })
+        .upload(SUPABASE_FOLDER + newFile.id, read, { contentType: type })
       if (error) { // if something went wrong uploading, get rid of the corresponding File entry
         console.error(error)
         await prisma.file.delete({ where: { id: newFile.id } })
