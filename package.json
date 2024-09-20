@@ -6,9 +6,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "ENV=development nodemon --watch src --exec ts-node app.ts",
-    "build": "tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
+    "build": "rm -r ./dist && tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
     "start": "ENV=production node ./dist/app.js",
-    "clean": "rm -r ./dist",
     "reset": "nodemon prisma/reset.ts"
   },
   "keywords": [],
