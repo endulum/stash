@@ -1,4 +1,7 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
+
+dotenv.config({ path: '.env.' + process.env.ENV })
+
 import './config/passport';
 import path from 'path';
 import express from 'express';

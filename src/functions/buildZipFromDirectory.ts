@@ -2,7 +2,7 @@ import { type Directory } from '@prisma/client';
 import Zip from 'adm-zip'
 
 import prisma from '../prisma';
-import supabase from '../supabase'
+import supabase, { SUPABASE_FOLDER } from '../supabase'
 import createDirectoryTree from './createDirectoryTree';
 
 async function buildZipFromDirectory(directory: Directory | null): Promise<Buffer> {
@@ -26,7 +26,7 @@ async function buildZipFromDirectory(directory: Directory | null): Promise<Buffe
     for (let file of currentDirectory.files) {
       const { data, error } = await supabase.storage
         .from('uploader')
-        .download(file.id)
+        .download(SUPABASE_FOLDER + file.id)
       if (error) {
         console.error(error)
         throw new Error('Problem downloading this file.')

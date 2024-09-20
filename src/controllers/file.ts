@@ -5,9 +5,9 @@ import { decode } from "base64-arraybuffer";
 import stream from "stream";
 
 import prisma from '../prisma'
-import supabase from '../supabase'
+import supabase, { SUPABASE_FOLDER } from '../supabase'
 
-import createPath, { createFilePath } from "../functions/createPath";
+import { createFilePath } from "../functions/createPath";
 import createDirectoryTree from "../functions/createDirectoryTree";
 import locationValidation from "../functions/locationValidation";
 
@@ -118,7 +118,7 @@ export const controller: Record<string, RequestHandler> = {
     req.fileDataString = ''
     if (previewTypes.includes(req.currentFile.type.split('/')[0])) {
       const { data, error } = await supabase.storage.from('uploader')
-        .download(req.currentFile.id ?? '')
+        .download(SUPABASE_FOLDER + req.currentFile.id)
       if (error) console.error(error);
       else {
         if (req.currentFile.type.startsWith('image')) {
@@ -207,7 +207,7 @@ export const controller: Record<string, RequestHandler> = {
     const fileBase64 = decode(req.file.buffer.toString('base64'))
     const { data, error } = await supabase.storage
       .from('uploader')
-      .upload(newFile.id, fileBase64, { contentType: req.file.mimetype });
+      .upload(SUPABASE_FOLDER + newFile.id, fileBase64, { contentType: req.file.mimetype });
 
     // delete the file entry if something goes wrong.
     if (error) {
@@ -271,7 +271,7 @@ export const controller: Record<string, RequestHandler> = {
     if (req.formErrors) return controller.renderDelete(req, res, next)
     const { data, error } = await supabase.storage
       .from('uploader')
-      .remove([req.currentFile.id])
+      .remove([SUPABASE_FOLDER + req.currentFile.id])
     if (error) {
       console.error(error)
       req.flash('warning', 'Sorry, there was a problem deleting your file.')
@@ -288,7 +288,7 @@ export const controller: Record<string, RequestHandler> = {
   download: asyncHandler(async (req, res) => {
     const { data, error } = await supabase.storage
       .from('uploader')
-      .download(req.currentFile.id)
+      .download(SUPABASE_FOLDER + req.currentFile.id)
     if (error) {
       req.flash('warning', 'Sorry, there was a problem downloading your file.')
       return res.redirect(`/file/${req.currentFile.id}`)

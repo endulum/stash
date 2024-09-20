@@ -4,7 +4,7 @@ import { ValidationChain, body } from "express-validator";
 import bcrypt from 'bcryptjs'
 
 import prisma from '../prisma'
-import supabase from "../supabase";
+import supabase, { SUPABASE_FOLDER } from "../supabase";
 import usernameValidation from '../functions/usernameValidation'
 
 export const validation: Record<string, ValidationChain[]> = {
@@ -125,7 +125,7 @@ export const controller: Record<string, RequestHandler> = {
     if (allFilesOfUser.length > 0) {
       const { data, error } = await supabase.storage
         .from('uploader')
-        .remove(allFilesOfUser.map(file => file.id))
+        .remove(allFilesOfUser.map(file => (SUPABASE_FOLDER + file.id)))
       if (error) console.error(error);
     }
 

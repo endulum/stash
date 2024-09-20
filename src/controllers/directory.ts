@@ -4,7 +4,7 @@ import { body, type ValidationChain } from "express-validator";
 import stream from "stream";
 
 import prisma from '../prisma'
-import supabase from "../supabase";
+import supabase, { SUPABASE_FOLDER } from "../supabase";
 
 import createDirectoryTree from "../functions/createDirectoryTree";
 import createPath from "../functions/createPath";
@@ -246,7 +246,7 @@ export const controller: Record<string, RequestHandler> = {
     if (filesToDelete.length > 0) {
       const { data, error } = await supabase.storage
         .from('uploader')
-        .remove(filesToDelete)
+        .remove(filesToDelete.map(f => (SUPABASE_FOLDER + f)))
       if (error) {
         console.error(error)
         req.flash('warning', 'Sorry, there was a problem deleting your directory.')

@@ -6,4 +6,8 @@ const key = process.env.SUPABASE_KEY as string
   
 const supabase = createClient(url, key)
 
+export const SUPABASE_FOLDER = process.env.ENV === 'production' 
+  ? 'production/' 
+  : 'development/'
+
 export default supabase
