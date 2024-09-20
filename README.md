@@ -1,7 +1,11 @@
 # Stash
 A minimal implementation of a personal storage service.
 
-[Section](https://www.theodinproject.com/lessons/nodejs-file-uploader)
+🚀 [Live on Adaptable](https://bonfires.vercel.app)
+
+[Project Spec](https://www.theodinproject.com/lessons/nodejs-file-uploader)
+
+![Preview of the login screen of the app](https://github.com/endulum/odin-uploader/blob/main/screenshot.png?raw=true)
 
 ## Features
 ### Users
