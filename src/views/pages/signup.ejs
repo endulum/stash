@@ -1,23 +1,39 @@
 <form action="/signup" method="post">
-  <%- include('../components/form-input', { 
+  <%- include('../components/input-checklist-wrapper', { 
     name: 'username',
     label: 'Username',
     type: 'text',
-    includePrevInput: true
+    includePrevInput: true,
+    conditionMessages: [
+      'Between 2 and 32 characters long',
+      'Contains only lowercase letters, numbers, and hyphens'
+    ],
+    conditionFunctions: [
+      (input) => (input.length < 33 && input.length > 1),
+      (input) => (/^[a-z0-9-]+$/g.test(input))
+    ]
   }) %>
 
-  <%- include('../components/form-input', { 
+  <%- include('../components/input-checklist-wrapper', { 
     name: 'password',
     label: 'Password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    conditionMessages: [
+      'At least 8 characters long'
+    ],
+    conditionFunctions: [
+      (input) => (input.length > 7)
+    ]
   }) %>
 
-  <%- include('../components/form-input', { 
+  <%- include('../components/input-checklist-wrapper', { 
     name: 'confirmPassword',
     label: 'Confirm password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    conditionMessages: [],
+    conditionFunctions: []
   }) %>
 
   <button type="submit">Submit</button>
