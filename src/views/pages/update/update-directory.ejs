@@ -1,10 +1,18 @@
 <form action=<%= '/directory/' + currentDirectory.id + '/edit' %> method="post">
-  <%- include('../../components/form-input', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'name',
     label: 'Directory name',
     type: 'text',
     includePrevInput: true,
-    required: true
+    required: true,
+    conditionMessages: [
+      'Between 1 and 64 characters long (spaces at the ends will be trimmed out)',
+      'Contains only letters, numbers, hyphens, underscores, and spaces'
+    ],
+    conditionFunctions: [
+      (input) => (input.length < 65 && input.length > 0),
+      (input) => (/^[A-Za-z0-9-_ ]+$/g.test(input))
+    ]
   }) %>
 
   <%- include('../../components/directory-dropdown') %>
