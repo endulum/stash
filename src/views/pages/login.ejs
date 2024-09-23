@@ -3,14 +3,16 @@
     name: 'username',
     label: 'Username',
     type: 'text',
-    includePrevInput: true
+    includePrevInput: true,
+    required: true
   }) %>
 
   <%- include('../components/form-input', { 
     name: 'password',
     label: 'Password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    required: true
   }) %>
 
   <button type="submit">

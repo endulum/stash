@@ -3,7 +3,8 @@
     name: 'name',
     label: 'Directory name',
     type: 'text',
-    includePrevInput: true
+    includePrevInput: true,
+    required: true
   }) %>
 
   <%- include('../../components/directory-dropdown') %>
@@ -27,7 +28,8 @@
     name: 'shareUntil',
     label: 'Share until',
     type: 'date',
-    includePrevInput: true
+    includePrevInput: true,
+    required: false
   }) %>
 
   <button type="submit">Submit</button>

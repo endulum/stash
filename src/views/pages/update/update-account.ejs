@@ -3,7 +3,8 @@
     name: 'username',
     label: 'Username',
     type: 'text',
-    includePrevInput: true
+    includePrevInput: true,
+    required: true
   }) %>
 
   <div>
@@ -15,21 +16,24 @@
     name: 'password',
     label: 'New password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    required: false
   }) %>
 
   <%- include('../../components/form-input', { 
     name: 'confirmPassword',
     label: 'Confirm password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    required: false
   }) %>
 
   <%- include('../../components/form-input', { 
     name: 'currentPassword',
     label: 'Current password',
     type: 'password',
-    includePrevInput: false
+    includePrevInput: false,
+    required: false
   }) %>
 
   <button type="submit">Submit</button>

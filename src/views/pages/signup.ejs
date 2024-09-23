@@ -4,6 +4,7 @@
     label: 'Username',
     type: 'text',
     includePrevInput: true,
+    required: true,
     conditionMessages: [
       'Between 2 and 32 characters long',
       'Contains only lowercase letters, numbers, and hyphens'
@@ -19,6 +20,7 @@
     label: 'Password',
     type: 'password',
     includePrevInput: false,
+    required: true,
     conditionMessages: [
       'At least 8 characters long'
     ],
@@ -32,6 +34,7 @@
     label: 'Confirm password',
     type: 'password',
     includePrevInput: false,
+    required: true,
     conditionMessages: [],
     conditionFunctions: []
   }) %>
