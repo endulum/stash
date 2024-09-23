@@ -2,11 +2,12 @@
   <%- include('./form-input') %>
   <div class="onfocus-message" style="display: none;" id=<%= name + '-onfocus' %>>
     <% conditionMessages.forEach((condition, index) => {%>
-      <p class="condition" id=<%= 'condition-' + name + index %>>
+      <p class="condition" id=<%= 'condition-' + name + '-' + index %>>
+        <%# the "id" of each condition takes the format "condition-password-1", "condition-password-2", etc, with numbers going up per condition for the same field. each condition needs this kind of id to be accessed in the script below, corresponding to each condition's function expression. %>
         <span class="correct" style="display: none;">
           <%- include('../svg/success.svg') %>
         </span>
-        <span class="incorrect">
+        <span class="incorrect" style="display: none;">
           <%- include('../svg/warning.svg') %>
         </span>
         <%= condition %>
@@ -16,35 +17,47 @@
 </div>
 
 <script defer>
-  const doCheckFor<%= name %> = (value) => {
-    <% for (let index = 0; index < conditionFunctions.length; index++) { %>
-      const check<%= name + index %> = <%- conditionFunctions[index] %>
-      const check<%= name + index %>Message = document
-        .getElementById('condition-<%= name + index %>')
+  <%# // holds a reference to the input element of the current field %>
+  const inputFor_<%= name %> = document.getElementById('<%= name %>')
 
-      const check<%= name + index %>Success = check<%= name + index %>(value)
-      
-      check<%= name + index %>Message.querySelector('.correct').style
-        .display = check<%= name + index %>Success ? 'inline' : 'none'
+  <%# // reference to the element containing the condition descriptions for the current field %>
+  const messageContainerFor_<%= name %> = document.getElementById('<%= name + "-onfocus" %>')
 
-      check<%= name + index %>Message.querySelector('.incorrect').style
-        .display = check<%= name + index %>Success ? 'none' : 'inline'
-    <% } %>
+  <%# // updates the condition descriptions for the current field %>
+  const doCheckFor_<%= name %> = (value) => {
+    [<%- conditionFunctions %>].forEach((check, index) => {
+      const valid = check(value)
+      <%# // i need to access the "condition-password-0", "condition-password-1", etc ids. %>
+      <%# // i can't dynamically name a variable! but i CAN dynamically name an object. %>
+      const messageText = {}
+      <%# // save the getElementById result instead of querying it again %>
+      messageText['condition-' + '<%= name %>' + '-' + index] = document.getElementById(
+        'condition-' + '<%= name %>' + '-' + index
+      )
+      <%# // and now, conditionally render the visibility of each condition's checkmark based on 'valid' %>
+      messageText['condition-' + '<%= name %>' + '-' + index].querySelector('.incorrect').style
+        .display = valid ? 'none' : 'inline'
+      messageText['condition-' + '<%= name %>' + '-' + index].querySelector('.correct').style
+        .display = valid ? 'inline' : 'none'
+    })
   }
 
-  const <%= name %>Input = document.getElementById('<%= name %>')
-  const <%= name %>Message = document.getElementById('<%= name + "-onfocus" %>')
-
-  if (<%= name %>Input.value !== '') {
-    <%= name %>Message.style.display = 'block'
-    doCheckFor<%= name %>(<%= name %>Input.value)
+  <%# // add listener to the field's corresponding input to run the check against its value on change %>
+  inputFor_<%= name %>.addEventListener('input', e => {
+    doCheckFor_<%= name %>(e.target.value)
+  })
+  
+  if (inputFor_<%= name %>.value !== '') {
+    <%# // for ux, if the field is prefilled and this is a rejected submission, %>
+    <%# // don't wait until focus for the condition list to show up. have it show up and check on load %>
+    messageContainerFor_<%= name %>.style.display = 'block'
+    doCheckFor_<%= name %>(inputFor_<%= name %>.value)
   } else {
-    <%= name %>Input.addEventListener('focus', () => {
-      <%= name %>Message.style.display = 'block'
+    <%# // add listener to untouched fields to render the condition list when touched %>
+    inputFor_<%= name %>.addEventListener('focus', (e) => {
+      doCheckFor_<%= name %>(e.target.value)
+      messageContainerFor_<%= name %>.style.display = 'block'
     })
   }
   
-  <%= name %>Input.addEventListener('input', e => {
-    doCheckFor<%= name %>(e.target.value)
-  })
 </script>
