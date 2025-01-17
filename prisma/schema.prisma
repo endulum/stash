@@ -17,7 +17,9 @@ model Session {
 model User {
   id          Int         @id @default(autoincrement())
   username    String      @unique @db.VarChar(32)
-  password    String      @db.VarChar(255)
+  password    String?     @db.VarChar(255)
+  githubUser  String?     @db.VarChar(255)
+  githubId    Int?
   role        Role        @default(BASIC)
   files       File[]      @relation("authorFiles")
   directories Directory[] @relation("authorDirectories")

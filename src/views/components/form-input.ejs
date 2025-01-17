@@ -5,19 +5,18 @@
   </label>
   <!-- top right: where errors belong -->
   <p>
-    <% if (formErrors && name in formErrors) { %>
+    <% if (locals.formErrors && name in locals.formErrors) { %>
       <small class="error">
         <b>Error: </b>
-        <%= formErrors[name] %>
+        <%= locals.formErrors[name] %>
       </small>
     <% } %>
   </p>
   <!-- bottom: where input goes -->
   <input 
-    <%= required ? 'required' : '' %>
     type=<%= type %> 
     name=<%= name %> 
     id=<%= name %> 
-    value="<%= includePrevInput && name in prevForm ? prevForm[name] : '' %>"
+    value="<%= includePrefill && name in prefill ? prefill[name] : '' %>"
   >
 </div>

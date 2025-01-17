@@ -10,22 +10,7 @@
     <link rel="stylesheet" href="/style.css">
     <link rel="stylesheet" href="/fonts/fonts.css">
 
-    <script>
-      html = document.querySelector('html');
-      const themePreference = localStorage.getItem('theme-preference')
-
-      if (themePreference) { // first, is there a saved theme preference?
-        html.dataset['theme'] = themePreference
-      } else if (window.matchMedia) { // second, does the browser prefer a theme?
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          html.dataset['theme'] = 'dark'
-        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-          html.dataset['theme'] = 'light'
-        }
-      } else {
-        html.dataset['theme'] = 'light'
-      }
-    </script>
+    <script src="/scripts/setTheme.js"></script>
   </head>
   <body>
     <header>
@@ -48,7 +33,7 @@
           </div>
           <nav>
             <% if (locals.user) { %>
-              <a type="button" href="/">
+              <!-- <a type="button" href="/">
                 <%- include('svg/file-tree.svg') %>
                 <span>Files</span>
               </a>
@@ -59,7 +44,7 @@
               <a type="button" href="/account">
                 <%- include('svg/user.svg') %>
                 <span>Account</span>
-              </a>
+              </a> -->
               <a type="button" href="/logout">
                 <%- include('svg/logout.svg') %>
                 <span>Log out</span>
@@ -105,28 +90,6 @@
       </div>
     </main>
 
-    <script defer>
-      const themeToggle = document.getElementById('theme-toggle');
-      const currentTheme = () => html.dataset['theme'];
-
-      function changeToggleText() {
-        if (currentTheme() === 'light') {
-        themeToggle.innerText = 'Lights off'
-        } else if (currentTheme() === 'dark') {
-          themeToggle.innerText = 'Lights on'
-        }
-      }
-
-      changeToggleText()
-      
-      themeToggle.addEventListener('click', () => {
-        const prevTheme = currentTheme()
-        html.dataset['theme'] = prevTheme === 'light' 
-          ? 'dark' : 'light';
-        changeToggleText()
-        localStorage.setItem('theme-preference', prevTheme === 'light' 
-          ? 'dark' : 'light')
-      })
-    </script>
+    <script defer src="/scripts/toggleTheme.js"></script>
   </body>
 </html>
