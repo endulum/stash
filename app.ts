@@ -68,11 +68,11 @@ if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
 }
 
-app.get("/", async (req, res) => {
+app.get("/", async (_req, res) => {
   res.sendStatus(200);
 });
 
-app.get("*", async (req, res) => {
+app.get("*", async (_req, res) => {
   res.sendStatus(404);
 });
 

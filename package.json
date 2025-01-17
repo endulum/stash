@@ -5,6 +5,7 @@
   "main": "index.js",
   "scripts": {
     "envinit": "cp -n .env.example .env.production && cp -n .env.example .env.development && cp -n .env.example .env.test",
+    "lint": "npx eslint .",
     "dev": "NODE_ENV=development nodemon --watch src --exec ts-node app.ts",
     "build": "tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
     "start": "ENV=production node ./dist/app.js",
@@ -26,6 +27,7 @@
     "connect-pg-simple": "^9.0.1",
     "dotenv": "^16.4.5",
     "ejs": "^3.1.10",
+    "eslint": "^9.18.0",
     "express": "^4.19.2",
     "express-async-handler": "^1.2.0",
     "express-session": "^1.18.0",
@@ -36,7 +38,8 @@
     "multer": "^1.4.5-lts.1",
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
-    "pg": "^8.12.0"
+    "pg": "^8.12.0",
+    "typescript-eslint": "^8.20.0"
   },
   "devDependencies": {
     "@types/adm-zip": "^0.5.5",
