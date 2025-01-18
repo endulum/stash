@@ -114,7 +114,9 @@ a[type="button"] {
     fill: oklch(from var(--color) l c h / 0.75);
   }
 
-  &:hover {
+  &:hover,
+  &:focus,
+  &:focus-visible {
     border: 1px solid oklch(from var(--color) l c h / 1);
     background-color: oklch(from var(--color) l c h / 0.25);
     svg {

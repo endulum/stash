@@ -181,7 +181,9 @@ main .body {
     width: 2rem;
     height: 2rem;
     transition: fill 0.25s ease;
-    &:hover {
+    &:hover,
+    &:focus,
+    &:focus-visible {
       fill: var(--fg);
       animation: wiggle 2s 1;
     }
