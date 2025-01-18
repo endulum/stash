@@ -3,10 +3,12 @@ import express from "express";
 
 import { logOut } from "../controllers/auth";
 import * as render from "../controllers/render";
+import * as user from "../controllers/user";
 
 const router = express.Router();
 
 router.route("/").get(render.index);
+router.route("/account").get(render.account).post(user.edit);
 router.route("/logout").get(logOut);
 router.route("*").all(render.notFound);
 

@@ -35,26 +35,43 @@ export const index = asyncHandler(async (_req, res) => {
   });
 });
 
-export const login = asyncHandler(async (req, res) => {
-  // provided by the signup post handler, saving the new account's username
-  const loginUsernamePrefill = req.flash("loginUsernamePrefill");
-  return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/login",
-    title: "Log In",
-    prefill: {
-      ...req.body,
-      username:
-        loginUsernamePrefill.length > 0
-          ? loginUsernamePrefill
-          : req.body.username,
-    },
+export const login = (includeWarning?: boolean) =>
+  asyncHandler(async (req, res) => {
+    // optionally provide warning flash
+    if (includeWarning)
+      req.flash("You must be logged in to perform this action.");
+
+    // specific for the signup post handler, saving the new account's username
+    const loginUsernamePrefill = req.flash("loginUsernamePrefill");
+
+    return res.status(req.formErrors ? 400 : 200).render("layout", {
+      page: "pages/login",
+      title: "Log In",
+      prefill: {
+        ...req.body,
+        username:
+          loginUsernamePrefill.length > 0
+            ? loginUsernamePrefill
+            : req.body.username,
+      },
+    });
   });
-});
 
 export const signup = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/signup",
     title: "Sign Up",
     prefill: req.body,
+  });
+});
+
+export const account = asyncHandler(async (req, res) => {
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/account",
+    title: "Account Settings",
+    prefill: {
+      ...req.body,
+      username: req.body.username ?? req.user?.username,
+    },
   });
 });

@@ -31,12 +31,12 @@ export const logIn = [
     .escape(),
   validate,
   asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return render.login(req, res, next);
+    if (req.formErrors) return render.login()(req, res, next);
     passport.authenticate("local", (err: Error, user: Express.User) => {
       if (err) return next(err);
       if (!user) {
         res.locals.formErrors = { password: "Incorrect username or password." };
-        return render.login(req, res, next);
+        return render.login()(req, res, next);
       } else
         req.logIn(user, (err) => {
           if (err) return next(err);
