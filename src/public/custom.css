@@ -207,9 +207,6 @@ main .body {
 }
 
 @container header (width < 400px) {
-  * {
-    border: 1px solid red;
-  }
   nav {
     flex-wrap: wrap;
     a[type="button"] {
