@@ -29,15 +29,13 @@
     ]
   }) %>
 
-  <%- include('../components/input-checklist-wrapper', { 
-    name: 'confirmPassword',
+<%- include('../components/form-input', { 
+  name: 'confirmPassword',
     label: 'Confirm password',
     type: 'password',
     includePrefill: false,
     required: true,
-    conditionMessages: [],
-    conditionFunctions: []
-  }) %>
+}) %>
 
   <button type="submit">Submit</button>
 </form>

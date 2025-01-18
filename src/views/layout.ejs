@@ -4,18 +4,19 @@
     <title><%= title %></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
     <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
-    <link rel="stylesheet" href="/reset.css">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/fonts/fonts.css">
+
+    <!-- look and feel -->
+    <link rel="stylesheet" href="/base.css">
+    <!-- structural -->
+    <link rel="stylesheet" href="/custom.css">
 
     <script src="/scripts/setTheme.js"></script>
   </head>
-  <body>
-    <header>
-      <div class="header-body">
-        <p class="header-userstatus">
+  <body class="flex-col">
+    <header class="w100">
+      <div class="body flex-col g-05 align-end">
+        <p class="header-userstatus as-end">
           <% if (locals.user) { %>
             Logged in as <b><%= locals.user.username %></b>
           <% } else { %>
@@ -24,16 +25,16 @@
           |
           <a href="#" id="theme-toggle"></a>
         </p>
-        <div class="header-main">
-          <div class="heading">
+        <div class="header-main flex-row w100 jcspb">
+          <div class="logo flex-row g-05">
             <h1>Stash</h1>
             <a href="https://github.com/endulum/odin-uploader" target="_blank">
               <%- include('svg/github.svg') %>
             </a>
           </div>
-          <nav>
+          <nav class="flex-row g-05">
             <% if (locals.user) { %>
-              <!-- <a type="button" href="/">
+              <a type="button" href="/">
                 <%- include('svg/file-tree.svg') %>
                 <span>Files</span>
               </a>
@@ -44,7 +45,7 @@
               <a type="button" href="/account">
                 <%- include('svg/user.svg') %>
                 <span>Account</span>
-              </a> -->
+              </a>
               <a type="button" href="/logout">
                 <%- include('svg/logout.svg') %>
                 <span>Log out</span>
@@ -64,8 +65,8 @@
       </div>
     </header>
 
-    <main>
-      <div class="main-body">
+    <main class="w100">
+      <div class="body">
         <!-- success alerts -->
         <% if ('success' in locals && locals.success.length > 0) { %>
           <div class="alert success">
@@ -85,11 +86,17 @@
           </div>
         <% } %>
 
-        <h2><%= title %></h2>
+        <h2 class="mb-1"><%= title %></h2>
         <%- include(`${page}`) %>
       </div>
     </main>
 
     <script defer src="/scripts/toggleTheme.js"></script>
   </body>
+
+  <footer class="p-1">
+    <small>
+      &copy; endulum, for The Odin Project.
+    </small>
+  </footer>
 </html>
