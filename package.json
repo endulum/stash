@@ -30,6 +30,7 @@
     "adm-zip": "^0.5.16",
     "base64-arraybuffer": "^1.0.2",
     "bcryptjs": "^2.4.3",
+    "cheerio": "^1.0.0",
     "compression": "^1.7.5",
     "connect-flash": "^0.1.1",
     "connect-pg-simple": "^9.0.1",
