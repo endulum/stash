@@ -101,6 +101,7 @@ export const github = asyncHandler(async (req, res, next) => {
     if (err) return next(err);
     req.logIn(user, (err) => {
       if (err) return next(err);
+      req.flash("success", "You have successfully authenticated with GitHub.");
       return res.redirect("/");
     });
   })(req, res, next);
