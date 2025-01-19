@@ -75,3 +75,10 @@ export const account = asyncHandler(async (req, res) => {
     },
   });
 });
+
+export const deleteAccount = asyncHandler(async (req, res) => {
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/delete-account",
+    title: "Delete Account",
+  });
+});

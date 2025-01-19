@@ -1,7 +1,7 @@
-import { type Prisma } from '@prisma/client';
-import bcrypt from 'bcryptjs';
+import { type Prisma } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
-import { client } from '../client';
+import { client } from "../client";
 
 export async function find({
   id,
@@ -29,7 +29,7 @@ export async function comparePassword({
   password: string;
 }) {
   let user: { password: string | null } | null = null;
-  if (typeof userData === 'string') {
+  if (typeof userData === "string") {
     user = await client.user.findUnique({
       where: { username: userData },
     });
@@ -58,7 +58,7 @@ export async function create({
     return id;
   } else {
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password ?? 'password', salt);
+    const hashedPassword = await bcrypt.hash(password ?? "password", salt);
     const { id } = await client.user.create({
       data: { username, password: hashedPassword },
     });
@@ -93,5 +93,11 @@ export async function updateGithubUser(id: number, githubUser: string) {
   await client.user.update({
     where: { id },
     data: { githubUser },
+  });
+}
+
+export async function del(id: number) {
+  await client.user.delete({
+    where: { id },
   });
 }

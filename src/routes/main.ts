@@ -9,6 +9,7 @@ const router = express.Router();
 
 router.route("/").get(render.index);
 router.route("/account").get(render.account).post(user.edit);
+router.route("/delete").get(render.deleteAccount).post(user.del);
 router.route("/logout").get(logOut);
 router.route("*").all(render.notFound);
 
