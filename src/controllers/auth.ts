@@ -35,7 +35,8 @@ export const logIn = [
     passport.authenticate("local", (err: Error, user: Express.User) => {
       if (err) return next(err);
       if (!user) {
-        res.locals.formErrors = { password: "Incorrect username or password." };
+        req.formErrors = { password: "Incorrect username or password." };
+        res.locals.formErrors = req.formErrors;
         return render.login()(req, res, next);
       } else
         req.logIn(user, (err) => {

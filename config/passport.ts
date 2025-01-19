@@ -30,65 +30,67 @@ passport.use(
   }) as VerifyFunction)
 );
 
-passport.use(
-  new GitHubStrategy(
-    {
-      clientID:
-        process.env.GITHUB_CLIENT_ID ||
-        (function () {
-          throw new Error("Github client id is not defined.");
-        })(),
-      clientSecret:
-        process.env.GITHUB_CLIENT_SECRET ||
-        (function () {
-          throw new Error("Github client secret is not defined.");
-        })(),
-      callbackURL: process.env.DEPLOYMENT_URL
-        ? `${process.env.DEPLOYMENT_URL}/github`
-        : (function () {
-            throw new Error("Project deployment URL is not specified.");
+if (process.env.NODE_ENV !== "test") {
+  passport.use(
+    new GitHubStrategy(
+      {
+        clientID:
+          process.env.GITHUB_CLIENT_ID ||
+          (function () {
+            throw new Error("Github client id is not defined.");
           })(),
-    },
-    async function (
-      _accessToken: string,
-      _refreshToken: string,
-      profile: {
-        _json: {
-          login: string;
-          id: number;
-        };
+        clientSecret:
+          process.env.GITHUB_CLIENT_SECRET ||
+          (function () {
+            throw new Error("Github client secret is not defined.");
+          })(),
+        callbackURL: process.env.DEPLOYMENT_URL
+          ? `${process.env.DEPLOYMENT_URL}/github`
+          : (function () {
+              throw new Error("Project deployment URL is not specified.");
+            })(),
       },
-      done: (error: unknown, user?: Express.User) => void
-    ) {
-      try {
-        let username = "";
-        let id = 0;
-        const existingUser = await userQueries.find({
-          githubId: profile._json.id,
-        });
-        if (existingUser) {
-          // if a user exists, great!
-          // keep the user's gh login up to date
-          username = existingUser.username;
-          id = existingUser.id;
-          await userQueries.updateGithubUser(id, profile._json.login);
-        } else {
-          // if a user doesn't exist, make one
-          const newUserId = await userQueries.create({
-            username: profile._json.login,
+      async function (
+        _accessToken: string,
+        _refreshToken: string,
+        profile: {
+          _json: {
+            login: string;
+            id: number;
+          };
+        },
+        done: (error: unknown, user?: Express.User) => void
+      ) {
+        try {
+          let username = "";
+          let id = 0;
+          const existingUser = await userQueries.find({
             githubId: profile._json.id,
-            githubUser: profile._json.login,
           });
-          username = profile._json.login;
-          id = newUserId as number;
+          if (existingUser) {
+            // if a user exists, great!
+            // keep the user's gh login up to date
+            username = existingUser.username;
+            id = existingUser.id;
+            await userQueries.updateGithubUser(id, profile._json.login);
+          } else {
+            // if a user doesn't exist, make one
+            const newUserId = await userQueries.create({
+              username: profile._json.login,
+              githubId: profile._json.id,
+              githubUser: profile._json.login,
+            });
+            username = profile._json.login;
+            id = newUserId as number;
+          }
+          return done(null, { username, id } as Express.User);
+        } catch (e) {
+          return done(e);
         }
-        return done(null, { username, id } as Express.User);
-      } catch (e) {
-        return done(e);
       }
-    }
-  )
-);
+    )
+  );
+}
 
 passport.serializeUser((user, done) => {
   done(null, "id" in user && user.id);

@@ -1,13 +1,18 @@
 import express from "express";
-// import asyncHandler from "express-async-handler";
+import asyncHandler from "express-async-handler";
 
 import { logOut } from "../controllers/auth";
 import * as render from "../controllers/render";
 import * as user from "../controllers/user";
 
 const router = express.Router();
+const redirectIndex = asyncHandler(async (_req, res) => {
+  return res.redirect("/");
+});
 
 router.route("/").get(render.index);
+router.route("/login").get(redirectIndex);
+router.route("/signup").get(redirectIndex);
 router.route("/account").get(render.account).post(user.edit);
 router.route("/delete").get(render.deleteAccount).post(user.del);
 router.route("/logout").get(logOut);
