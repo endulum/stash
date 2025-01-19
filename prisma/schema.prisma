@@ -28,6 +28,7 @@ model User {
 model Directory {
   id          String      @id @default(nanoid(6))
   name        String
+  created     DateTime    @default(now())
   shareUntil  DateTime?
   files       File[]      @relation("directoryFiles")
   directories Directory[] @relation("parentDirectory")
@@ -43,7 +44,7 @@ model File {
   ext         String?
   type        String
   size        Float
-  url         String?
+  supabaseUrl String?
   createdAt   DateTime   @default(now())
   updatedAt   DateTime?
   directory   Directory? @relation("directoryFiles", fields: [directoryId], references: [id], onDelete: Cascade)

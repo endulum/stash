@@ -17,12 +17,14 @@
     "docker:rollback": "npm run docker:up && npx dotenv -e .env.test -- npx prisma migrate resolve --rolled-back",
     "docker:reset": "npm run docker:up && npx dotenv -e .env.test -- prisma migrate reset",
     "docker:clean": "docker compose down --rmi all --volumes --remove-orphans",
-    "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest"
+    "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest",
+    "play": "ENV=development nodemon playground.ts"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@faker-js/faker": "^9.4.0",
     "@prisma/client": "^5.19.0",
     "@quixo3/prisma-session-store": "^3.1.13",
     "@supabase/supabase-js": "^2.45.3",
