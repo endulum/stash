@@ -4,6 +4,7 @@ import asyncHandler from "express-async-handler";
 import { logOut } from "../controllers/auth";
 import * as render from "../controllers/render";
 import * as user from "../controllers/user";
+import * as dir from "../controllers/directory";
 
 const router = express.Router();
 const redirectIndex = asyncHandler(async (_req, res) => {
@@ -11,10 +12,14 @@ const redirectIndex = asyncHandler(async (_req, res) => {
 });
 
 router.route("/").get(render.index);
-router.route("/login").get(redirectIndex);
-router.route("/signup").get(redirectIndex);
 router.route("/account").get(render.account).post(user.edit);
 router.route("/delete").get(render.deleteAccount).post(user.del);
+
+router.route("/root").get(dir.root);
+router.route("/dir/:dir").get(dir.get);
+
+router.route("/login").get(redirectIndex);
+router.route("/signup").get(redirectIndex);
 router.route("/logout").get(logOut);
 router.route("*").all(render.notFound);
 

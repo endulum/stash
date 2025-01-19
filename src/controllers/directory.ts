@@ -1,4 +1,74 @@
-import { RequestHandler } from "express";
+import asyncHandler from "express-async-handler";
+
+import * as render from "./render";
+import * as dirQueries from "../../prisma/queries/directory";
+import * as fileQueries from "../../prisma/queries/file";
+
+const units = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
+
+function niceBytes(x: string) {
+  let l = 0,
+    n = parseInt(x, 10) || 0;
+
+  while (n >= 1024 && ++l) {
+    n = n / 1024;
+  }
+
+  return n.toFixed(n < 10 && l > 0 ? 1 : 0) + " " + units[l];
+}
+
+export const root = asyncHandler(async (req, res, next) => {
+  if (!req.user) return render.login(true)(req, res, next);
+  res.locals.dir = null;
+  res.locals.childDirs = await dirQueries.findAtRoot(req.user.id);
+  res.locals.childFiles = (await fileQueries.findAtRoot(req.user.id)).map(
+    (f) => ({ ...f, size: niceBytes(f.size.toString()) })
+  );
+  return render.dir(req, res, next);
+});
+
+export const exists = asyncHandler(async (req, res, next) => {
+  const dir = await dirQueries.findOne(req.params.dir);
+  if (!dir) return render.dirNotFound(req, res, next);
+  req.thisDirectory = dir;
+  return next();
+});
+
+export const isYours = asyncHandler(async (req, res, next) => {
+  if (!req.user) return render.login(true)(req, res, next);
+  if (req.user.id !== req.thisDirectory?.authorId)
+    return render.dirNotYours(req, res, next);
+  return next();
+});
+
+export const get = [
+  exists,
+  isYours,
+  asyncHandler(async (req, res, next) => {
+    if (!req.user)
+      // wondering if we should remove the `?` from req.user type
+      // so we don't have to check every time.
+      return render.login(true)(req, res, next);
+    res.locals.dir = req.thisDirectory;
+    res.locals.childDirs = req.thisDirectory.directories;
+    res.locals.childFiles = (
+      await fileQueries.findAtDir(req.user.id, req.thisDirectory.id)
+    ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
+    res.locals.path = [
+      ...(await dirQueries.findPath(req.thisDirectory.id)),
+      { name: req.thisDirectory.name, id: req.thisDirectory.id },
+    ];
+    return render.dir(req, res, next);
+  }),
+];
+
+// export const get = asyncHandler(async (req, res, next) => {
+//   if (!req.user) return render.login(true)(req, res, next);
+//   const dir =
+//   if (!dir) return render.dirNotFound(req, res, next);
+// });
+
+/* import { RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { body, type ValidationChain } from "express-validator";
 import stream from "stream";
@@ -291,4 +361,4 @@ export const controller: Record<string, RequestHandler> = {
         : ''))
     }
   })
-}
+} */

@@ -1,0 +1,96 @@
+<div class="mb-1">
+  <%- include('../components/directory-path') %>
+</div>
+
+<%
+  if (
+    !dir &&
+    childDirs.length === 0 &&
+    childFiles.length === 0
+  ) {
+%>
+  <div class="alert">
+    <%- include('../svg/info.svg') %>
+    <p>
+      Your filesystem is currently empty. You can get started on creating your filesystem with the <b>Add Directory</b> and <b>Add File</b> links below. Files and directories you create will be shown here in a table.
+    </p>
+  </div>
+<% } else { %>
+  <div class="table-wrapper" id="scrolling-table">
+    <table class="w100" cellpadding="0" cellspacing="0">
+      <thead>
+        <td><span>Name</span></td> 
+        <td>Type</td> 
+        <td>Size</td> 
+        <td>Created</td>
+        <td>Updated</td>
+      </thead>
+
+      <% if (dir) { %>
+        <tr>
+          <td>
+            <a class="entry-link" href="<%= dir.parentId ? '/dir/' +  dir.parentId : '/root' %>">
+              <span>..</span>
+            </a>
+          </td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      <% } %>
+      
+      <% if (childDirs.length > 0) { %>
+        <tbody>
+          <% childDirs.forEach(child => { %>
+            <tr>
+              <td>
+                <a class="entry-link" href="<%= '/dir/' + child.id %>">
+                  <%- include('../svg/folder.svg') %>
+                  <span>
+                    <b><%= child.name %></b>/
+                  </span>
+                </a>
+              </td>
+              <td>directory</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+            </tr>
+          <% }) %>
+        </tbody>
+      <% } %>
+
+      <% if (childFiles.length > 0) { %>
+        <tbody>
+          <% childFiles.forEach(file => { %>
+            <tr>
+              <td>
+                <a class="entry-link" href="<%= '/file/' + file.id %>">
+                  <%- include('../svg/file.svg') %>
+                  <span>
+                   <b><%= file.name %></b>.<%= file.ext %>
+                  </span>
+                </a>
+              </td>
+              <td><%= file.type %></td>
+              <td><%= file.size %></td>
+              <td><%= 
+                file.createdAt.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                })
+              %></td>
+              <td><%= 
+                file.updatedAt ? file.updatedAt.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                }) : '-'
+              %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      <% } %>
+    </table>
+  </div>
+<% } %>
+
+<script src="/scripts/detectTableScroll.js"></script>

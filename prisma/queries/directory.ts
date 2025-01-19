@@ -19,7 +19,7 @@ export async function create({
 }
 
 export async function findOne(id: string) {
-  await client.directory.findFirst({
+  return await client.directory.findFirst({
     where: { id },
     include: {
       directories: {
@@ -33,9 +33,9 @@ export async function findOne(id: string) {
   });
 }
 
-export async function findAtIndex() {
-  await client.directory.findMany({
-    where: { parentId: null },
+export async function findAtRoot(authorId: number) {
+  return await client.directory.findMany({
+    where: { authorId, parentId: null },
     include: {
       directories: {
         select: {
