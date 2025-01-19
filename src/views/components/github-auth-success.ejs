@@ -1,0 +1,6 @@
+<div class="alert info">
+  <%- include('../svg/github.svg') %>
+  <p>
+    Have a GitHub account? You can <a href="https://github.com/login/oauth/authorize?client_id=<%= process.env.GITHUB_CLIENT_ID %>&redirect_uri=<%= process.env.DEPLOYMENT_URL %>/github&scope=read%3Auser&allow_signup=true">authenticate</a> with it here.
+  </p>
+</div>

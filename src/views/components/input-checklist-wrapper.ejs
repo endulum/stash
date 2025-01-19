@@ -16,7 +16,7 @@
   </div>
 </div>
 
-<script defer>
+<script defer nonce="<%= locals.nonce %>">
   <%# // holds a reference to the input element of the current field %>
   const inputFor_<%= name %> = document.getElementById('<%= name %>')
 
