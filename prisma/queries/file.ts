@@ -8,8 +8,24 @@ export async function findChildrenFiles(
 ) {
   return await client.file.findMany({
     where: { authorId, directoryId },
-    orderBy: {
-      [settings.sortFiles]: settings.sortFilesDirection,
-    },
+    orderBy: [
+      { [settings.sortFiles]: settings.sortFilesDirection },
+      // secondarily sort by created if updated is primary sort
+      ...(settings.sortFiles === "updated"
+        ? [
+            {
+              created: settings.sortFilesDirection,
+            },
+          ]
+        : []),
+      // secondarily sort by name if type is primary sort
+      ...(settings.sortFiles === "type"
+        ? [
+            {
+              name: settings.sortFilesDirection,
+            },
+          ]
+        : []),
+    ],
   });
 }

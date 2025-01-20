@@ -60,7 +60,7 @@
                 })
               %></td>
               <td><%= 
-                child.updated.toISOString() !== child.created.toISOString() ? child.updated.toLocaleString('default', { 
+                child.updated ? child.updated.toLocaleString('default', { 
                   month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
                 }) : '-'
               %></td>
@@ -94,7 +94,7 @@
                 })
               %></td>
               <td><%= 
-                file.updated.toISOString() !== file.created.toISOString() ? file.updated.toLocaleString('default', { 
+                file.updated ? file.updated.toLocaleString('default', { 
                   month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
                 }) : '-'
               %></td>

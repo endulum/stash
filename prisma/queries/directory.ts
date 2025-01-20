@@ -35,9 +35,17 @@ export async function findChildrenDirs(
     include: {
       directories: true,
     },
-    orderBy: {
-      [settings.sortDirs]: settings.sortDirsDirection,
-    },
+    orderBy: [
+      { [settings.sortDirs]: settings.sortDirsDirection },
+      // secondarily sort by created if updated is primary sort
+      ...(settings.sortDirs === "updated"
+        ? [
+            {
+              created: settings.sortDirsDirection,
+            },
+          ]
+        : []),
+    ],
   });
 }
 

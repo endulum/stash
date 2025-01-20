@@ -64,7 +64,7 @@ model Directory {
   id          String      @id @default(nanoid(6))
   name        String
   created     DateTime    @default(now())
-  updated     DateTime    @default(now())
+  updated     DateTime?
   shareUntil  DateTime?
   files       File[]      @relation("directoryFiles")
   directories Directory[] @relation("parentDirectory")
@@ -82,7 +82,7 @@ model File {
   size        Float
   supabaseUrl String?
   created     DateTime   @default(now())
-  updated     DateTime   @default(now())
+  updated     DateTime?
   directory   Directory? @relation("directoryFiles", fields: [directoryId], references: [id], onDelete: Cascade)
   directoryId String?
   author      User       @relation("authorFiles", fields: [authorId], references: [id], onDelete: Cascade)
