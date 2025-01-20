@@ -67,7 +67,7 @@
             <tr>
               <td>
                 <a class="entry-link" href="<%= '/file/' + file.id %>">
-                  <%- include('../svg/file.svg') %>
+                  <%- include('../components/filetype-icon', { type: file.type }) %>
                   <span>
                    <b><%= file.name %></b>.<%= file.ext %>
                   </span>

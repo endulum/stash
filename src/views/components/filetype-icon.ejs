@@ -1,0 +1,16 @@
+<% if (type.startsWith('image')) { %>
+  <%- include('../svg/filetype-image.svg') %>
+<% } else if (type.startsWith('video')) { %>
+  <%- include('../svg/filetype-video.svg') %>
+<% } else if (
+  type.startsWith('text') || 
+  type.endsWith('/json') || 
+  type.endsWith('/javascript')
+  // not yet exhaustive...
+) { %>
+  <%- include('../svg/filetype-text.svg') %>
+<% } else if (type.startsWith('audio')) { %>
+  <%- include('../svg/filetype-audio.svg') %>
+<% } else { %>
+  <%- include('../svg/file.svg') %>
+<% } %>
