@@ -18,10 +18,9 @@ function niceBytes(x: string) {
 }
 
 export const root = asyncHandler(async (req, res, next) => {
-  if (!req.user) return render.login(true)(req, res, next);
   res.locals.dir = null;
-  res.locals.childDirs = await dirQueries.findAtRoot(req.user.id);
-  res.locals.childFiles = (await fileQueries.findAtRoot(req.user.id)).map(
+  res.locals.childDirs = await dirQueries.findAtRoot(req.thisUser.id);
+  res.locals.childFiles = (await fileQueries.findAtRoot(req.thisUser.id)).map(
     (f) => ({ ...f, size: niceBytes(f.size.toString()) })
   );
   return render.dir(req, res, next);
@@ -35,8 +34,7 @@ export const exists = asyncHandler(async (req, res, next) => {
 });
 
 export const isYours = asyncHandler(async (req, res, next) => {
-  if (!req.user) return render.login(true)(req, res, next);
-  if (req.user.id !== req.thisDirectory?.authorId)
+  if (req.thisUser.id !== req.thisDirectory?.authorId)
     return render.dirNotYours(req, res, next);
   return next();
 });
@@ -45,14 +43,10 @@ export const get = [
   exists,
   isYours,
   asyncHandler(async (req, res, next) => {
-    if (!req.user)
-      // wondering if we should remove the `?` from req.user type
-      // so we don't have to check every time.
-      return render.login(true)(req, res, next);
     res.locals.dir = req.thisDirectory;
     res.locals.childDirs = req.thisDirectory.directories;
     res.locals.childFiles = (
-      await fileQueries.findAtDir(req.user.id, req.thisDirectory.id)
+      await fileQueries.findAtDir(req.thisUser.id, req.thisDirectory.id)
     ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
     res.locals.path = [
       ...(await dirQueries.findPath(req.thisDirectory.id)),

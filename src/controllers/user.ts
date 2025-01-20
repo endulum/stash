@@ -6,6 +6,19 @@ import { usernameValidation } from "../common/usernameValidation";
 import { validate } from "../middleware/validate";
 import * as userQueries from "../../prisma/queries/user";
 
+export const auth = asyncHandler(async (req, res, next) => {
+  if (!req.user) {
+    req.flash("warning", "You must be logged in to perform this action.");
+    res.redirect("/login");
+  } else {
+    req.thisUser = req.user;
+    // Express.User is always unioned with undefined,
+    // so this reassigns to a custom req property whose type isn't undefined.
+    // that way, we don't have to check for undefined for every middleware that needs user
+    return next();
+  }
+});
+
 export const edit = [
   usernameValidation,
   body("password")
@@ -50,10 +63,9 @@ export const edit = [
     .escape(),
   validate,
   asyncHandler(async (req, res, next) => {
-    if (!req.user) return render.login(true)(req, res, next);
     if (req.formErrors) return render.account(req, res, next);
     await userQueries.update({
-      userData: req.user,
+      userData: req.thisUser,
       body: req.body,
     });
     req.flash("success", "Your account details have been successfully saved.");
@@ -104,9 +116,8 @@ export const del = [
     .escape(),
   validate,
   asyncHandler(async (req, res, next) => {
-    if (!req.user) return render.login(true)(req, res, next);
     if (req.formErrors) return render.deleteAccount(req, res, next);
-    await userQueries.del(req.user.id);
+    await userQueries.del(req.thisUser.id);
     req.logOut((err) => {
       if (err) return next(err);
       req.flash(

@@ -59,27 +59,22 @@ export const index = asyncHandler(async (_req, res) => {
   });
 });
 
-export const login = (includeWarning?: boolean) =>
-  asyncHandler(async (req, res) => {
-    // optionally provide warning flash
-    if (includeWarning)
-      req.flash("You must be logged in to perform this action.");
+export const login = asyncHandler(async (req, res) => {
+  // specific for the signup post handler, saving the new account's username
+  const loginUsernamePrefill = req.flash("loginUsernamePrefill");
 
-    // specific for the signup post handler, saving the new account's username
-    const loginUsernamePrefill = req.flash("loginUsernamePrefill");
-
-    return res.status(req.formErrors ? 400 : 200).render("layout", {
-      page: "pages/login",
-      title: "Log In",
-      prefill: {
-        ...req.body,
-        username:
-          loginUsernamePrefill.length > 0
-            ? loginUsernamePrefill
-            : req.body.username,
-      },
-    });
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/login",
+    title: "Log In",
+    prefill: {
+      ...req.body,
+      username:
+        loginUsernamePrefill.length > 0
+          ? loginUsernamePrefill
+          : req.body.username,
+    },
   });
+});
 
 export const signup = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {

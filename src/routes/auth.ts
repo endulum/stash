@@ -11,7 +11,7 @@ router
   .get(asyncHandler(async (_req, res) => res.redirect("/login")));
 
 router.route("/signup").get(render.signup).post(auth.signUp);
-router.route("/login").get(render.login()).post(auth.logIn);
+router.route("/login").get(render.login).post(auth.logIn);
 router.route("/github").get(auth.github);
 
 router.route("*").all(
