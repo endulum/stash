@@ -1,18 +1,18 @@
 <div class="input">
-  <!-- top left: where label goes -->
+  <%# top left: where label goes %>
   <label for=<%= name %>>
     <%= label %>
   </label>
-  <!-- top right: where errors belong -->
+  <%# top right: where errors belong %>
   <p>
     <% if (locals.formErrors && name in locals.formErrors) { %>
-      <small class="error">
+      <small class="error" data-for="<%= name %>">
         <b>Error: </b>
         <%= locals.formErrors[name] %>
       </small>
     <% } %>
   </p>
-  <!-- bottom: where input goes -->
+  <%# bottom: where input goes %>
   <input 
     type=<%= type %> 
     name=<%= name %> 
