@@ -10,8 +10,8 @@ async function reset() {
   await devQueries.createAdmin();
   await devQueries.seedStash({
     authorId: 1,
-    directories: 25,
-    files: { min: 0, max: 10 },
+    directories: 10,
+    files: { min: 10, max: 20 },
   });
 }
 

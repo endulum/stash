@@ -84,6 +84,7 @@ export async function createBulkDirectories(
         ...dir,
         authorId,
         parentId: parentIds[Math.floor(Math.random() * parentIds.length)],
+        created: dir.created,
       },
     });
     parentIds.push(id);
@@ -108,6 +109,7 @@ export async function createBulkFiles(
           ...file,
           authorId,
           directoryId: directoryId ?? null,
+          created: file.created,
         },
       });
       items.push({ id, name: file.name });
