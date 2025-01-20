@@ -1,3 +1,4 @@
+import { type UserSettings } from "@prisma/client";
 import { client } from "../client";
 
 export async function create({
@@ -26,20 +27,16 @@ export async function find(authorId: number, id: string) {
 
 export async function findChildrenDirs(
   authorId: number,
-  parentId: string | null
+  parentId: string | null,
+  settings: UserSettings
 ) {
-  const order = await client.userSettings.findFirst({
-    where: { userId: authorId },
-  });
   return await client.directory.findMany({
     where: { authorId, parentId },
     include: {
       directories: true,
     },
     orderBy: {
-      [order ? order.sortDirs : "name"]: order
-        ? order.sortDirsDirection
-        : "asc",
+      [settings.sortDirs]: settings.sortDirsDirection,
     },
   });
 }

@@ -11,6 +11,7 @@ declare global {
     export interface Request {
       formErrors?: Record<string, string>;
       thisUser: Prisma.User;
+      thisUserSettings: Prisma.UserSettings;
       thisDirectory: Prisma.Directory;
     }
   }

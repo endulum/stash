@@ -1,18 +1,15 @@
+import { type UserSettings } from "@prisma/client";
 import { client } from "../client";
 
 export async function findChildrenFiles(
   authorId: number,
-  directoryId: string | null
+  directoryId: string | null,
+  settings: UserSettings
 ) {
-  const order = await client.userSettings.findFirst({
-    where: { userId: authorId },
-  });
   return await client.file.findMany({
     where: { authorId, directoryId },
     orderBy: {
-      [order ? order.sortFiles : "name"]: order
-        ? order.sortFilesDirection
-        : "asc",
+      [settings.sortFiles]: settings.sortFilesDirection,
     },
   });
 }

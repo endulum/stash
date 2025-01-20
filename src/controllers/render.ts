@@ -85,6 +85,7 @@ export const signup = asyncHandler(async (req, res) => {
 });
 
 export const account = asyncHandler(async (req, res) => {
+  res.locals.userSettings = req.thisUserSettings;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/account",
     title: "Account Settings",

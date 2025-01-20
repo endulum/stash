@@ -21,6 +21,10 @@ export async function find({
   });
 }
 
+export async function findSettings(userId: number) {
+  return await client.userSettings.findFirst({ where: { userId } });
+}
+
 export async function comparePassword({
   userData,
   password,
@@ -55,12 +59,18 @@ export async function create({
     const { id } = await client.user.create({
       data: { username, githubId, githubUser },
     });
+    await client.userSettings.create({
+      data: { userId: id },
+    });
     return id;
   } else {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password ?? "password", salt);
     const { id } = await client.user.create({
       data: { username, password: hashedPassword },
+    });
+    await client.userSettings.create({
+      data: { userId: id },
     });
     return id;
   }

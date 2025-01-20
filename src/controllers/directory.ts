@@ -21,10 +21,15 @@ export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
   res.locals.childDirs = await dirQueries.findChildrenDirs(
     req.thisUser.id,
-    null
+    null,
+    req.thisUserSettings
   );
   res.locals.childFiles = (
-    await fileQueries.findChildrenFiles(req.thisUser.id, null)
+    await fileQueries.findChildrenFiles(
+      req.thisUser.id,
+      null,
+      req.thisUserSettings
+    )
   ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
   return render.dir(req, res, next);
 });
@@ -42,10 +47,15 @@ export const get = [
     res.locals.dir = req.thisDirectory;
     res.locals.childDirs = await dirQueries.findChildrenDirs(
       req.thisUser.id,
-      req.thisDirectory.id
+      req.thisDirectory.id,
+      req.thisUserSettings
     );
     res.locals.childFiles = (
-      await fileQueries.findChildrenFiles(req.thisUser.id, req.thisDirectory.id)
+      await fileQueries.findChildrenFiles(
+        req.thisUser.id,
+        req.thisDirectory.id,
+        req.thisUserSettings
+      )
     ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
     res.locals.path = [
       ...(await dirQueries.findPath(req.thisDirectory.id)),

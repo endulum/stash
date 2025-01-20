@@ -12,7 +12,10 @@ const redirectIndex = asyncHandler(async (_req, res) => {
 });
 
 router.route("/").get(render.index);
-router.route("/account").get(render.account).post(user.auth, user.edit);
+router
+  .route("/account")
+  .get(user.auth, render.account)
+  .post(user.auth, user.edit);
 router.route("/delete").get(render.deleteAccount).post(user.auth, user.del);
 
 router.route("/root").get(user.auth, dir.getRoot);

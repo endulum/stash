@@ -15,6 +15,7 @@ export const auth = asyncHandler(async (req, res, next) => {
     // Express.User is always unioned with undefined,
     // so this reassigns to a custom req property whose type isn't undefined.
     // that way, we don't have to check for undefined for every middleware that needs user
+    req.thisUserSettings = await userQueries.findSettings(req.user.id);
     return next();
   }
 });

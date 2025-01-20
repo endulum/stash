@@ -52,6 +52,10 @@ export async function createAdmin() {
     },
   });
 
+  await client.userSettings.create({
+    data: { userId: 1 },
+  });
+
   // since the id is manually set, we need to prevent unique constraint error
   await client.$executeRawUnsafe(
     "SELECT setval(pg_get_serial_sequence('\"User\"', 'id'), coalesce(max(id)+1, 1), false) FROM \"User\";"
