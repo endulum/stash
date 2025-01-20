@@ -1,4 +1,10 @@
-import { type Prisma } from "@prisma/client";
+import {
+  type Prisma,
+  type FileSort,
+  type FileSortOrder,
+  type DirSort,
+  type DirSortOrder,
+} from "@prisma/client";
 import bcrypt from "bcryptjs";
 
 import { client } from "../client";
@@ -19,10 +25,6 @@ export async function find({
   return client.user.findFirst({
     where: { OR },
   });
-}
-
-export async function findSettings(userId: number) {
-  return await client.userSettings.findFirst({ where: { userId } });
 }
 
 export async function comparePassword({
@@ -109,5 +111,29 @@ export async function updateGithubUser(id: number, githubUser: string) {
 export async function del(id: number) {
   await client.user.delete({
     where: { id },
+  });
+}
+
+export async function findSettings(userId: number) {
+  return await client.userSettings.findFirst({ where: { userId } });
+}
+
+export async function updateSettings(
+  userId: number,
+  body: {
+    sortFiles: FileSort;
+    sortFilesDirection: FileSortOrder;
+    sortDirs: DirSort;
+    sortDirsDirection: DirSortOrder;
+  }
+) {
+  await client.userSettings.update({
+    where: { userId },
+    data: {
+      sortFiles: body.sortFiles,
+      sortDirs: body.sortDirs,
+      sortFilesDirection: body.sortFilesDirection,
+      sortDirsDirection: body.sortDirsDirection,
+    },
   });
 }

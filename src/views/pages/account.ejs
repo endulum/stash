@@ -16,8 +16,28 @@
   }) %>
 
   <h3>Sorting</h3>
-  <!-- todo: inputs for these -->
-  <% console.log(locals.userSettings) %>
+
+  <%- include('../components/settings-sort-select', {
+    name: 'Files',
+    label: 'files',
+    options: [
+      { value: 'name', name: 'Name' },
+      { value: 'type', name: 'Type' },
+      { value: 'size', name: 'Size' },
+      { value: 'created', name: 'Created date' },
+      { value: 'updated', name: 'Updated date' }
+    ]
+  }) %>
+
+  <%- include('../components/settings-sort-select', {
+    name: 'Dirs',
+    label: 'directories',
+    options: [
+      { value: 'name', name: 'Name' },
+      { value: 'created', name: 'Created date' },
+      { value: 'updated', name: 'Updated date' }
+    ]
+  }) %>
 
   <% if (locals.user.password) { %>
     <div>

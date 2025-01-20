@@ -1,0 +1,55 @@
+<div class="select flex-row g-1">
+  <div class="input flg">
+    <label for="sort<%= name %>">
+      Sort <%= label %>
+    </label>
+    <p>
+      <% if (locals.formErrors && (`sort${name}`) in locals.formErrors) { %>
+        <small class="error">
+          <b>Error: </b>
+          <%= locals.formErrors[`sort${name}`] %>
+        </small>
+      <% } %>
+    </p>
+    <select name="sort<%= name %>" id="sort<%= name %>">
+      <% options.forEach((opt) => { %>
+        <option 
+          value="<%=opt.value%>"
+          <%=
+            locals.userSettings[`sort${name}`] === opt.value && 'selected'
+          %>
+        >
+          <%= opt.name %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+  <div class="input">
+    <label for="sort<%= name %>Direction">
+      Order:
+    </label>
+    <p>
+      <% if (locals.formErrors && `sort${name}Direction` in locals.formErrors) { %>
+        <small class="error">
+          <b>Error: </b>
+          <%= locals.formErrors[`sort${name}Direction`] %>
+        </small>
+      <% } %>
+    </p>
+    <select name="sort<%= name %>Direction" id="sort<%= name %>Direction">
+      <% [
+        { value: 'asc', name: 'Ascending' }, 
+        { value: 'desc', name: 'Descending' }
+      ].forEach((opt) => { %>
+        <option 
+          value="<%=opt.value%>"
+          <%=
+            locals.userSettings[`sort${name}Direction`] === opt.value && 'selected'
+          %>
+        >
+          <%= opt.name %>
+        </option>
+      <% }) %>
+    </select>
+  </div>
+</div>

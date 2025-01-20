@@ -62,6 +62,13 @@ export const edit = [
       }
     })
     .escape(),
+  body("sortFiles")
+    .trim()
+    .isIn(["name", "type", "size", "created", "updated"])
+    .escape(),
+  body("sortFilesDirection").trim().isIn(["asc", "desc"]).escape(),
+  body("sortDirs").trim().isIn(["name", "created", "updated"]).escape(),
+  body("sortDirsDirection").trim().isIn(["asc", "desc"]).escape(),
   validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.account(req, res, next);
@@ -69,6 +76,7 @@ export const edit = [
       userData: req.thisUser,
       body: req.body,
     });
+    await userQueries.updateSettings(req.thisUser.id, req.body);
     req.flash("success", "Your account details have been successfully saved.");
     return res.redirect("/account");
   }),
