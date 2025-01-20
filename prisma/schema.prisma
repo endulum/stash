@@ -15,20 +15,56 @@ model Session {
 }
 
 model User {
-  id          Int         @id @default(autoincrement())
-  username    String      @unique @db.VarChar(32)
-  password    String?     @db.VarChar(255)
-  githubUser  String?     @db.VarChar(255)
+  id          Int           @id @default(autoincrement())
+  username    String        @unique @db.VarChar(32)
+  password    String?       @db.VarChar(255)
+  githubUser  String?       @db.VarChar(255)
   githubId    Int?
-  role        Role        @default(BASIC)
-  files       File[]      @relation("authorFiles")
-  directories Directory[] @relation("authorDirectories")
+  role        Role          @default(BASIC)
+  files       File[]        @relation("authorFiles")
+  directories Directory[]   @relation("authorDirectories")
+  settings    UserSettings?
+}
+
+model UserSettings {
+  id                 Int           @id @default(autoincrement())
+  sortFiles          FileSort      @default(name)
+  sortFilesDirection FileSortOrder @default(asc)
+  sortDirs           DirSort       @default(name)
+  sortDirsDirection  DirSortOrder  @default(asc)
+  user               User          @relation(fields: [userId], references: [id])
+  userId             Int           @unique
+}
+
+enum FileSort {
+  name
+  size
+  type
+  created
+  updated
+}
+
+enum FileSortOrder {
+  asc
+  desc
+}
+
+enum DirSort {
+  name
+  created
+  updated
+}
+
+enum DirSortOrder {
+  asc
+  desc
 }
 
 model Directory {
   id          String      @id @default(nanoid(6))
   name        String
   created     DateTime    @default(now())
+  updated     DateTime    @default(now())
   shareUntil  DateTime?
   files       File[]      @relation("directoryFiles")
   directories Directory[] @relation("parentDirectory")
@@ -45,8 +81,8 @@ model File {
   type        String
   size        Float
   supabaseUrl String?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime?
+  created     DateTime   @default(now())
+  updated     DateTime   @default(now())
   directory   Directory? @relation("directoryFiles", fields: [directoryId], references: [id], onDelete: Cascade)
   directoryId String?
   author      User       @relation("authorFiles", fields: [authorId], references: [id], onDelete: Cascade)
