@@ -73,7 +73,11 @@
                   </span>
                 </a>
               </td>
-              <td><%= file.type %></td>
+              <td><%= 
+                (file.type.length > 32) 
+                  ? file.type.slice(0, 31) + '...' 
+                  : file.type;
+              %></td>
               <td><%= file.size %></td>
               <td><%= 
                 file.createdAt.toLocaleString('default', { 
