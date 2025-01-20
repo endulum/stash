@@ -15,7 +15,7 @@ router.route("/").get(render.index);
 router.route("/account").get(render.account).post(user.auth, user.edit);
 router.route("/delete").get(render.deleteAccount).post(user.auth, user.del);
 
-router.route("/root").get(user.auth, dir.root);
+router.route("/root").get(user.auth, dir.getRoot);
 router.route("/dir/:dir").get(user.auth, dir.get);
 
 router.route("/login").get(redirectIndex);

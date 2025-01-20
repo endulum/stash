@@ -1,13 +1,18 @@
 import { client } from "../client";
 
-export async function findAtDir(authorId: number, directoryId: string) {
+export async function findChildrenFiles(
+  authorId: number,
+  directoryId: string | null
+) {
+  const order = await client.userSettings.findFirst({
+    where: { userId: authorId },
+  });
   return await client.file.findMany({
     where: { authorId, directoryId },
-  });
-}
-
-export async function findAtRoot(authorId: number) {
-  return await client.file.findMany({
-    where: { authorId, directoryId: null },
+    orderBy: {
+      [order ? order.sortFiles : "name"]: order
+        ? order.sortFilesDirection
+        : "asc",
+    },
   });
 }

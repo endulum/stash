@@ -18,32 +18,28 @@ export async function create({
   });
 }
 
-export async function findOne(id: string) {
+export async function find(authorId: number, id: string) {
   return await client.directory.findFirst({
-    where: { id },
-    include: {
-      directories: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      files: true,
-    },
+    where: { id, authorId },
   });
 }
 
-export async function findAtRoot(authorId: number) {
+export async function findChildrenDirs(
+  authorId: number,
+  parentId: string | null
+) {
+  const order = await client.userSettings.findFirst({
+    where: { userId: authorId },
+  });
   return await client.directory.findMany({
-    where: { authorId, parentId: null },
+    where: { authorId, parentId },
     include: {
-      directories: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      files: true,
+      directories: true,
+    },
+    orderBy: {
+      [order ? order.sortDirs : "name"]: order
+        ? order.sortDirsDirection
+        : "asc",
     },
   });
 }

@@ -54,8 +54,17 @@
               </td>
               <td>directory</td>
               <td>-</td>
-              <td>-</td>
-              <td>-</td>
+              <td><%= 
+                child.created.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                })
+              %></td>
+              <td><%= 
+                child.updated.toISOString() !== child.created.toISOString() ? child.updated.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                }) : '-'
+              %></td>
+            </tr>
             </tr>
           <% }) %>
         </tbody>
@@ -80,12 +89,12 @@
               %></td>
               <td><%= file.size %></td>
               <td><%= 
-                file.createdAt.toLocaleString('default', { 
+                file.created.toLocaleString('default', { 
                   month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
                 })
               %></td>
               <td><%= 
-                file.updatedAt ? file.updatedAt.toLocaleString('default', { 
+                file.updated.toISOString() !== file.created.toISOString() ? file.updated.toLocaleString('default', { 
                   month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
                 }) : '-'
               %></td>

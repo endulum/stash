@@ -11,17 +11,7 @@ declare global {
     export interface Request {
       formErrors?: Record<string, string>;
       thisUser: Prisma.User;
-      thisDirectory: Prisma.DirectoryGetPayload<{
-        include: {
-          directories: {
-            select: {
-              id: true;
-              name: true;
-            };
-          };
-          files: true;
-        };
-      }>;
+      thisDirectory: Prisma.Directory;
     }
   }
 }

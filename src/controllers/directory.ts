@@ -17,36 +17,35 @@ function niceBytes(x: string) {
   return n.toFixed(n < 10 && l > 0 ? 1 : 0) + " " + units[l];
 }
 
-export const root = asyncHandler(async (req, res, next) => {
+export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
-  res.locals.childDirs = await dirQueries.findAtRoot(req.thisUser.id);
-  res.locals.childFiles = (await fileQueries.findAtRoot(req.thisUser.id)).map(
-    (f) => ({ ...f, size: niceBytes(f.size.toString()) })
+  res.locals.childDirs = await dirQueries.findChildrenDirs(
+    req.thisUser.id,
+    null
   );
+  res.locals.childFiles = (
+    await fileQueries.findChildrenFiles(req.thisUser.id, null)
+  ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
   return render.dir(req, res, next);
 });
 
 export const exists = asyncHandler(async (req, res, next) => {
-  const dir = await dirQueries.findOne(req.params.dir);
+  const dir = await dirQueries.find(req.thisUser.id, req.params.dir);
   if (!dir) return render.dirNotFound(req, res, next);
   req.thisDirectory = dir;
   return next();
 });
 
-export const isYours = asyncHandler(async (req, res, next) => {
-  if (req.thisUser.id !== req.thisDirectory?.authorId)
-    return render.dirNotYours(req, res, next);
-  return next();
-});
-
 export const get = [
   exists,
-  isYours,
   asyncHandler(async (req, res, next) => {
     res.locals.dir = req.thisDirectory;
-    res.locals.childDirs = req.thisDirectory.directories;
+    res.locals.childDirs = await dirQueries.findChildrenDirs(
+      req.thisUser.id,
+      req.thisDirectory.id
+    );
     res.locals.childFiles = (
-      await fileQueries.findAtDir(req.thisUser.id, req.thisDirectory.id)
+      await fileQueries.findChildrenFiles(req.thisUser.id, req.thisDirectory.id)
     ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
     res.locals.path = [
       ...(await dirQueries.findPath(req.thisDirectory.id)),
@@ -55,12 +54,6 @@ export const get = [
     return render.dir(req, res, next);
   }),
 ];
-
-// export const get = asyncHandler(async (req, res, next) => {
-//   if (!req.user) return render.login(true)(req, res, next);
-//   const dir =
-//   if (!dir) return render.dirNotFound(req, res, next);
-// });
 
 /* import { RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
