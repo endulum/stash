@@ -2,6 +2,7 @@ import request from "supertest";
 import app from "../app";
 import { wipe } from "../../prisma/queries/dev";
 import { create } from "../../prisma/queries/user";
+import { checkFormOk } from "../helpers";
 
 const agent = request.agent(app);
 
@@ -62,13 +63,13 @@ describe("/account", () => {
     await agent
       .post("/account")
       .send({ username: "demo-user" })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/account");
     // change it back
     await agent
       .post("/account")
       .send({ username: "admin" })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/account");
   });
 
@@ -76,7 +77,7 @@ describe("/account", () => {
     await agent
       .post("/account")
       .send(correctInputs)
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/account");
   });
 
@@ -88,7 +89,7 @@ describe("/account", () => {
         username: correctInputs.username,
         password: correctInputs.password,
       })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/");
 
     // change it all back
@@ -100,7 +101,7 @@ describe("/account", () => {
         confirmPassword: "password",
         currentPassword: "new-password",
       })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/account");
   });
 });
@@ -124,7 +125,7 @@ describe("/delete", () => {
     await agent
       .post("/delete")
       .send({ password: "password" })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("location", "/signup");
   });
 });

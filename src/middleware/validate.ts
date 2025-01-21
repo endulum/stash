@@ -4,6 +4,16 @@ import { validationResult } from "express-validator";
 export const validate = asyncHandler(async (req, res, next) => {
   const errorsArray = validationResult(req).array();
   if (errorsArray.length > 0) {
+    res.set(
+      "X-Validation-Errors",
+      JSON.stringify(
+        errorsArray.map((err) =>
+          err.type === "field"
+            ? { value: err.value, path: err.path, msg: err.msg }
+            : {}
+        )
+      )
+    );
     req.formErrors = {};
     errorsArray.forEach((error) => {
       if (req.formErrors && error.type === "field")

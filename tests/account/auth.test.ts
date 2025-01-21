@@ -1,8 +1,9 @@
 import request from "supertest";
 import app from "../app";
 import { wipe } from "../../prisma/queries/dev";
+import { checkFormOk } from "../helpers";
 
-afterAll(async () => {
+beforeAll(async () => {
   await wipe();
 });
 
@@ -40,7 +41,7 @@ describe("/login", () => {
     await agent
       .post("/login")
       .send(correctInputs)
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/");
   });
 
@@ -87,7 +88,7 @@ describe("/signup", () => {
     await agent
       .post("/signup")
       .send(correctInputs)
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/login");
   });
 
@@ -98,7 +99,7 @@ describe("/signup", () => {
         username: correctInputs.username,
         password: correctInputs.password,
       })
-      .expect(302)
+      .expect(checkFormOk)
       .expect("Location", "/");
   });
 });

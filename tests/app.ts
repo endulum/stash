@@ -1,5 +1,4 @@
 import express, { type Response, type Request } from "express";
-import asyncHandler from "express-async-handler";
 import crypto from "crypto";
 import path from "path";
 import session from "express-session";
@@ -13,8 +12,7 @@ import dotenv from "dotenv";
 import "./config/passport";
 
 import { errorHandler } from "../src/middleware/errorHandler";
-import { router as authRouter } from "../src/routes/auth";
-import { router as mainRouter } from "../src/routes/main";
+import { initUser } from "../src/middleware/initUser";
 
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
@@ -82,29 +80,8 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(
-  asyncHandler(async (req, res, next) => {
-    // set to locals so templates can use them
-    res.locals.user = req.user;
-    res.locals.warning = req.flash("warning");
-    res.locals.success = req.flash("success");
-
-    if (req.user) return mainRouter(req, res, next);
-    else return authRouter(req, res, next);
-  })
-);
-
-app.get("*", async (_req, res) => {
-  res.sendStatus(404);
-});
+app.use(initUser);
 
 app.use(errorHandler);
 
 export default app;
-
-// const port = process.env.PORT ?? 3000;
-// app.listen(port, () => {
-//   process.stdout.write(
-//     `⚡️ server starting at http://localhost:${port} in ${process.env.NODE_ENV} mode\n`
-//   );
-// });
