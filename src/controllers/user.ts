@@ -6,20 +6,6 @@ import { usernameValidation } from "../common/usernameValidation";
 import { validate } from "../middleware/validate";
 import * as userQueries from "../../prisma/queries/user";
 
-export const auth = asyncHandler(async (req, res, next) => {
-  if (!req.user) {
-    req.flash("warning", "You must be logged in to perform this action.");
-    res.redirect("/login");
-  } else {
-    req.thisUser = req.user;
-    // Express.User is always unioned with undefined,
-    // so this reassigns to a custom req property whose type isn't undefined.
-    // that way, we don't have to check for undefined for every middleware that needs user
-    req.thisUserSettings = await userQueries.findSettings(req.user.id);
-    return next();
-  }
-});
-
 export const edit = [
   usernameValidation,
   body("password")

@@ -12,26 +12,24 @@ const redirectIndex = asyncHandler(async (_req, res) => {
 });
 
 router.route("/").get(render.index);
-router
-  .route("/account")
-  .get(user.auth, render.account)
-  .post(user.auth, user.edit);
-router.route("/delete").get(render.deleteAccount).post(user.auth, user.del);
 
-router.route("/root").get(user.auth, dir.getRoot);
-router.route("/dir/:dir").get(user.auth, dir.get);
-router
-  .route("/dir/:dir/edit")
-  .get(user.auth, dir.exists, render.editDir)
-  .post(user.auth, dir.edit);
+// account
+
+router.route("/account").get(render.account).post(user.edit);
+router.route("/delete").get(render.deleteAccount).post(user.del);
+
+// directory
+
+router.route("/root").get(dir.getRoot);
+router.route("/dir/new").get(render.newDir).post(dir.create);
+router.route("/dir/:dir").get(dir.get);
+router.route("/dir/:dir/edit").get(dir.exists, render.editDir).post(dir.edit);
 router
   .route("/dir/:dir/delete")
-  .get(user.auth, dir.exists, render.deleteDir)
-  .post(user.auth, dir.del);
-router
-  .route("/newdir")
-  .get(user.auth, render.newDir)
-  .post(user.auth, dir.create);
+  .get(dir.exists, render.deleteDir)
+  .post(dir.del);
+
+// etc
 
 router.route("/login").get(redirectIndex);
 router.route("/signup").get(redirectIndex);
