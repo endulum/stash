@@ -1,5 +1,5 @@
 <form action="/newdir" method="post">
-  <%- include('../components/input-checklist-wrapper', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'name',
     label: 'Directory name',
     type: 'text',
@@ -15,7 +15,7 @@
     ]
   }) %>
 
-  <%- include('../components/location-dropdown') %>
+  <%- include('../../components/location-dropdown') %>
 
   <button type="submit">Submit</button>
 </form>

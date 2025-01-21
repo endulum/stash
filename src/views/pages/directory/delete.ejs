@@ -1,12 +1,12 @@
 <div class="alert warning">
-  <%- include('../svg/warning.svg') %>
+  <%- include('../../svg/warning.svg') %>
   <p>Deleting a directory will also delete all of its contents. This is permanent and cannot be undone.</p>
 </div>
 
 <p>To delete this directory, type <b><%= path %></b> below and submit.</p>
 <br>
 <form method="post" action=<%= `/dir/${dir.id}/delete` %>>
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'path',
     label: 'Directory path',
     type: 'text',

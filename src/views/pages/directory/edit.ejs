@@ -1,5 +1,5 @@
 <form action="<%= '/dir/' + dir.id + '/edit' %>" method="post">
-  <%- include('../components/input-checklist-wrapper', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'name',
     label: 'Directory name',
     type: 'text',
@@ -15,7 +15,7 @@
     ]
   }) %>
 
-  <%- include('../components/location-dropdown') %>
+  <%- include('../../components/location-dropdown') %>
 
   <% if (dir.shareUntil && Date.parse(dir.shareUntil) > Date.parse(new Date())) { %>
     <p>
@@ -29,7 +29,7 @@
     </p>
   <% } %>
 
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'shareUntil',
     label: 'Share until',
     type: 'date',

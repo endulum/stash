@@ -1,5 +1,5 @@
 <form action="/account" method="post">
-  <%- include('../components/input-checklist-wrapper', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'username',
     label: 'Username',
     type: 'text',
@@ -17,7 +17,7 @@
 
   <h3>Sorting</h3>
 
-  <%- include('../components/settings-sort-select', {
+  <%- include('../../components/settings-sort-select', {
     name: 'Files',
     label: 'files',
     options: [
@@ -29,7 +29,7 @@
     ]
   }) %>
 
-  <%- include('../components/settings-sort-select', {
+  <%- include('../../components/settings-sort-select', {
     name: 'Dirs',
     label: 'directories',
     options: [
@@ -45,7 +45,7 @@
       <p>Leave this area blank if you would not like to change your password.</p>
     </div>
     
-    <%- include('../components/input-checklist-wrapper', { 
+    <%- include('../../components/input-checklist-wrapper', { 
       name: 'password',
       label: 'New password',
       type: 'password',
@@ -59,7 +59,7 @@
       ]
     }) %>
 
-    <%- include('../components/form-input', { 
+    <%- include('../../components/form-input', { 
       name: 'confirmPassword',
       label: 'Confirm password',
       type: 'password',
@@ -67,7 +67,7 @@
       required: false
     }) %>
 
-    <%- include('../components/form-input', { 
+    <%- include('../../components/form-input', { 
       name: 'currentPassword',
       label: 'Current password',
       type: 'password',
@@ -81,7 +81,7 @@
 
 <div class="controls">
   <a type="button" class="warning" href="/delete">
-    <%- include('../svg/user-delete.svg') %>
+    <%- include('../../svg/user-delete.svg') %>
     <span>Delete Account</span>
   </a>
 </div>

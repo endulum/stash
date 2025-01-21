@@ -1,7 +1,7 @@
-<%- include('../components/github-auth-success') %>
+<%- include('../../components/github-auth-success') %>
 
 <form action="/signup" method="post">
-  <%- include('../components/input-checklist-wrapper', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'username',
     label: 'Username',
     type: 'text',
@@ -17,7 +17,7 @@
     ]
   }) %>
 
-  <%- include('../components/input-checklist-wrapper', { 
+  <%- include('../../components/input-checklist-wrapper', { 
     name: 'password',
     label: 'Password',
     type: 'password',
@@ -31,7 +31,7 @@
     ]
   }) %>
 
-<%- include('../components/form-input', { 
+<%- include('../../components/form-input', { 
   name: 'confirmPassword',
     label: 'Confirm password',
     type: 'password',

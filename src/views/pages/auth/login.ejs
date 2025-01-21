@@ -1,7 +1,7 @@
-<%- include('../components/github-auth-success') %>
+<%- include('../../components/github-auth-success') %>
 
 <form action="/login" method="post">
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'username',
     label: 'Username',
     type: 'text',
@@ -9,7 +9,7 @@
     required: true
   }) %>
 
-  <%- include('../components/form-input', { 
+  <%- include('../../components/form-input', { 
     name: 'password',
     label: 'Password',
     type: 'password',

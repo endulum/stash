@@ -66,7 +66,7 @@ export const login = asyncHandler(async (req, res) => {
   const loginUsernamePrefill = req.flash("loginUsernamePrefill");
 
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/login",
+    page: "pages/auth/login",
     title: "Log In",
     prefill: {
       ...req.body,
@@ -80,7 +80,7 @@ export const login = asyncHandler(async (req, res) => {
 
 export const signup = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/signup",
+    page: "pages/auth/signup",
     title: "Sign Up",
     prefill: req.body,
   });
@@ -89,7 +89,7 @@ export const signup = asyncHandler(async (req, res) => {
 export const account = asyncHandler(async (req, res) => {
   res.locals.userSettings = req.thisUserSettings;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/account",
+    page: "pages/account/settings",
     title: "Account Settings",
     prefill: {
       ...req.body,
@@ -100,21 +100,21 @@ export const account = asyncHandler(async (req, res) => {
 
 export const deleteAccount = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/delete-account",
+    page: "pages/account/delete",
     title: "Delete Account",
   });
 });
 
 export const dir = asyncHandler(async (_req, res) => {
   return res.render("layout", {
-    page: "pages/directory",
+    page: "pages/directory/view",
     title: "Your Files",
   });
 });
 
 export const newDir = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/new-directory",
+    page: "pages/directory/new",
     title: "Create a Directory",
     locations: [{ id: null }, ...(await findChildren({ id: null }))],
     prefill: {
@@ -127,7 +127,7 @@ export const newDir = asyncHandler(async (req, res) => {
 export const editDir = asyncHandler(async (req, res) => {
   res.locals.dir = req.thisDirectory;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/edit-directory",
+    page: "pages/directory/edit",
     title: "Edit Directory",
     locations: [{ id: null }, ...(await findChildren({ id: null }))].filter(
       (loc) => loc.id !== req.thisDirectory.id
@@ -147,7 +147,7 @@ export const editDir = asyncHandler(async (req, res) => {
 export const deleteDir = asyncHandler(async (req, res) => {
   res.locals.dir = req.thisDirectory;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
-    page: "pages/delete-directory",
+    page: "pages/directory/delete",
     title: "Delete Directory",
     path:
       (await findPath(req.thisDirectory)).map((loc) => loc.name).join("/") +
