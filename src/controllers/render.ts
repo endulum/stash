@@ -150,11 +150,7 @@ export const deleteDir = asyncHandler(async (req, res) => {
     page: "pages/delete-directory",
     title: "Delete Directory",
     path:
-      [
-        ...(await findPath(req.thisDirectory.id)),
-        { id: req.thisDirectory.id, name: req.thisDirectory.name },
-      ]
-        .map((loc) => loc.name)
-        .join("/") + "/",
+      (await findPath(req.thisDirectory)).map((loc) => loc.name).join("/") +
+      "/",
   });
 });

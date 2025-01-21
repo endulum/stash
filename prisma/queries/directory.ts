@@ -1,4 +1,4 @@
-import { type UserSettings } from "@prisma/client";
+import { Directory, type UserSettings } from "@prisma/client";
 import { client } from "../client";
 
 export async function create({
@@ -83,16 +83,16 @@ export async function findExistingWithName(
 }
 
 export async function findPath(
-  id: string,
-  path: Array<{ id: string; name: string; parentId: string | null }> = []
+  dir: Directory,
+  path: Array<{ name: string; id: string }> = []
 ) {
+  path.unshift({ name: dir.name, id: dir.id });
+  if (!dir.parentId) return path;
   const parent = await client.directory.findFirst({
-    where: { directories: { some: { id } } },
-    select: { id: true, parentId: true, name: true },
+    where: { id: dir.parentId },
   });
   if (!parent) return path;
-  path.unshift(parent);
-  return findPath(parent.id, path);
+  return findPath(parent, path);
 }
 
 export async function findChildren(

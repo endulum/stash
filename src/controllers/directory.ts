@@ -60,10 +60,7 @@ export const get = [
         req.thisUserSettings
       )
     ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
-    res.locals.path = [
-      ...(await dirQueries.findPath(req.thisDirectory.id)),
-      { name: req.thisDirectory.name, id: req.thisDirectory.id },
-    ];
+    res.locals.path = await dirQueries.findPath(req.thisDirectory);
     return render.dir(req, res, next);
   }),
 ];
@@ -130,10 +127,7 @@ export const del = [
     .trim()
     .custom(async (value, { req }) => {
       const path =
-        [
-          ...(await dirQueries.findPath(req.thisDirectory.id)),
-          { id: req.thisDirectory.id, name: req.thisDirectory.name },
-        ]
+        (await dirQueries.findPath(req.thisDirectory))
           .map((loc) => loc.name)
           .join("/") + "/";
       if (value !== path) throw new Error("Incorrect path.");
