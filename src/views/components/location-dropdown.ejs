@@ -11,7 +11,6 @@
     <% } %>
   </p>
   <select name="location" id="location">
-    <% console.log(locals.prefill, locals.locations) %>
     <% locals.locations.forEach(location => { %>
       <option 
         value=<%= location.id ?? 'home' %>

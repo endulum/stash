@@ -95,11 +95,11 @@ const validation = [
     })
     .escape(),
   locationValidation,
-  validate,
 ];
 
 export const create = [
   ...validation,
+  validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.newDir(req, res, next);
     const id = await dirQueries.create({
@@ -108,6 +108,47 @@ export const create = [
       name: req.body.name,
     });
     res.redirect(`/dir/${id}`);
+  }),
+];
+
+export const edit = [
+  exists,
+  ...validation,
+  body("shareUntil").trim().optional({ values: "falsy" }).isDate(),
+  validate,
+  asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return render.editDir(req, res, next);
+    await dirQueries.edit(req.thisDirectory.id, req.body);
+    req.flash("success", "Your directory has been successfully edited.");
+    res.redirect(`/dir/${req.thisDirectory.id}`);
+  }),
+];
+
+export const del = [
+  exists,
+  body("path")
+    .trim()
+    .custom(async (value, { req }) => {
+      const path =
+        [
+          ...(await dirQueries.findPath(req.thisDirectory.id)),
+          { id: req.thisDirectory.id, name: req.thisDirectory.name },
+        ]
+          .map((loc) => loc.name)
+          .join("/") + "/";
+      if (value !== path) throw new Error("Incorrect path.");
+    })
+    .escape(),
+  validate,
+  asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return render.deleteDir(req, res, next);
+    await dirQueries.del(req.thisDirectory.id);
+    req.flash("success", "Directory successfully deleted.");
+    res.redirect(
+      req.thisDirectory.parentId
+        ? `/dir/${req.thisDirectory.parentId}`
+        : "/root"
+    );
   }),
 ];
 

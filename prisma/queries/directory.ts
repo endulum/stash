@@ -20,6 +20,28 @@ export async function create({
   return id;
 }
 
+export async function edit(
+  id: string,
+  body: {
+    name?: string;
+    location?: string;
+    shareUntil?: string;
+  }
+) {
+  await client.directory.update({
+    where: { id },
+    data: {
+      ...(body.name && { name: body.name }),
+      ...(body.location && {
+        parentId: body.location === "home" ? null : body.location,
+      }),
+      ...(body.shareUntil && {
+        shareUntil: body.shareUntil === "" ? null : new Date(body.shareUntil),
+      }),
+    },
+  });
+}
+
 export async function find(authorId: number, id: string) {
   return await client.directory.findFirst({
     where: { id, authorId },

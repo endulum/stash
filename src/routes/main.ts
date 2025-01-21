@@ -21,6 +21,14 @@ router.route("/delete").get(render.deleteAccount).post(user.auth, user.del);
 router.route("/root").get(user.auth, dir.getRoot);
 router.route("/dir/:dir").get(user.auth, dir.get);
 router
+  .route("/dir/:dir/edit")
+  .get(user.auth, dir.exists, render.editDir)
+  .post(user.auth, dir.edit);
+router
+  .route("/dir/:dir/delete")
+  .get(user.auth, dir.exists, render.deleteDir)
+  .post(user.auth, dir.del);
+router
   .route("/newdir")
   .get(user.auth, render.newDir)
   .post(user.auth, dir.create);

@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 
-import { findChildren } from "../../prisma/queries/directory";
+import { findPath, findChildren } from "../../prisma/queries/directory";
 
 // errors
 
@@ -121,5 +121,40 @@ export const newDir = asyncHandler(async (req, res) => {
       ...req.body,
       location: req.body.location ?? req.query.location,
     },
+  });
+});
+
+export const editDir = asyncHandler(async (req, res) => {
+  res.locals.dir = req.thisDirectory;
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/edit-directory",
+    title: "Edit Directory",
+    locations: [{ id: null }, ...(await findChildren({ id: null }))].filter(
+      (loc) => loc.id !== req.thisDirectory.id
+    ),
+    prefill: {
+      ...req.body,
+      name: req.body.name ?? req.thisDirectory.name,
+      location: req.body.location ?? req.thisDirectory.parentId,
+      shareUntil:
+        "shareUntil" in req.body
+          ? req.body.shareUntil
+          : req.thisDirectory.shareUntil?.toISOString().substring(0, 10),
+    },
+  });
+});
+
+export const deleteDir = asyncHandler(async (req, res) => {
+  res.locals.dir = req.thisDirectory;
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/delete-directory",
+    title: "Delete Directory",
+    path:
+      [
+        ...(await findPath(req.thisDirectory.id)),
+        { id: req.thisDirectory.id, name: req.thisDirectory.name },
+      ]
+        .map((loc) => loc.name)
+        .join("/") + "/",
   });
 });

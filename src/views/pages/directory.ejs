@@ -111,6 +111,17 @@
     <%- include('../svg/folder-create.svg') %>
     <span>Add Directory</span>
   </a>
+
+  <% if (dir) { %>
+    <a type="button" href="<%= '/dir/' + dir.id + '/edit' %>">
+      <%- include('../svg/folder-update.svg') %>
+      <span>Edit Directory</span>
+    </a>
+    <a type="button" class="warning" href="<%= '/dir/' + dir.id + '/delete' %>">
+      <%- include('../svg/folder-delete.svg') %>
+      <span>Delete Directory</span>
+    </a>
+  <% } %>
 </div>
 
 <script src="/scripts/detectTableScroll.js"></script>
