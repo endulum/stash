@@ -64,11 +64,35 @@ export const edit = [
     .escape(),
   body("sortFiles")
     .trim()
-    .isIn(["name", "type", "size", "created", "updated"])
-    .escape(),
-  body("sortFilesDirection").trim().isIn(["asc", "desc"]).escape(),
-  body("sortDirs").trim().isIn(["name", "created", "updated"]).escape(),
-  body("sortDirsDirection").trim().isIn(["asc", "desc"]).escape(),
+    .custom((value) => {
+      if (
+        value !== "" &&
+        !["name", "type", "size", "created", "updated"].includes(value)
+      )
+        throw new Error("Not a valid sort value.");
+    })
+    .optional(),
+  body("sortFilesDirection")
+    .trim()
+    .custom((value) => {
+      if (value !== "" && !["asc", "desc"].includes(value))
+        throw new Error("Not a valid sort value.");
+    })
+    .optional(),
+  body("sortDirs")
+    .trim()
+    .custom((value) => {
+      if (value !== "" && !["name", "created", "updated"].includes(value))
+        throw new Error("Not a valid sort value.");
+    })
+    .optional(),
+  body("sortDirsDirection")
+    .trim()
+    .custom((value) => {
+      if (value !== "" && !["asc", "desc"].includes(value))
+        throw new Error("Not a valid sort value.");
+    })
+    .optional(),
   validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.account(req, res, next);

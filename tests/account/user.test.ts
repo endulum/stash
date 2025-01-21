@@ -6,12 +6,9 @@ import { create } from "../../prisma/queries/user";
 const agent = request.agent(app);
 
 beforeAll(async () => {
+  await wipe();
   await agent.post("/login").send({ username: "admin", password: "password" });
   await create({ username: "basic" });
-});
-
-afterAll(async () => {
-  await wipe();
 });
 
 describe("/account", () => {
@@ -45,6 +42,19 @@ describe("/account", () => {
           .send({ ...correctInputs, ...wrongInputs })
           .expect(400);
       })
+    );
+  });
+
+  test("POST - 400 if any invalid sort", async () => {
+    await Promise.all(
+      ["sortFiles", "sortFilesDirection", "sortDirs", "sortDirsDirection"].map(
+        async (sortName) => {
+          await agent
+            .post("/account")
+            .send({ [sortName]: "owo" })
+            .expect(400);
+        }
+      )
     );
   });
 
