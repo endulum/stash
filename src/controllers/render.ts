@@ -1,5 +1,7 @@
 import asyncHandler from "express-async-handler";
 
+import { findChildren } from "../../prisma/queries/directory";
+
 // errors
 
 export const notFound = asyncHandler(async (_req, res) => {
@@ -107,5 +109,17 @@ export const dir = asyncHandler(async (_req, res) => {
   return res.render("layout", {
     page: "pages/directory",
     title: "Your Files",
+  });
+});
+
+export const newDir = asyncHandler(async (req, res) => {
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/new-directory",
+    title: "Create a Directory",
+    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    prefill: {
+      ...req.body,
+      location: req.body.location ?? req.query.location,
+    },
   });
 });

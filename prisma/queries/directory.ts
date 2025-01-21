@@ -10,13 +10,14 @@ export async function create({
   name: string;
   parentId?: string;
 }) {
-  await client.directory.create({
+  const { id } = await client.directory.create({
     data: {
       name,
       parentId,
       authorId,
     },
   });
+  return id;
 }
 
 export async function find(authorId: number, id: string) {
@@ -46,6 +47,16 @@ export async function findChildrenDirs(
           ]
         : []),
     ],
+  });
+}
+
+export async function findExistingWithName(
+  authorId: number,
+  parentId: string,
+  name: string
+) {
+  return await client.directory.findFirst({
+    where: { name, parentId, authorId },
   });
 }
 
@@ -79,7 +90,7 @@ export async function findChildren(
   // useful for directory select dropdown, and creating the .zip
   const renamedDirectories = directories.map((dir) => ({
     ...dir,
-    name: parent.id ? parent.name + "/" + dir.name : dir.name,
+    name: parent.id ? parent.name + "/" + dir.name : "/" + dir.name,
   }));
 
   children.push(...renamedDirectories);

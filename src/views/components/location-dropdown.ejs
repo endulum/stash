@@ -1,0 +1,26 @@
+<div class="input">
+  <label for="location">
+    Select location
+  </label>
+  <p>
+    <% if (locals.formErrors && 'location' in formErrors) { %>
+      <small class="error">
+        <b>Error: </b>
+        <%= formErrors['location'] %>
+      </small>
+    <% } %>
+  </p>
+  <select name="location" id="location">
+    <% console.log(locals.prefill, locals.locations) %>
+    <% locals.locations.forEach(location => { %>
+      <option 
+        value=<%= location.id ?? 'home' %>
+        <%= locals.prefill.location === location.id && "selected" %>
+      >
+        <%= location.name ?? '/' %>
+      </option>
+    <% }) %>
+  </select>
+</div>
+
+<%#  %>

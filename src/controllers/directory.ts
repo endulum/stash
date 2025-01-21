@@ -1,8 +1,11 @@
 import asyncHandler from "express-async-handler";
+import { body } from "express-validator";
 
 import * as render from "./render";
 import * as dirQueries from "../../prisma/queries/directory";
 import * as fileQueries from "../../prisma/queries/file";
+import { validate } from "../middleware/validate";
+import { locationValidation } from "../common/locationValidation";
 
 const units = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
 
@@ -65,7 +68,69 @@ export const get = [
   }),
 ];
 
-/* import { RequestHandler } from "express";
+const validation = [
+  body("name")
+    .trim()
+    .isLength({ min: 2, max: 64 })
+    .withMessage("Directory names must be between 2 and 64 characters long.")
+    .bail()
+    .matches(/^[A-Za-z0-9-_ ]+$/g)
+    .withMessage(
+      "Directory names must only consist of letters, numbers, hyphens, underscores, and spaces."
+    )
+    .bail()
+    .custom(async (value, { req }) => {
+      const duplicate = await dirQueries.findExistingWithName(
+        req.thisUser.id,
+        req.body.location === "home" ? null : req.body.location,
+        value
+      );
+      if (
+        duplicate &&
+        !(req.thisDirectory && req.thisDirectory.id === duplicate.id)
+      )
+        throw new Error(
+          "There already exists a directory in the chosen location with this name. Directories in the same location cannot have the same name."
+        );
+    })
+    .escape(),
+  locationValidation,
+  validate,
+];
+
+export const create = [
+  ...validation,
+  asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return render.newDir(req, res, next);
+    const id = await dirQueries.create({
+      authorId: req.thisUser.id,
+      parentId: req.body.location === "home" ? null : req.body.location,
+      name: req.body.name,
+    });
+    res.redirect(`/dir/${id}`);
+  }),
+];
+
+/* 
+
+submitCreate: asyncHandler(async (req, res, next) => {
+    if (req.formErrors) return controller.renderCreate(req, res, next)
+    if (!req.user) {
+      req.flash('warning', 'You must be logged in to create directories.')
+      return res.redirect('/login')
+    }
+    const newDirectory = await prisma.directory.create({
+      data: {
+        name: req.body.name,
+        parentId: req.body.location === 'home' ? null : req.body.location,
+        authorId: req.user.id
+      }
+    })
+    req.flash('success', 'New directory successfully created.')
+    return res.redirect(`/directory/${newDirectory.id}`)
+  }),
+
+import { RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { body, type ValidationChain } from "express-validator";
 import stream from "stream";
@@ -246,22 +311,7 @@ export const controller: Record<string, RequestHandler> = {
     })
   }),
 
-  submitCreate: asyncHandler(async (req, res, next) => {
-    if (req.formErrors) return controller.renderCreate(req, res, next)
-    if (!req.user) {
-      req.flash('warning', 'You must be logged in to create directories.')
-      return res.redirect('/login')
-    }
-    const newDirectory = await prisma.directory.create({
-      data: {
-        name: req.body.name,
-        parentId: req.body.location === 'home' ? null : req.body.location,
-        authorId: req.user.id
-      }
-    })
-    req.flash('success', 'New directory successfully created.')
-    return res.redirect(`/directory/${newDirectory.id}`)
-  }),
+  
 
   renderUpdate: asyncHandler(async (req, res) => {
     return res.render('layout', {

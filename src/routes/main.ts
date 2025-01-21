@@ -20,6 +20,10 @@ router.route("/delete").get(render.deleteAccount).post(user.auth, user.del);
 
 router.route("/root").get(user.auth, dir.getRoot);
 router.route("/dir/:dir").get(user.auth, dir.get);
+router
+  .route("/newdir")
+  .get(user.auth, render.newDir)
+  .post(user.auth, dir.create);
 
 router.route("/login").get(redirectIndex);
 router.route("/signup").get(redirectIndex);
