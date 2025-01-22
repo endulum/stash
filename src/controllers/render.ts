@@ -165,3 +165,15 @@ export const file = asyncHandler(async (_req, res) => {
     title: "Viewing File",
   });
 });
+
+export const newFile = asyncHandler(async (req, res) => {
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/file/new",
+    title: "Upload a File",
+    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    prefill: {
+      ...req.body,
+      location: req.body.location ?? req.query.location,
+    },
+  });
+});

@@ -10,6 +10,16 @@ export async function find(authorId: number, id: string) {
   });
 }
 
+export async function findExistingWithName(
+  authorId: number,
+  directoryId: string | null,
+  name: string
+) {
+  return await client.file.findFirst({
+    where: { name, directoryId, authorId },
+  });
+}
+
 export async function findChildrenFiles(
   authorId: number,
   directoryId: string | null,

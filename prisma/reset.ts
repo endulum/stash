@@ -8,11 +8,11 @@ async function reset() {
   await devQueries.truncateTable("User");
   await devQueries.truncateTable("Session");
   await devQueries.createAdmin();
-  await devQueries.seedStash({
-    authorId: 1,
-    directories: 10,
-    files: { min: 10, max: 20 },
-  });
+  // await devQueries.seedStash({
+  //   authorId: 1,
+  //   directories: 10,
+  //   files: { min: 10, max: 20 },
+  // });
 }
 
 reset()

@@ -112,6 +112,11 @@
     <span>Add Directory</span>
   </a>
 
+  <a type="button" class="success" href="<%= '/file/new' + (dir ? ('?dest=' + dir.id) : '') %>">
+    <%- include('../../svg/file-create.svg') %>
+    <span>Add File</span>
+  </a>
+
   <% if (dir) { %>
     <a type="button" href="<%= '/dir/' + dir.id + '/edit' %>">
       <%- include('../../svg/folder-update.svg') %>

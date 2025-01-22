@@ -32,7 +32,10 @@ router
 
 // file
 
+router.route("/file/new").get(render.newFile).post(file.create);
 router.route("/file/:file").get(file.get);
+router.route("/file/:file/download").get(file.download);
+router.route("/serve/:file").get(file.serve);
 
 // etc
 
