@@ -83,6 +83,22 @@ export async function getReadable(fileName: string, authorId: number) {
   return { readable, contentType };
 }
 
+export async function empty() {
+  const files = await client.file.findMany({
+    where: {},
+    select: {
+      authorId: true,
+      id: true,
+    },
+  });
+  if (files.length === 0) return;
+  const fileUrls = files.map((f) => `user_${f.authorId}/${f.id}`);
+  const { error: deleteError } = await supabase.storage
+    .from(bucketName)
+    .remove(fileUrls);
+  if (deleteError) throw deleteError;
+}
+
 // perform a check on server run so we can throw an error right away
 // if the buckets we're expecting don't exist
 async function checkBucket() {
@@ -91,20 +107,3 @@ async function checkBucket() {
 }
 
 checkBucket();
-
-/* 
-
-
-
-export async function empty() {
-  const { data: filesData, error: listError } = await supabaseService.storage
-    .from(bucketName)
-    .list(process.env.NODE_ENV);
-  if (listError) throw listError;
-  const files = filesData.map((f) => `${process.env.NODE_ENV}/${f.name}`);
-  const { error: deleteError } = await supabaseService.storage
-    .from(bucketName)
-    .remove(files);
-  if (deleteError) throw deleteError;
-}
- */

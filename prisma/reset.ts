@@ -3,8 +3,10 @@ dotenv.config({ path: ".env" + process.env.NODE_ENV });
 
 import { client } from "./client";
 import * as devQueries from "./queries/dev";
+import { empty } from "../supabase/supabase";
 
 async function reset() {
+  await empty();
   await devQueries.truncateTable("User");
   await devQueries.truncateTable("Session");
   await devQueries.createAdmin();
@@ -17,7 +19,7 @@ async function reset() {
 
 reset()
   .catch((e) => {
-    console.error(e.message);
+    console.error(e);
   })
   .finally(async () => {
     await client.$disconnect();
