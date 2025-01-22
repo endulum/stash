@@ -13,6 +13,9 @@ const redirectIndex = asyncHandler(async (_req, res) => {
 });
 
 router.route("/").get(render.index);
+router.route("/login").get(redirectIndex);
+router.route("/signup").get(redirectIndex);
+router.route("/logout").get(logOut);
 
 // account
 
@@ -32,17 +35,22 @@ router
 
 // file
 
-router.route("/file/new").get(render.newFile).post(file.create);
+router.route("/file/new").get(render.newFile);
 router.route("/file/:file").get(file.get);
-router.route("/file/:file/download").get(file.download);
-router.route("/serve/:file").get(file.serve);
 
 // etc
 
-router.route("/login").get(redirectIndex);
-router.route("/signup").get(redirectIndex);
-router.route("/logout").get(logOut);
-router.route("*").all(render.notFound);
+if (process.env.NODE_ENV !== "test") {
+  import("../controllers/supa").then((module) => {
+    console.warn("supabase connected");
+    router.route("/file/new").post(module.upload);
+    router.route("/file/:file/download").get(module.download);
+    router.route("/serve/:file").get(module.serve);
+    router.route("*").all(render.notFound);
+  });
+} else {
+  router.route("*").all(render.notFound);
+}
 
 export { router };
 
