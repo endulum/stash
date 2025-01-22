@@ -1,6 +1,7 @@
 import request from "supertest";
 import * as cheerio from "cheerio";
 
+import { checkFormOk } from "../helpers";
 import app from "../app";
 import { wipe, seedStash } from "../../prisma/queries/dev";
 
@@ -8,6 +9,7 @@ const agent = request.agent(app);
 
 const directories: Array<{ id: string; name: string }> = [];
 const files: Array<{ id: string; name: string }> = [];
+let directory: { id?: string; name?: string } = {};
 
 beforeAll(async () => {
   await wipe();
@@ -83,5 +85,116 @@ describe("/root, /dir/:dir", () => {
 
     expect(dirCount).toEqual(directories.length);
     expect(fileCount).toEqual(files.length);
+  });
+});
+
+describe("/dir/new", () => {
+  const correctInputs = {
+    name: "directory",
+    location: "home",
+  };
+
+  beforeAll(async () => {
+    await wipe();
+    await agent
+      .post("/login")
+      .send({ username: "admin", password: "password" });
+  });
+
+  test("GET - ok", async () => {
+    await agent.get("/dir/new").expect(200);
+  });
+
+  test("POST - 400 and errors", async () => {
+    await Promise.all(
+      [{ name: "" }, { name: "/" }, { location: "" }, { location: "owo" }].map(
+        async (wrongInputs) => {
+          await agent
+            .post("/dir/new")
+            .send({ ...correctInputs, ...wrongInputs })
+            .expect(400);
+        }
+      )
+    );
+  });
+
+  test("POST - 304 with correct inputs", async () => {
+    const response = await agent
+      .post("/dir/new")
+      .send(correctInputs)
+      .expect(checkFormOk);
+    directory = {
+      id: response.get("Location")!.split("/dir/")[1],
+      name: correctInputs.name,
+    };
+  });
+});
+
+describe("/dir/:dir", () => {
+  test("GET - ok", async () => {
+    await agent.get(`/dir/${directory.id}`).expect(200);
+  });
+});
+
+describe("/dir/:dir/edit", () => {
+  const correctInputs = { name: "edited-directory", location: "home" };
+
+  test("GET - ok", async () => {
+    await agent.get(`/dir/${directory.id}/edit`).expect(200);
+  });
+
+  test("POST - 400 and errors", async () => {
+    await Promise.all(
+      [
+        { name: "" },
+        { name: "/" },
+        { location: "" },
+        { location: "owo" },
+        { location: directory.id },
+      ].map(async (wrongInputs) => {
+        await agent
+          .post(`/dir/${directory.id}/edit`)
+          .send({ ...correctInputs, ...wrongInputs })
+          .expect(400);
+      })
+    );
+  });
+
+  test("POST - 304 with correct inputs", async () => {
+    await agent
+      .post(`/dir/${directory.id}/edit`)
+      .send(correctInputs)
+      .expect(checkFormOk)
+      .expect("Location", `/dir/${directory.id}`);
+  });
+});
+
+describe("/dir/:dir/delete", () => {
+  test("GET - ok", async () => {
+    await agent.get(`/dir/${directory.id}/delete`).expect(200);
+  });
+
+  test("POST - 400 and errors", async () => {
+    await Promise.all(
+      [{ path: "" }, { path: "/" }, { path: "owo" }].map(
+        async (wrongInputs) => {
+          await agent
+            .post(`/dir/${directory.id}/delete`)
+            .send(wrongInputs)
+            .expect(400);
+        }
+      )
+    );
+  });
+
+  test("POST - 304 with correct inputs", async () => {
+    await agent
+      .post(`/dir/${directory.id}/delete`)
+      .send({ path: "edited-directory/" })
+      .expect(checkFormOk);
+  });
+
+  test("GET /dir/:dir - 404, it should no longer exist", async () => {
+    await agent.post(`/dir/${directory.id}`).expect(404);
   });
 });
