@@ -50,19 +50,21 @@ export const edit = [
     .escape(),
   body("sortFiles")
     .trim()
+    .optional({ values: "falsy" })
     .custom((value) => {
       if (
         value !== "" &&
         !["name", "type", "size", "created", "updated"].includes(value)
       )
         throw new Error("Not a valid sort value.");
-    })
-    .optional(),
+      return true;
+    }),
   body("sortFilesDirection")
     .trim()
     .custom((value) => {
       if (value !== "" && !["asc", "desc"].includes(value))
         throw new Error("Not a valid sort value.");
+      return true;
     })
     .optional(),
   body("sortDirs")
@@ -70,6 +72,7 @@ export const edit = [
     .custom((value) => {
       if (value !== "" && !["name", "created", "updated"].includes(value))
         throw new Error("Not a valid sort value.");
+      return true;
     })
     .optional(),
   body("sortDirsDirection")
@@ -77,6 +80,7 @@ export const edit = [
     .custom((value) => {
       if (value !== "" && !["asc", "desc"].includes(value))
         throw new Error("Not a valid sort value.");
+      return true;
     })
     .optional(),
   validate,
