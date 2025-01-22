@@ -5,6 +5,7 @@ import { logOut } from "../controllers/auth";
 import * as render from "../controllers/render";
 import * as user from "../controllers/user";
 import * as dir from "../controllers/directory";
+import * as file from "../controllers/file";
 
 const router = express.Router();
 const redirectIndex = asyncHandler(async (_req, res) => {
@@ -28,6 +29,10 @@ router
   .route("/dir/:dir/delete")
   .get(dir.exists, render.deleteDir)
   .post(dir.del);
+
+// file
+
+router.route("/file/:file").get(file.get);
 
 // etc
 

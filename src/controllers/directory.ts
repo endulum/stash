@@ -6,19 +6,7 @@ import * as dirQueries from "../../prisma/queries/directory";
 import * as fileQueries from "../../prisma/queries/file";
 import { validate } from "../middleware/validate";
 import { locationValidation } from "../common/locationValidation";
-
-const units = ["bytes", "KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"];
-
-function niceBytes(x: string) {
-  let l = 0,
-    n = parseInt(x, 10) || 0;
-
-  while (n >= 1024 && ++l) {
-    n = n / 1024;
-  }
-
-  return n.toFixed(n < 10 && l > 0 ? 1 : 0) + " " + units[l];
-}
+import { niceBytes } from "../functions/niceBytes";
 
 export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
@@ -33,7 +21,7 @@ export const getRoot = asyncHandler(async (req, res, next) => {
       null,
       req.thisUserSettings
     )
-  ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
+  ).map((f) => ({ ...f, size: niceBytes(f.size) }));
   return render.dir(req, res, next);
 });
 
@@ -59,7 +47,7 @@ export const get = [
         req.thisDirectory.id,
         req.thisUserSettings
       )
-    ).map((f) => ({ ...f, size: niceBytes(f.size.toString()) }));
+    ).map((f) => ({ ...f, size: niceBytes(f.size) }));
     res.locals.path = await dirQueries.findPath(req.thisDirectory);
     return render.dir(req, res, next);
   }),

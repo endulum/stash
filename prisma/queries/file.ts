@@ -1,6 +1,15 @@
 import { type UserSettings } from "@prisma/client";
 import { client } from "../client";
 
+export async function find(authorId: number, id: string) {
+  return await client.file.findFirst({
+    where: { id, authorId },
+    include: {
+      directory: true,
+    },
+  });
+}
+
 export async function findChildrenFiles(
   authorId: number,
   directoryId: string | null,

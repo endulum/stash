@@ -1,4 +1,33 @@
-import { type RequestHandler } from "express";
+import asyncHandler from "express-async-handler";
+
+import * as render from "./render";
+import * as dirQueries from "../../prisma/queries/directory";
+import * as fileQueries from "../../prisma/queries/file";
+import { niceBytes } from "../functions/niceBytes";
+
+export const exists = asyncHandler(async (req, res, next) => {
+  const file = await fileQueries.find(req.thisUser.id, req.params.file);
+  if (!file) return render.fileNotFound(req, res, next);
+  req.thisFile = file;
+  res.locals.file = {
+    ...req.thisFile,
+    size: niceBytes(req.thisFile.size),
+  };
+  res.locals.path = [
+    ...(file.directory ? await dirQueries.findPath(file.directory) : []),
+    { name: file.name + "." + file.ext },
+  ];
+  return next();
+});
+
+export const get = [
+  exists,
+  asyncHandler(async (req, res, next) => {
+    return render.file(req, res, next);
+  }),
+];
+
+/* import { type RequestHandler } from "express";
 import asyncHandler from "express-async-handler";
 import { body, type ValidationChain } from "express-validator";
 import { decode } from "base64-arraybuffer";
@@ -302,4 +331,4 @@ export const controller: Record<string, RequestHandler> = {
       readStream.pipe(res)
     }
   }),
-}
+} */

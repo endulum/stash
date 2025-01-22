@@ -20,19 +20,19 @@ export const dirNotFound = asyncHandler(async (_req, res) => {
   });
 });
 
+export const fileNotFound = asyncHandler(async (_req, res) => {
+  return res.status(404).render("layout", {
+    page: "pages/error",
+    title: "File Not Found",
+    message: "The file you're looking for could not be found.",
+  });
+});
+
 export const sharedDirNotFound = asyncHandler(async (_req, res) => {
   return res.status(404).render("layout", {
     page: "pages/error",
     title: "Shared Directory Not Found",
     message: "The shared directory you're looking for could not be found.",
-  });
-});
-
-export const dirNotYours = asyncHandler(async (_req, res) => {
-  return res.status(403).render("layout", {
-    page: "pages/error",
-    title: "Directory Not Yours",
-    message: "You do not own this directory.",
   });
 });
 
@@ -105,6 +105,8 @@ export const deleteAccount = asyncHandler(async (req, res) => {
   });
 });
 
+// dir
+
 export const dir = asyncHandler(async (_req, res) => {
   return res.render("layout", {
     page: "pages/directory/view",
@@ -152,5 +154,14 @@ export const deleteDir = asyncHandler(async (req, res) => {
     path:
       (await findPath(req.thisDirectory)).map((loc) => loc.name).join("/") +
       "/",
+  });
+});
+
+// file
+
+export const file = asyncHandler(async (_req, res) => {
+  return res.render("layout", {
+    page: "pages/file/view",
+    title: "Viewing File",
   });
 });
