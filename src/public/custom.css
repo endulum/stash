@@ -426,6 +426,13 @@ thead td:first-of-type span {
   background-color: var(--bg2);
   border-radius: var(--radius);
   text-align: center;
+  textarea {
+    width: 100%;
+    color: var(--fg);
+    font-family: monospace;
+    max-height: 500px;
+    resize: vertical;
+  }
 }
 
 ul {
