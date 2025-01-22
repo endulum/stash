@@ -6,33 +6,39 @@ let previewElement = null;
 const serveUrl = '<%= process.env.DEPLOYMENT_URL %>/serve/<%= file.id %>'
 const fileType = '<%= file.type.split('/')[0] %>'
 
-switch (fileType) {
-  case 'image': 
-    previewElement = document.createElement('img');
-    previewElement.src = serveUrl;
-    break;
-  case 'audio':
-    previewElement = document.createElement('audio');
-    previewElement.controls = true;
-    previewElement.src = serveUrl;
-    break;
-  case 'video':
-    previewElement = document.createElement('video');
-    previewElement.controls = true;
-    previewElement.src = serveUrl
-    break;
-  case 'text':
-    previewElement = document.createElement('textarea');
-    fetch(serveUrl)
-      .then(response => response.text())
-      .then(text => {
-        previewElement.textContent = text;
-        previewElement.style.height = previewElement.scrollHeight + "px";
-      })
-    break;
-  default:
-    previewElement = doucment.createElement('p');
-    previewElement.textContent = 'No preview is available for this file.';
+try {
+  switch (fileType) {
+    case 'image': 
+      previewElement = document.createElement('img');
+      previewElement.src = serveUrl;
+      break;
+    case 'audio':
+      previewElement = document.createElement('audio');
+      previewElement.controls = true;
+      previewElement.src = serveUrl;
+      break;
+    case 'video':
+      previewElement = document.createElement('video');
+      previewElement.controls = true;
+      previewElement.src = serveUrl
+      break;
+    case 'text':
+      previewElement = document.createElement('textarea');
+      fetch(serveUrl)
+        .then(response => response.text())
+        .then(text => {
+          previewElement.textContent = text;
+          previewElement.style.height = previewElement.scrollHeight + "px";
+        })
+      break;
+    default:
+      previewElement = doucment.createElement('p');
+      previewElement.textContent = 'No preview is available for this file.';
+  }
+} catch (e) { 
+  console.error(e);
+  previewElement = doucment.createElement('p');
+  previewElement.textContent = 'Sorry, there was a problem trying to preview this file.';
 }
 
 if (previewElement) {
