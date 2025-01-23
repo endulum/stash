@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { Prisma, type Directory, type File } from "@prisma/client";
 import bcrypt from "bcryptjs";
 import { client } from "../client";
 
@@ -74,12 +74,12 @@ export async function wipe() {
 export async function createBulkDirectories(
   count: number,
   authorId: number
-): Promise<Item[]> {
-  const items: Item[] = [];
+): Promise<Directory[]> {
+  const dirs: Directory[] = [];
   const directoryData = fakes.bulkDirectories(count);
   const parentIds: Array<string | null> = [null];
   for (const dir of directoryData) {
-    const { id } = await client.directory.create({
+    const newDir = await client.directory.create({
       data: {
         ...dir,
         authorId,
@@ -87,24 +87,22 @@ export async function createBulkDirectories(
         created: dir.created,
       },
     });
-    parentIds.push(id);
-    items.push({ id, name: dir.name });
+    parentIds.push(newDir.id);
+    dirs.push(newDir);
   }
-  return items;
+  return dirs;
 }
-
-type Item = { id: string; name: string };
 
 export async function createBulkFiles(
   count: number,
   authorId: number,
   directoryId?: string | null
-): Promise<Item[]> {
-  const items: Item[] = [];
+): Promise<File[]> {
+  const files: File[] = [];
   const fileData = fakes.bulkFiles(count);
   await Promise.all(
     fileData.map(async (file) => {
-      const { id } = await client.file.create({
+      const newFile = await client.file.create({
         data: {
           ...file,
           authorId,
@@ -112,10 +110,10 @@ export async function createBulkFiles(
           created: file.created,
         },
       });
-      items.push({ id, name: file.name });
+      files.push(newFile);
     })
   );
-  return items;
+  return files;
 }
 
 export async function populateDirectories(
@@ -123,8 +121,8 @@ export async function populateDirectories(
   upperCount: number,
   authorId: number,
   directoryIds: Array<string | null>
-): Promise<Item[]> {
-  const items: Item[] = [];
+): Promise<File[]> {
+  const items: File[] = [];
   await Promise.all(
     directoryIds.map(async (id) => {
       const bulkFileItems = await createBulkFiles(
