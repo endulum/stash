@@ -177,3 +177,25 @@ export const newFile = asyncHandler(async (req, res) => {
     },
   });
 });
+
+export const editFile = asyncHandler(async (req, res) => {
+  res.locals.file = req.thisFile;
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/file/edit",
+    title: "Edit File",
+    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    prefill: {
+      ...req.body,
+      name: req.body.name ?? req.thisFile.name,
+      location: req.body.location ?? req.thisFile.directoryId,
+    },
+  });
+});
+
+export const deleteFile = asyncHandler(async (req, res) => {
+  res.locals.file = req.thisFile;
+  return res.status(req.formErrors ? 400 : 200).render("layout", {
+    page: "pages/file/delete",
+    title: "Delete File",
+  });
+});

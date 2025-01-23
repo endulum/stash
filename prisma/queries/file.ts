@@ -10,6 +10,25 @@ export async function find(authorId: number, id: string) {
   });
 }
 
+export async function edit(
+  id: string,
+  body: {
+    name?: string;
+    location?: string;
+  }
+) {
+  await client.file.update({
+    where: { id },
+    data: {
+      ...(body.name && { name: body.name }),
+      ...(body.location && {
+        directoryId: body.location === "home" ? null : body.location,
+      }),
+      updated: new Date(),
+    },
+  });
+}
+
 export async function findExistingWithName(
   authorId: number,
   directoryId: string | null,
@@ -47,4 +66,8 @@ export async function findChildrenFiles(
         : []),
     ],
   });
+}
+
+export async function del(id: string) {
+  await client.file.delete({ where: { id } });
 }

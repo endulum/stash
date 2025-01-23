@@ -12,7 +12,7 @@ import { exists } from "./file";
 const storage = multer.memoryStorage();
 const uploadMulter = multer({ storage });
 
-const validation = [
+export const upload = [
   uploadMulter.single("upload"),
   body("upload").custom(async (_value, { req }) => {
     if (!req.file) throw new Error("Please upload a file.");
@@ -32,10 +32,6 @@ const validation = [
       );
   }),
   locationValidation,
-];
-
-export const upload = [
-  ...validation,
   validate,
   asyncHandler(async (req, res, next) => {
     if (!req.file) {

@@ -1,0 +1,17 @@
+<div class="alert warning">
+  <%- include('../../svg/warning.svg') %>
+  <p>Deleting a file is permanent and cannot be undone.</p>
+</div>
+
+<p>To delete this file, type <b><%= path.map((loc) => loc.name).join("/") %></b> below and submit.</p>
+<br>
+<form method="post" action=<%= `/file/${file.id}/delete` %>>
+  <%- include('../../components/form-input', { 
+    name: 'path',
+    label: 'File path',
+    type: 'text',
+    includePrefill: false,
+    required: true
+  }) %>
+  <button type="submit">Submit</button>
+</form>

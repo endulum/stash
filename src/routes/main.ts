@@ -37,6 +37,14 @@ router
 
 router.route("/file/new").get(render.newFile);
 router.route("/file/:file").get(file.get);
+router
+  .route("/file/:file/edit")
+  .get(file.exists, render.editFile)
+  .post(file.edit);
+router
+  .route("/file/:file/delete")
+  .get(file.exists, render.deleteFile)
+  .post(file.del);
 
 // etc
 
