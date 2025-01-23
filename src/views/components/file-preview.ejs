@@ -32,12 +32,12 @@ try {
         })
       break;
     default:
-      previewElement = doucment.createElement('p');
+      previewElement = document.createElement('p');
       previewElement.textContent = 'No preview is available for this file.';
   }
 } catch (e) { 
   console.error(e);
-  previewElement = doucment.createElement('p');
+  previewElement = document.createElement('p');
   previewElement.textContent = 'Sorry, there was a problem trying to preview this file.';
 }
 
