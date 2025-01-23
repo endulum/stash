@@ -80,7 +80,7 @@ describe("/file/:file/delete", () => {
   test("POST - 304 with correct inputs", async () => {
     await agent
       .post(`/file/${files[0].id}/delete`)
-      .send({ path: "file." + files[0].ext })
+      .send({ path: "/file." + files[0].ext })
       .expect(checkFormOk);
   });
 

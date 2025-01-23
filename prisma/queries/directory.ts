@@ -83,9 +83,10 @@ export async function findExistingWithName(
 }
 
 export async function findPath(
-  dir: Directory,
+  dir: Directory | null,
   path: Array<{ name: string; id: string }> = []
 ) {
+  if (!dir) return path;
   path.unshift({ name: dir.name, id: dir.id });
   if (!dir.parentId) return path;
   const parent = await client.directory.findFirst({
@@ -93,6 +94,10 @@ export async function findPath(
   });
   if (!parent) return path;
   return findPath(parent, path);
+}
+
+export async function getPathString(dir: Directory) {
+  return "/" + (await findPath(dir)).map((loc) => loc.name).join("/") + "/";
 }
 
 export async function findChildren(

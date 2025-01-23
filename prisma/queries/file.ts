@@ -1,5 +1,6 @@
-import { type UserSettings } from "@prisma/client";
+import { type UserSettings, type Prisma } from "@prisma/client";
 import { client } from "../client";
+import { findPath } from "./directory";
 
 export async function find(authorId: number, id: string) {
   return await client.file.findFirst({
@@ -27,6 +28,18 @@ export async function edit(
       updated: new Date(),
     },
   });
+}
+
+export async function getPathString(
+  file: Prisma.FileGetPayload<{ include: { directory: true } }>
+) {
+  return (
+    "/" +
+    (await findPath(file.directory)).map((loc) => loc.name).join("/") +
+    file.name +
+    "." +
+    file.ext
+  );
 }
 
 export async function findExistingWithName(

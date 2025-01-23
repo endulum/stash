@@ -22,9 +22,9 @@ router.route("/logout").get(logOut);
 router.route("/account").get(render.account).post(user.edit);
 router.route("/delete").get(render.deleteAccount).post(user.del);
 
-// directory
+// dir
 
-router.route("/root").get(dir.getRoot);
+router.route("/dir/root").get(dir.getRoot);
 router.route("/dir/new").get(render.newDir).post(dir.create);
 router.route("/dir/:dir").get(dir.get);
 router.route("/dir/:dir/edit").get(dir.exists, render.editDir).post(dir.edit);

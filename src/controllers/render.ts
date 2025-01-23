@@ -1,6 +1,7 @@
 import asyncHandler from "express-async-handler";
 
-import { findPath, findChildren } from "../../prisma/queries/directory";
+import { getPathString, findChildren } from "../../prisma/queries/directory";
+import { getPathString as getFilePathString } from "../../prisma/queries/file";
 
 // errors
 
@@ -127,7 +128,6 @@ export const newDir = asyncHandler(async (req, res) => {
 });
 
 export const editDir = asyncHandler(async (req, res) => {
-  res.locals.dir = req.thisDirectory;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/edit",
     title: "Edit Directory",
@@ -147,13 +147,10 @@ export const editDir = asyncHandler(async (req, res) => {
 });
 
 export const deleteDir = asyncHandler(async (req, res) => {
-  res.locals.dir = req.thisDirectory;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/delete",
     title: "Delete Directory",
-    path:
-      (await findPath(req.thisDirectory)).map((loc) => loc.name).join("/") +
-      "/",
+    path: await getPathString(req.thisDirectory),
   });
 });
 
@@ -197,5 +194,6 @@ export const deleteFile = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/file/delete",
     title: "Delete File",
+    path: await getFilePathString(req.thisFile),
   });
 });

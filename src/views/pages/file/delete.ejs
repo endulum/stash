@@ -3,7 +3,7 @@
   <p>Deleting a file is permanent and cannot be undone.</p>
 </div>
 
-<p>To delete this file, type <b><%= path.map((loc) => loc.name).join("/") %></b> below and submit.</p>
+<p>To delete this file, type <b><%= path %></b> below and submit.</p>
 <br>
 <form method="post" action=<%= `/file/${file.id}/delete` %>>
   <%- include('../../components/form-input', { 

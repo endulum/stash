@@ -16,7 +16,7 @@ beforeAll(async () => {
   await agent.post("/login").send({ username: "admin", password: "password" });
 });
 
-describe("/root, /dir/:dir", () => {
+describe("/dir/root, /dir/:dir", () => {
   beforeAll(async () => {
     const { directoryItems, fileItems } = await seedStash({
       authorId: 1,
@@ -28,7 +28,7 @@ describe("/root, /dir/:dir", () => {
   });
 
   test("GET /root - OK", async () => {
-    const { text } = await agent.get("/root").expect(200);
+    const { text } = await agent.get("/dir/root").expect(200);
     const $ = cheerio.load(text);
     // there should not be a parent link
     expect($("a.entry-link:contains('..')").length).toBe(0);
@@ -53,7 +53,7 @@ describe("/root, /dir/:dir", () => {
     // make a request to /root, gather links, enqueue links and visit each link
     // to gather and enqueue more links. use the links to count up dirs and files.
 
-    const { text } = await agent.get("/root").expect(200);
+    const { text } = await agent.get("/dir/root").expect(200);
     const links = getLinks(text);
 
     const queue: string[] = links.filter((l) => l.startsWith("/dir"));
@@ -190,7 +190,7 @@ describe("/dir/:dir/delete", () => {
   test("POST - 304 with correct inputs", async () => {
     await agent
       .post(`/dir/${directory.id}/delete`)
-      .send({ path: "edited-directory/" })
+      .send({ path: "/edited-directory/" })
       .expect(checkFormOk);
   });
 

@@ -8,6 +8,15 @@ import { validate } from "../middleware/validate";
 import { locationValidation } from "../common/locationValidation";
 import { niceBytes } from "../functions/niceBytes";
 
+export const exists = asyncHandler(async (req, res, next) => {
+  const dir = await dirQueries.find(req.thisUser.id, req.params.dir);
+  if (!dir) return render.dirNotFound(req, res, next);
+  req.thisDirectory = dir;
+  res.locals.dir = dir;
+  res.locals.path = await dirQueries.findPath(req.thisDirectory);
+  return next();
+});
+
 export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
   res.locals.childDirs = await dirQueries.findChildrenDirs(
@@ -25,17 +34,9 @@ export const getRoot = asyncHandler(async (req, res, next) => {
   return render.dir(req, res, next);
 });
 
-export const exists = asyncHandler(async (req, res, next) => {
-  const dir = await dirQueries.find(req.thisUser.id, req.params.dir);
-  if (!dir) return render.dirNotFound(req, res, next);
-  req.thisDirectory = dir;
-  return next();
-});
-
 export const get = [
   exists,
   asyncHandler(async (req, res, next) => {
-    res.locals.dir = req.thisDirectory;
     res.locals.childDirs = await dirQueries.findChildrenDirs(
       req.thisUser.id,
       req.thisDirectory.id,
@@ -48,7 +49,6 @@ export const get = [
         req.thisUserSettings
       )
     ).map((f) => ({ ...f, size: niceBytes(f.size) }));
-    res.locals.path = await dirQueries.findPath(req.thisDirectory);
     return render.dir(req, res, next);
   }),
 ];
@@ -114,10 +114,7 @@ export const del = [
   body("path")
     .trim()
     .custom(async (value, { req }) => {
-      const path =
-        (await dirQueries.findPath(req.thisDirectory))
-          .map((loc) => loc.name)
-          .join("/") + "/";
+      const path = await dirQueries.getPathString(req.thisDirectory);
       if (value !== path) throw new Error("Incorrect path.");
     })
     .escape(),
@@ -129,7 +126,7 @@ export const del = [
     res.redirect(
       req.thisDirectory.parentId
         ? `/dir/${req.thisDirectory.parentId}`
-        : "/root"
+        : "/dir/root"
     );
   }),
 ];

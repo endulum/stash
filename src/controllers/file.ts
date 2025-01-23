@@ -17,8 +17,10 @@ export const exists = asyncHandler(async (req, res, next) => {
     size: niceBytes(req.thisFile.size),
   };
   res.locals.path = [
-    ...(file.directory ? await dirQueries.findPath(file.directory) : []),
-    { name: file.name + "." + file.ext },
+    ...(req.thisFile.directory
+      ? await dirQueries.findPath(req.thisFile.directory)
+      : []),
+    { name: req.thisFile.name + "." + req.thisFile.ext },
   ];
   return next();
 });
@@ -70,14 +72,7 @@ export const del = [
   body("path")
     .trim()
     .custom(async (value, { req }) => {
-      const path = [
-        ...(req.thisFile.directory
-          ? await dirQueries.findPath(req.thisFile.directory)
-          : []),
-        { name: req.thisFile.name + "." + req.thisFile.ext },
-      ]
-        .map((loc) => loc.name)
-        .join("/");
+      const path = await fileQueries.getPathString(req.thisFile);
       if (value !== path) throw new Error("Incorrect path.");
     })
     .escape(),
@@ -87,7 +82,9 @@ export const del = [
     await fileQueries.del(req.thisFile.id);
     req.flash("success", "File successfully deleted.");
     res.redirect(
-      req.thisFile.directoryId ? `/dir/${req.thisFile.directoryId}` : "/root"
+      req.thisFile.directoryId
+        ? `/dir/${req.thisFile.directoryId}`
+        : "/dir/root"
     );
   }),
 ];
