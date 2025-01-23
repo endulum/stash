@@ -4,17 +4,14 @@ dotenv.config({ path: ".env" + process.env.NODE_ENV });
 import { client } from "./client";
 import * as devQueries from "./queries/dev";
 import { empty } from "../supabase/supabase";
+import { readSamples } from "../supabase/readSamples";
 
 async function reset() {
   await empty();
   await devQueries.truncateTable("User");
   await devQueries.truncateTable("Session");
   await devQueries.createAdmin();
-  // await devQueries.seedStash({
-  //   authorId: 1,
-  //   directories: 10,
-  //   files: { min: 10, max: 20 },
-  // });
+  await readSamples();
 }
 
 reset()

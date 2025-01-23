@@ -7,7 +7,7 @@ import { ofetch } from "ofetch";
 import { Readable } from "stream";
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
-const supabase = createClient(
+export const supabase = createClient(
   process.env.SUPABASE_URL ||
     (function () {
       throw new Error("Supabase URL was not provided.");
@@ -18,7 +18,7 @@ const supabase = createClient(
     })()
 );
 
-const bucketName = `stash_${process.env.NODE_ENV}`;
+export const bucketName = `stash_${process.env.NODE_ENV}`;
 
 export async function upload(
   file: Express.Multer.File,
