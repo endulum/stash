@@ -85,6 +85,7 @@ export const create = [
       parentId: req.body.location === "home" ? null : req.body.location,
       name: req.body.name,
     });
+    req.flash("success", "New directory successfully created.");
     res.redirect(`/dir/${id}`);
   }),
 ];

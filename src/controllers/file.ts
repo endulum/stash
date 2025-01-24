@@ -51,10 +51,10 @@ export const edit = [
     .custom(async (value, { req }) => {
       const duplicate = await fileQueries.findExistingWithName(
         req.thisUser.id,
-        req.thisFile.parentId,
+        req.thisFile.directoryId,
         value
       );
-      if (duplicate && duplicate.id !== req.currentFile.id)
+      if (duplicate && duplicate.id !== req.thisFile.id)
         throw new Error(
           "There already exists a file in the chosen location with this name. Files in the same location cannot have the same name."
         );

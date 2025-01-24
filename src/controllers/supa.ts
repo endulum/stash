@@ -56,7 +56,10 @@ export const upload = [
         "Sorry, something went wrong when uploading your file. Try again."
       );
       return render.newFile(req, res, next);
-    } else return res.redirect(`/file/${id}`);
+    } else {
+      req.flash("success", "File successfully uploaded.");
+      return res.redirect(`/file/${id}`);
+    }
   }),
 ];
 
@@ -83,9 +86,9 @@ const pipeDownload = asyncHandler(async (req, res) => {
 });
 
 export const serve = [fileExists, pipeServe];
-
 export const serveShared = [sharedDirExists, isDescendantFile, pipeServe];
 
 export const download = [fileExists, pipeDownload];
-
 export const downloadShared = [sharedDirExists, isDescendantFile, pipeDownload];
+export const downloadDir = [];
+export const downloadSharedDir = [];

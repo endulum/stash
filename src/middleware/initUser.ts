@@ -15,12 +15,8 @@ const initUser = asyncHandler(async (req, res, next) => {
   } else {
     req.thisUser = req.user;
     req.thisUserSettings = await findSettings(req.user.id);
-
     // set locals for convenience
     res.locals.user = req.user;
-    res.locals.warning = req.flash("warning");
-    res.locals.success = req.flash("success");
-
     return mainRouter(req, res, next);
   }
 });
