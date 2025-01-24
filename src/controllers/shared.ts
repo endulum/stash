@@ -5,7 +5,7 @@ import * as dirQueries from "../../prisma/queries/directory";
 import * as fileQueries from "../../prisma/queries/file";
 import { niceBytes } from "../functions/niceBytes";
 
-const exists = asyncHandler(async (req, res, next) => {
+export const exists = asyncHandler(async (req, res, next) => {
   const dir = await dirQueries.findShared(req.params.sharedDir);
   if (!dir) return render.sharedDirNotFound(req, res, next);
   req.thisSharedDirectory = dir;
@@ -32,7 +32,7 @@ const isDescendant = asyncHandler(async (req, res, next) => {
   return next();
 });
 
-const isDescendantFile = asyncHandler(async (req, res, next) => {
+export const isDescendantFile = asyncHandler(async (req, res, next) => {
   const file = await fileQueries.find(req.params.file);
   if (!file) return render.fileNotFound(req, res, next);
 
@@ -41,7 +41,7 @@ const isDescendantFile = asyncHandler(async (req, res, next) => {
     const p = path.shift();
     if (!p || p.id === req.thisSharedDirectory.id) break;
   }
-  if (path.length === 0) return render.dirNotFound(req, res, next);
+  if (path.length === 0) return render.fileNotFound(req, res, next);
 
   req.thisFile = file;
   res.locals.file = {

@@ -7,7 +7,8 @@ import * as fileQueries from "../../prisma/queries/file";
 import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
 import * as supabase from "../../supabase/supabase";
-import { exists } from "./file";
+import { exists as fileExists } from "./file";
+import { exists as sharedDirExists, isDescendantFile } from "./shared";
 
 const storage = multer.memoryStorage();
 const uploadMulter = multer({ storage });
@@ -59,30 +60,32 @@ export const upload = [
   }),
 ];
 
-export const serve = [
-  exists,
-  asyncHandler(async (req, res) => {
-    const { readable, contentType } = await supabase.getReadable(
-      req.thisFile.id,
-      req.thisUser.id
-    );
-    res.set("Content-Type", contentType ?? "application/x-www-form-urlencoded");
-    readable.pipe(res);
-  }),
-];
+const pipeServe = asyncHandler(async (req, res) => {
+  const { readable, contentType } = await supabase.getReadable(
+    req.thisFile.id,
+    req.thisFile.authorId
+  );
+  res.set("Content-Type", contentType ?? "application/x-www-form-urlencoded");
+  readable.pipe(res);
+});
 
-export const download = [
-  exists,
-  asyncHandler(async (req, res) => {
-    const { readable, contentType } = await supabase.getReadable(
-      req.thisFile.id,
-      req.thisUser.id
-    );
-    res.set(
-      "Content-Disposition",
-      `attachment; filename="${req.thisFile.name}.${req.thisFile.ext}"`
-    );
-    res.set("Content-Type", contentType ?? "application/octet-stream");
-    readable.pipe(res);
-  }),
-];
+const pipeDownload = asyncHandler(async (req, res) => {
+  const { readable, contentType } = await supabase.getReadable(
+    req.thisFile.id,
+    req.thisFile.authorId
+  );
+  res.set(
+    "Content-Disposition",
+    `attachment; filename="${req.thisFile.name}.${req.thisFile.ext}"`
+  );
+  res.set("Content-Type", contentType ?? "application/octet-stream");
+  readable.pipe(res);
+});
+
+export const serve = [fileExists, pipeServe];
+
+export const serveShared = [sharedDirExists, isDescendantFile, pipeServe];
+
+export const download = [fileExists, pipeDownload];
+
+export const downloadShared = [sharedDirExists, isDescendantFile, pipeDownload];

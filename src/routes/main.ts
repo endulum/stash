@@ -50,7 +50,6 @@ router
 
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
-    console.warn("supabase connected");
     router.route("/file/new").post(module.upload);
     router.route("/file/:file/download").get(module.download);
     router.route("/serve/:file").get(module.serve);

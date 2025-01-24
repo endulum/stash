@@ -6,6 +6,14 @@ const router = express.Router();
 router.route("/:sharedDir").get(shared.getSharedRoot);
 router.route("/:sharedDir/dir/:dir").get(shared.getSharedDescendant);
 router.route("/:sharedDir/file/:file").get(shared.getSharedFile);
+//
+
+if (process.env.NODE_ENV !== "test") {
+  import("../controllers/supa").then((module) => {
+    router.route("/:sharedDir/serve/:file").get(module.serveShared);
+    router.route("/:sharedDir/file/:file/download").get(module.downloadShared);
+  });
+}
 
 export { router };
 

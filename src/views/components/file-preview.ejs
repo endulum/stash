@@ -3,7 +3,7 @@
 <script defer nonce="<%= locals.nonce %>">
 const previewBox = document.getElementById("preview");
 let previewElement = null;
-const serveUrl = '<%= process.env.DEPLOYMENT_URL %>/serve/<%= file.id %>'
+const serveUrl = '<%= process.env.DEPLOYMENT_URL %><%= locals.sharedDir ? '/shared/' + locals.sharedDir.id : '' %>/serve/<%= file.id %>'
 const fileType = '<%= file.type.split('/')[0] %>'
 
 try {
