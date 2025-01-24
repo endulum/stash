@@ -433,6 +433,9 @@ thead td:first-of-type span {
     max-height: 500px;
     resize: vertical;
   }
+  img {
+    max-height: 500px;
+  }
 }
 
 ul {
