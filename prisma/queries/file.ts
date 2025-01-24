@@ -36,6 +36,7 @@ export async function getPathString(
   return (
     "/" +
     (await findPath(file.directory)).map((loc) => loc.name).join("/") +
+    "/" +
     file.name +
     "." +
     file.ext
