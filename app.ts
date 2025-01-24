@@ -13,6 +13,7 @@ import dotenv from "dotenv";
 import "./config/passport";
 
 import { initUser } from "./src/middleware/initUser";
+import { router as shareRouter } from "./src/routes/share";
 
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
@@ -83,6 +84,8 @@ app.use(passport.session());
 if (process.env.NODE_ENV === "development") {
   app.use(logger("dev"));
 }
+
+app.use("/shared", shareRouter);
 
 app.use(initUser);
 

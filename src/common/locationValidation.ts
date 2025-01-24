@@ -11,7 +11,7 @@ const locationValidation = body("location")
   .custom(async (value, { req }) => {
     if (value !== "home") {
       // case: the parent doesn't exist
-      const parent = await dirQueries.find(req.thisUser.id, value);
+      const parent = await dirQueries.findWithAuthor(req.thisUser.id, value);
       if (!parent) throw new Error("Selected location could not be found.");
       // case (for editing directory): the parent is itself
       if (req.thisDirectory && value === req.thisDirectory.id)

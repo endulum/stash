@@ -1,4 +1,15 @@
-import express from 'express';
+import express from "express";
+import * as shared from "../controllers/shared";
+
+const router = express.Router();
+
+router.route("/:sharedDir").get(shared.getSharedRoot);
+router.route("/:sharedDir/dir/:dir").get(shared.getSharedDescendant);
+router.route("/:sharedDir/file/:file").get(shared.getSharedFile);
+
+export { router };
+
+/* import express from 'express';
 import { controller as directory } from '../controllers/directory';
 import { controller as file } from '../controllers/file';
 
@@ -26,4 +37,4 @@ router.route('/:sharedDirectoryId/file/:fileId')
 router.route('/:sharedDirectoryId/file/:fileId/download')
   .get(directory.isShared, file.exists, file.hasSharedRoot, file.download)
 
-export default router
+export default router */

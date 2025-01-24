@@ -1,16 +1,16 @@
 <div class="path-links flex-row">
   <% if (!locals.path) { %>
     <small>
-      At root <%= 'sharedDirectory' in locals ? 'of shared directory' : 'of your filesystem'%>
+      At root <%= 'sharedDir' in locals ? 'of shared directory' : 'of your filesystem'%>
     </small>
   <% } else { %>
     <small>
       <a class="path-link" href=<%=
-        'sharedDirectory' in locals
-          ? ('/share/' + sharedDirectory.id)
-          : '/dir/root' %>>(<%= 'sharedDirectory' in locals ? 'shared ' : ''
+        'sharedDir' in locals
+          ? ('/shared/' + sharedDir.id)
+          : '/dir/root' %>>(<%= 'sharedDir' in locals ? 'shared ' : ''
       %>root)</a>
-    </small>
+    </small> 
 
     <% path.forEach((directory, index) => { %>
       <% if (index === path.length - 1) { %>
@@ -23,8 +23,8 @@
           <%- include('../svg/path-arrow.svg') %> 
           <small>
             <a class="path-link" href=<%=
-              ('sharedDirectory' in locals
-                ? ('/share/' + sharedDirectory.id)
+              ('sharedDir' in locals
+                ? ('/shared/' + sharedDir.id)
                 : '')
               + '/dir/' + directory.id
             %>> <%= directory.name %></a>

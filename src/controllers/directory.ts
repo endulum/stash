@@ -9,7 +9,7 @@ import { locationValidation } from "../common/locationValidation";
 import { niceBytes } from "../functions/niceBytes";
 
 export const exists = asyncHandler(async (req, res, next) => {
-  const dir = await dirQueries.find(req.thisUser.id, req.params.dir);
+  const dir = await dirQueries.findWithAuthor(req.thisUser.id, req.params.dir);
   if (!dir) return render.dirNotFound(req, res, next);
   req.thisDirectory = dir;
   res.locals.dir = dir;
@@ -20,16 +20,11 @@ export const exists = asyncHandler(async (req, res, next) => {
 export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
   res.locals.childDirs = await dirQueries.findChildrenDirs(
-    req.thisUser.id,
     null,
     req.thisUserSettings
   );
   res.locals.childFiles = (
-    await fileQueries.findChildrenFiles(
-      req.thisUser.id,
-      null,
-      req.thisUserSettings
-    )
+    await fileQueries.findChildrenFiles(null, req.thisUserSettings)
   ).map((f) => ({ ...f, size: niceBytes(f.size) }));
   return render.dir(req, res, next);
 });
@@ -38,13 +33,11 @@ export const get = [
   exists,
   asyncHandler(async (req, res, next) => {
     res.locals.childDirs = await dirQueries.findChildrenDirs(
-      req.thisUser.id,
       req.thisDirectory.id,
       req.thisUserSettings
     );
     res.locals.childFiles = (
       await fileQueries.findChildrenFiles(
-        req.thisUser.id,
         req.thisDirectory.id,
         req.thisUserSettings
       )

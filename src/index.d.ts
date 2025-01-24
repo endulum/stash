@@ -13,6 +13,15 @@ declare global {
       thisUser: Prisma.User;
       thisUserSettings: Prisma.UserSettings;
       thisDirectory: Prisma.Directory;
+      thisSharedDirectory: Prisma.DirectoryGetPayload<{
+        include: {
+          author: {
+            include: {
+              settings: true;
+            };
+          };
+        };
+      }>;
       thisFile: Prisma.FileGetPayload<{
         include: { directory: true };
       }>;

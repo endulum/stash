@@ -42,19 +42,40 @@ export async function edit(
   });
 }
 
-export async function find(authorId: number, id: string) {
+export async function find(id: string) {
+  return await client.directory.findFirst({
+    where: { id },
+  });
+}
+
+export async function findShared(id: string) {
+  return await client.directory.findFirst({
+    where: {
+      id,
+      AND: [{ shareUntil: { not: null } }, { shareUntil: { gte: new Date() } }],
+    },
+    include: {
+      author: {
+        include: {
+          settings: true,
+        },
+      },
+    },
+  });
+}
+
+export async function findWithAuthor(authorId: number, id: string) {
   return await client.directory.findFirst({
     where: { id, authorId },
   });
 }
 
 export async function findChildrenDirs(
-  authorId: number,
   parentId: string | null,
   settings: UserSettings
 ) {
   return await client.directory.findMany({
-    where: { authorId, parentId },
+    where: { parentId },
     include: {
       directories: true,
     },

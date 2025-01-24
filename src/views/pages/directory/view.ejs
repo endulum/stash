@@ -1,3 +1,25 @@
+<% if (
+    dir &&
+    dir.shareUntil && 
+    Date.parse(dir.shareUntil) > Date.parse(new Date())
+  ) { 
+%>
+  <div class="alert">
+    <%- include('../../svg/info.svg') %>
+    <p>
+      This directory is <b>public</b>. You can share this directory with others using the link below.
+      <input 
+        type="text" 
+        value="<%= 
+          process.env.DEPLOYMENT_URL
+          + '/shared/'
+          + dir.id
+        %>"
+      >
+    </p>
+  </div>
+<% } %>
+
 <div class="mb-1">
   <%- include('../../components/directory-path') %>
 </div>

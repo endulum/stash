@@ -197,3 +197,19 @@ export const deleteFile = asyncHandler(async (req, res) => {
     path: await getFilePathString(req.thisFile),
   });
 });
+
+// shared
+
+export const sharedDir = asyncHandler(async (_req, res) => {
+  return res.render("layout", {
+    page: "pages/directory/view-shared",
+    title: "Viewing Shared Directory",
+  });
+});
+
+export const sharedFile = asyncHandler(async (_req, res) => {
+  return res.render("layout", {
+    page: "pages/file/view-shared",
+    title: "Viewing Shared File",
+  });
+});

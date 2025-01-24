@@ -2,7 +2,16 @@ import { type UserSettings, type Prisma } from "@prisma/client";
 import { client } from "../client";
 import { findPath } from "./directory";
 
-export async function find(authorId: number, id: string) {
+export async function find(id: string) {
+  return await client.file.findFirst({
+    where: { id },
+    include: {
+      directory: true,
+    },
+  });
+}
+
+export async function findWithAuthor(authorId: number, id: string) {
   return await client.file.findFirst({
     where: { id, authorId },
     include: {
@@ -54,12 +63,11 @@ export async function findExistingWithName(
 }
 
 export async function findChildrenFiles(
-  authorId: number,
   directoryId: string | null,
   settings: UserSettings
 ) {
   return await client.file.findMany({
-    where: { authorId, directoryId },
+    where: { directoryId },
     orderBy: [
       { [settings.sortFiles]: settings.sortFilesDirection },
       // secondarily sort by created if updated is primary sort

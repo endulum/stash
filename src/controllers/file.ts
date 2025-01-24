@@ -9,7 +9,10 @@ import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
 
 export const exists = asyncHandler(async (req, res, next) => {
-  const file = await fileQueries.find(req.thisUser.id, req.params.file);
+  const file = await fileQueries.findWithAuthor(
+    req.thisUser.id,
+    req.params.file
+  );
   if (!file) return render.fileNotFound(req, res, next);
   req.thisFile = file;
   res.locals.file = {
