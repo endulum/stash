@@ -42,9 +42,9 @@ export async function edit(
 export async function getPathString(
   file: Prisma.FileGetPayload<{ include: { directory: true } }>
 ) {
+  const path = await findPath(file.directory);
   return (
-    "/" +
-    (await findPath(file.directory)).map((loc) => loc.name).join("/") +
+    (path.length > 0 ? "/" + path.map((loc) => loc.name).join("/") : "") +
     "/" +
     file.name +
     "." +
