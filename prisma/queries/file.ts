@@ -64,29 +64,31 @@ export async function findExistingWithName(
 
 export async function findChildrenFiles(
   directoryId: string | null,
-  settings: UserSettings
+  settings?: UserSettings
 ) {
   return await client.file.findMany({
     where: { directoryId },
-    orderBy: [
-      { [settings.sortFiles]: settings.sortFilesDirection },
-      // secondarily sort by created if updated is primary sort
-      ...(settings.sortFiles === "updated"
-        ? [
-            {
-              created: settings.sortFilesDirection,
-            },
-          ]
-        : []),
-      // secondarily sort by name if type is primary sort
-      ...(settings.sortFiles === "type"
-        ? [
-            {
-              name: settings.sortFilesDirection,
-            },
-          ]
-        : []),
-    ],
+    ...(settings && {
+      orderBy: [
+        { [settings.sortFiles]: settings.sortFilesDirection },
+        // secondarily sort by created if updated is primary sort
+        ...(settings.sortFiles === "updated"
+          ? [
+              {
+                created: settings.sortFilesDirection,
+              },
+            ]
+          : []),
+        // secondarily sort by name if type is primary sort
+        ...(settings.sortFiles === "type"
+          ? [
+              {
+                name: settings.sortFilesDirection,
+              },
+            ]
+          : []),
+      ],
+    }),
   });
 }
 

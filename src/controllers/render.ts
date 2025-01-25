@@ -1,6 +1,6 @@
 import asyncHandler from "express-async-handler";
 
-import { getPathString, findChildren } from "../../prisma/queries/directory";
+import { getPathString, findDescendants } from "../../prisma/queries/directory";
 import { getPathString as getFilePathString } from "../../prisma/queries/file";
 
 // errors
@@ -119,7 +119,7 @@ export const newDir = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/new",
     title: "Create a Directory",
-    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
     prefill: {
       ...req.body,
       location: req.body.location ?? req.query.location,
@@ -131,7 +131,7 @@ export const editDir = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/edit",
     title: "Edit Directory",
-    locations: [{ id: null }, ...(await findChildren({ id: null }))].filter(
+    locations: [{ id: null }, ...(await findDescendants({ id: null }))].filter(
       (loc) => loc.id !== req.thisDirectory.id
     ),
     prefill: {
@@ -167,7 +167,7 @@ export const newFile = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/file/new",
     title: "Upload a File",
-    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
     prefill: {
       ...req.body,
       location: req.body.location ?? req.query.location,
@@ -180,7 +180,7 @@ export const editFile = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/file/edit",
     title: "Edit File",
-    locations: [{ id: null }, ...(await findChildren({ id: null }))],
+    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
     prefill: {
       ...req.body,
       name: req.body.name ?? req.thisFile.name,

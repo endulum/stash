@@ -121,7 +121,7 @@ export async function getPathString(dir: Directory) {
   return "/" + (await findPath(dir)).map((loc) => loc.name).join("/") + "/";
 }
 
-export async function findChildren(
+export async function findDescendants(
   parent: { name: string; id: string } | { id: null },
   children: Array<{ id: string; name: string }> = []
 ): Promise<Array<{ id: string; name: string }>> {
@@ -146,7 +146,7 @@ export async function findChildren(
     ...children,
     ...(
       await Promise.all(
-        renamedDirectories.map(async (dir) => findChildren(dir))
+        renamedDirectories.map(async (dir) => findDescendants(dir))
       )
     ).flat(),
   ];

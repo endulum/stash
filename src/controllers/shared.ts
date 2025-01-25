@@ -13,7 +13,7 @@ export const exists = asyncHandler(async (req, res, next) => {
   return next();
 });
 
-const isDescendant = asyncHandler(async (req, res, next) => {
+export const isDescendant = asyncHandler(async (req, res, next) => {
   const dir = await dirQueries.find(req.params.dir);
   if (!dir) return render.dirNotFound(req, res, next);
   if (dir.id === req.thisSharedDirectory.id)

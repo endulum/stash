@@ -20,8 +20,19 @@
   </div>
 <% } %>
 
-<div class="mb-1">
+<div class="mb-1 flex-row jcspb">
   <%- include('../../components/directory-path') %>
+
+  <% if (dir) { %> 
+    <a 
+      type="button" 
+      class="info" 
+      href="<%= '/dir/' + dir.id + '/download' %>"
+    >
+      <%- include('../../svg/download.svg') %>
+      <span>Download</span>
+    </a>
+  <% } %>
 </div>
 
 <%

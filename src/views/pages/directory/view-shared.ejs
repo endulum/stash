@@ -4,8 +4,21 @@
   <b><%= sharedDir.author.username %></b>
 </h3>
 
-<div class="mb-1">
+<div class="mb-1 flex-row jcspb">
   <%- include('../../components/directory-path') %>
+
+  <a 
+    type="button" 
+    class="info" 
+    href="<%= 
+      dir
+        ? '/shared/' + sharedDir.id + '/dir/' + dir.id + '/download'
+        : '/shared/' + sharedDir.id + '/download'
+    %>"
+  >
+    <%- include('../../svg/download.svg') %>
+    <span>Download</span>
+  </a>
 </div>
 
 <div class="table-wrapper" id="scrolling-table">

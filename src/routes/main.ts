@@ -53,6 +53,7 @@ if (process.env.NODE_ENV !== "test") {
     router.route("/file/new").post(module.upload);
     router.route("/file/:file/download").get(module.download);
     router.route("/serve/:file").get(module.serve);
+    router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("*").all(render.notFound);
   });
 } else {

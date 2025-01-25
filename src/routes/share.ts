@@ -11,7 +11,11 @@ router.route("/:sharedDir/file/:file").get(shared.getSharedFile);
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
     router.route("/:sharedDir/serve/:file").get(module.serveShared);
-    router.route("/:sharedDir/file/:file/download").get(module.downloadShared);
+    router
+      .route("/:sharedDir/file/:file/download")
+      .get(module.downloadSharedFile);
+    router.route("/:sharedDir/download").get(module.downloadSharedRoot);
+    router.route("/:sharedDir/dir/:dir/download").get(module.downloadSharedDir);
   });
 }
 

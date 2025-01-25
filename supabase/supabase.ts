@@ -65,12 +65,7 @@ async function getSignedUrl(filePath: string) {
   return data.signedUrl;
 }
 
-export async function getReadable(fileName: string, authorId: number) {
-  // todo: we need author id since we've divided files into folders
-  // based on user id. but what if this is a file from a shared
-  // folder, and we don't have req.thisUser?
-  // 1. have this function look for the owner of the file
-  // 2. add `thisSharedOwner` to req and use that to give the author id
+export async function getBuffer(fileName: string, authorId: number) {
   const signedUrl = await getSignedUrl(`user_${authorId}/${fileName}`);
   const response = await ofetch.raw(signedUrl, {
     responseType: "arrayBuffer",
@@ -79,7 +74,12 @@ export async function getReadable(fileName: string, authorId: number) {
   const buffer = response._data;
   if (!buffer)
     throw new Error("Error loading file from bucket: Buffer is empty.");
-  const readable = Readable.from(Buffer.from(buffer));
+  return { buffer: Buffer.from(buffer), contentType };
+}
+
+export async function getReadable(fileName: string, authorId: number) {
+  const { buffer, contentType } = await getBuffer(fileName, authorId);
+  const readable = Readable.from(buffer);
   return { readable, contentType };
 }
 
