@@ -9,7 +9,11 @@ import { locationValidation } from "../common/locationValidation";
 import { niceBytes } from "../functions/niceBytes";
 
 export const exists = asyncHandler(async (req, res, next) => {
-  const dir = await dirQueries.findWithAuthor(req.thisUser.id, req.params.dir);
+  const dir = await dirQueries.find(
+    req.params.dir,
+    req.thisUser.id,
+    req.thisUser.settings
+  );
   if (!dir) return render.dirNotFound(req, res, next);
   req.thisDirectory = dir;
   res.locals.dir = dir;
@@ -19,12 +23,16 @@ export const exists = asyncHandler(async (req, res, next) => {
 
 export const getRoot = asyncHandler(async (req, res, next) => {
   res.locals.dir = null;
-  res.locals.childDirs = await dirQueries.findChildrenDirs(
-    null,
-    req.thisUserSettings
+  res.locals.childDirs = await dirQueries.findDirsAtRoot(
+    req.thisUser.id,
+    req.thisUser.settings
   );
   res.locals.childFiles = (
-    await fileQueries.findChildrenFiles(null, req.thisUserSettings)
+    await fileQueries.findFilesAtDir(
+      null,
+      req.thisUser.id,
+      req.thisUser.settings
+    )
   ).map((f) => ({ ...f, size: niceBytes(f.size) }));
   return render.dir(req, res, next);
 });
@@ -32,16 +40,11 @@ export const getRoot = asyncHandler(async (req, res, next) => {
 export const get = [
   exists,
   asyncHandler(async (req, res, next) => {
-    res.locals.childDirs = await dirQueries.findChildrenDirs(
-      req.thisDirectory.id,
-      req.thisUserSettings
-    );
-    res.locals.childFiles = (
-      await fileQueries.findChildrenFiles(
-        req.thisDirectory.id,
-        req.thisUserSettings
-      )
-    ).map((f) => ({ ...f, size: niceBytes(f.size) }));
+    res.locals.childDirs = req.thisDirectory.directories;
+    res.locals.childFiles = req.thisDirectory.files.map((f) => ({
+      ...f,
+      size: niceBytes(f.size),
+    }));
     return render.dir(req, res, next);
   }),
 ];
@@ -58,10 +61,9 @@ const validation = [
     )
     .bail()
     .custom(async (value, { req }) => {
-      const duplicate = await dirQueries.findExistingWithName(
-        req.thisUser.id,
-        req.body.location === "home" ? null : req.body.location,
-        value
+      const duplicate = await dirQueries.findNamedDuplicate(
+        value,
+        req.body.location === "home" ? null : req.body.location
       );
       if (
         duplicate &&

@@ -90,7 +90,6 @@ export const edit = [
       userData: req.thisUser,
       body: req.body,
     });
-    await userQueries.updateSettings(req.thisUser.id, req.body);
     req.flash("success", "Your account details have been successfully saved.");
     return res.redirect("/account");
   }),

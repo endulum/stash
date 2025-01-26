@@ -2,18 +2,21 @@ import { type Directory } from "@prisma/client";
 import Zip from "adm-zip";
 
 import { findDescendants } from "../../prisma/queries/directory";
-import { findChildrenFiles } from "../../prisma/queries/file";
+import { findFilesAtDir } from "../../prisma/queries/file";
 import { getBuffer } from "../../supabase/supabase";
 
-export async function buildZip(directory: Directory | null) {
+export async function buildZip(directory: Directory | null, authorId: number) {
   const zip = new Zip();
 
-  const descendants = await findDescendants(directory ?? { id: null });
+  const descendants = await findDescendants(
+    authorId,
+    directory ?? { id: null }
+  );
   if (directory)
     descendants.unshift({ id: directory.id, name: directory.name });
 
   for (const descendant of descendants) {
-    const files = await findChildrenFiles(descendant.id);
+    const files = await findFilesAtDir(descendant.id, authorId);
 
     if (
       // quicker way to check dir child count without having to query:

@@ -1,27 +1,57 @@
+// everthing to do with interacting with supabase.
+// in own module to conditionally import in non-testing env
 import asyncHandler from "express-async-handler";
 import { body } from "express-validator";
 import multer from "multer";
+import { Readable } from "stream";
 
-import * as render from "./render";
+import * as supabase from "../../supabase/supabase";
 import * as fileQueries from "../../prisma/queries/file";
-import * as dirQueries from "../../prisma/queries/directory";
 import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
-import * as supabase from "../../supabase/supabase";
-import { exists as dirExists } from "./directory";
-import { exists as fileExists } from "./file";
-import {
-  exists as sharedDirExists,
-  isDescendant,
-  isDescendantFile,
-} from "./shared";
+import * as file from "./file";
+import * as directory from "./directory";
+import * as shared from "./shared";
+import * as render from "./render";
 import { buildZip } from "../functions/buildZip";
-import { Readable } from "stream";
 
 const storage = multer.memoryStorage();
 const uploadMulter = multer({ storage });
 
-export const upload = [
+const pipeServe = asyncHandler(async (req, res) => {
+  const { readable, contentType } = await supabase.getReadable(
+    req.thisFile.id,
+    req.thisFile.authorId
+  );
+  res.set("Content-Type", contentType ?? "application/x-www-form-urlencoded");
+  readable.pipe(res);
+});
+
+const pipeDownload = asyncHandler(async (req, res) => {
+  const { readable, contentType } = await supabase.getReadable(
+    req.thisFile.id,
+    req.thisFile.authorId
+  );
+  res.set(
+    "Content-Disposition",
+    `attachment; filename="${req.thisFile.name}.${req.thisFile.ext}"`
+  );
+  res.set("Content-Type", contentType ?? "application/octet-stream");
+  readable.pipe(res);
+});
+
+const pipeDownloadDir = asyncHandler(async (req, res) => {
+  const buffer = await buildZip(req.thisDirectory, req.thisDirectory.authorId);
+  const readable = Readable.from(buffer);
+  res.set(
+    "Content-disposition",
+    "attachment; filename=" + `${req.thisDirectory.name}.zip`
+  );
+  res.set("Content-Type", "application/x-zip-compressed");
+  readable.pipe(res);
+});
+
+export const uploadFile = [
   uploadMulter.single("upload"),
   body("upload").custom(async (_value, { req }) => {
     if (!req.file) throw new Error("Please upload a file.");
@@ -30,10 +60,9 @@ export const upload = [
         "Files cannot be larger than 5 megabytes (5,242,880 bytes) in size."
       );
     }
-    const duplicate = await fileQueries.findExistingWithName(
-      req.thisUser.id,
-      req.body.location === "home" ? null : req.body.location,
-      req.file.originalname.split(".")[0]
+    const duplicate = await fileQueries.findNamedDuplicate(
+      req.file.originalname.split(".")[0],
+      req.body.location === "home" ? null : req.body.location
     );
     if (duplicate)
       throw new Error(
@@ -71,59 +100,23 @@ export const upload = [
   }),
 ];
 
-const pipeServe = asyncHandler(async (req, res) => {
-  const { readable, contentType } = await supabase.getReadable(
-    req.thisFile.id,
-    req.thisFile.authorId
-  );
-  res.set("Content-Type", contentType ?? "application/x-www-form-urlencoded");
-  readable.pipe(res);
-});
+export const serveFile = [file.exists, pipeServe];
 
-const pipeDownload = asyncHandler(async (req, res) => {
-  const { readable, contentType } = await supabase.getReadable(
-    req.thisFile.id,
-    req.thisFile.authorId
-  );
-  res.set(
-    "Content-Disposition",
-    `attachment; filename="${req.thisFile.name}.${req.thisFile.ext}"`
-  );
-  res.set("Content-Type", contentType ?? "application/octet-stream");
-  readable.pipe(res);
-});
+export const serveSharedFile = [...shared.fileIsDescendant, pipeServe];
 
-const pipeDownloadDir = asyncHandler(async (req, res, next) => {
-  const buffer = await buildZip(req.thisDirectory);
-  const readable = Readable.from(buffer);
-  res.set(
-    "Content-disposition",
-    "attachment; filename=" + `${req.thisDirectory.name}.zip`
-  );
-  res.set("Content-Type", "application/x-zip-compressed");
-  readable.pipe(res);
-});
+export const downloadFile = [file.exists, pipeDownload];
 
-export const serve = [fileExists, pipeServe];
-export const serveShared = [sharedDirExists, isDescendantFile, pipeServe];
+export const downloadSharedFile = [...shared.fileIsDescendant, pipeDownload];
 
-export const download = [fileExists, pipeDownload];
-export const downloadSharedFile = [
-  sharedDirExists,
-  isDescendantFile,
-  pipeDownload,
-];
-export const downloadDir = [dirExists, pipeDownloadDir];
+export const downloadDir = [directory.exists, pipeDownloadDir];
+
+export const downloadSharedDir = [...shared.dirIsDescendant, pipeDownloadDir];
+
 export const downloadSharedRoot = [
-  sharedDirExists,
-  asyncHandler(async (req, res, next) => {
+  shared.exists,
+  asyncHandler(async (req, _res, next) => {
     req.thisDirectory = req.thisSharedDirectory;
     return next();
   }),
-  pipeDownloadDir,
-];
-export const downloadSharedDir = [
-  sharedDirExists,
-  isDescendant,
   pipeDownloadDir,
 ];

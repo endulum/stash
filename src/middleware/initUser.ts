@@ -2,7 +2,6 @@ import asyncHandler from "express-async-handler";
 
 import { router as authRouter } from "../routes/auth";
 import { router as mainRouter } from "../routes/main";
-import { findSettings } from "../../prisma/queries/user";
 
 // Express.User is always unioned with undefined,
 // which means every middleware that uses req.user needs to have it typechecked.
@@ -14,8 +13,6 @@ const initUser = asyncHandler(async (req, res, next) => {
     return authRouter(req, res, next);
   } else {
     req.thisUser = req.user;
-    req.thisUserSettings = await findSettings(req.user.id);
-    // set locals for convenience
     res.locals.user = req.user;
     return mainRouter(req, res, next);
   }

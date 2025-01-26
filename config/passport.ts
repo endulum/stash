@@ -2,11 +2,9 @@ import passport, { type DoneCallback } from "passport";
 import passportLocal, { type VerifyFunction } from "passport-local";
 import passportGithub from "passport-github2";
 import bcrypt from "bcryptjs";
-import { PrismaClient } from "@prisma/client";
 
 import * as userQueries from "../prisma/queries/user";
 
-const prisma = new PrismaClient();
 const LocalStrategy = passportLocal.Strategy;
 const GitHubStrategy = passportGithub.Strategy;
 
@@ -17,9 +15,7 @@ passport.use(
     done: DoneCallback
   ) => {
     try {
-      const user = await prisma.user.findUnique({
-        where: { username },
-      });
+      const user = await userQueries.find({ username });
       if (!user || !user.password) return done(null, false);
       const match = await bcrypt.compare(password, user.password);
       if (!match) return done(null, false);
@@ -98,9 +94,7 @@ passport.serializeUser((user, done) => {
 
 passport.deserializeUser(async (id: number, done) => {
   try {
-    const user = await prisma.user.findUnique({
-      where: { id },
-    });
+    const user = await userQueries.find({ id });
     done(null, user as Express.User);
   } catch (err) {
     done(err);

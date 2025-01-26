@@ -6,19 +6,27 @@ declare global {
       id: number;
       username: string;
       password: string;
+      githubUser: string | null;
+      githubId: number | null;
+      role: Prisma.Role;
+      settings: Prisma.UserSettings;
     }
 
     export interface Request {
       formErrors?: Record<string, string>;
-      thisUser: Prisma.User;
-      thisUserSettings: Prisma.UserSettings;
-      thisDirectory: Prisma.Directory;
+      thisUser: Prisma.UserGetPayload<{ include: { settings: true } }>;
+      thisDirectory: Prisma.DirectoryGetPayload<{
+        include: {
+          directories: true;
+          files: true;
+        };
+      }>;
       thisSharedDirectory: Prisma.DirectoryGetPayload<{
         include: {
+          directories: true;
+          files: true;
           author: {
-            include: {
-              settings: true;
-            };
+            select: { id: true; username: true };
           };
         };
       }>;

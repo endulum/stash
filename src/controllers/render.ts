@@ -88,7 +88,6 @@ export const signup = asyncHandler(async (req, res) => {
 });
 
 export const account = asyncHandler(async (req, res) => {
-  res.locals.userSettings = req.thisUserSettings;
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/account/settings",
     title: "Account Settings",
@@ -119,7 +118,10 @@ export const newDir = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/new",
     title: "Create a Directory",
-    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
+    locations: [
+      { id: null },
+      ...(await findDescendants(req.thisUser.id, { id: null })),
+    ],
     prefill: {
       ...req.body,
       location: req.body.location ?? req.query.location,
@@ -131,9 +133,10 @@ export const editDir = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/directory/edit",
     title: "Edit Directory",
-    locations: [{ id: null }, ...(await findDescendants({ id: null }))].filter(
-      (loc) => loc.id !== req.thisDirectory.id
-    ),
+    locations: [
+      { id: null },
+      ...(await findDescendants(req.thisUser.id, { id: null })),
+    ].filter((loc) => loc.id !== req.thisDirectory.id),
     prefill: {
       ...req.body,
       name: req.body.name ?? req.thisDirectory.name,
@@ -167,7 +170,10 @@ export const newFile = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/file/new",
     title: "Upload a File",
-    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
+    locations: [
+      { id: null },
+      ...(await findDescendants(req.thisUser.id, { id: null })),
+    ],
     prefill: {
       ...req.body,
       location: req.body.location ?? req.query.location,
@@ -180,7 +186,10 @@ export const editFile = asyncHandler(async (req, res) => {
   return res.status(req.formErrors ? 400 : 200).render("layout", {
     page: "pages/file/edit",
     title: "Edit File",
-    locations: [{ id: null }, ...(await findDescendants({ id: null }))],
+    locations: [
+      { id: null },
+      ...(await findDescendants(req.thisUser.id, { id: null })),
+    ],
     prefill: {
       ...req.body,
       name: req.body.name ?? req.thisFile.name,

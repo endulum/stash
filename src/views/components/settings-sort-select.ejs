@@ -16,7 +16,7 @@
         <option 
           value="<%=opt.value%>"
           <%=
-            locals.userSettings[`sort${name}`] === opt.value && 'selected'
+            locals.user.settings[`sort${name}`] === opt.value && 'selected'
           %>
         >
           <%= opt.name %>
@@ -44,7 +44,7 @@
         <option 
           value="<%=opt.value%>"
           <%=
-            locals.userSettings[`sort${name}Direction`] === opt.value && 'selected'
+            locals.user.settings[`sort${name}Direction`] === opt.value && 'selected'
           %>
         >
           <%= opt.name %>

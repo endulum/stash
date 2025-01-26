@@ -2,17 +2,13 @@ import asyncHandler from "express-async-handler";
 import { body } from "express-validator";
 
 import * as render from "./render";
-import * as dirQueries from "../../prisma/queries/directory";
 import * as fileQueries from "../../prisma/queries/file";
 import { niceBytes } from "../functions/niceBytes";
 import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
 
 export const exists = asyncHandler(async (req, res, next) => {
-  const file = await fileQueries.findWithAuthor(
-    req.thisUser.id,
-    req.params.file
-  );
+  const file = await fileQueries.find(req.params.file, req.thisUser.id);
   if (!file) return render.fileNotFound(req, res, next);
   req.thisFile = file;
   res.locals.file = {
@@ -20,9 +16,7 @@ export const exists = asyncHandler(async (req, res, next) => {
     size: niceBytes(req.thisFile.size),
   };
   res.locals.path = [
-    ...(req.thisFile.directory
-      ? await dirQueries.findPath(req.thisFile.directory)
-      : []),
+    ...(req.thisFile.directory ? await fileQueries.findPath(req.thisFile) : []),
     { name: req.thisFile.name + "." + req.thisFile.ext },
   ];
   return next();
@@ -49,10 +43,9 @@ export const edit = [
       "File names must only consist of letters, numbers, hyphens, underscores, dots, and spaces."
     )
     .custom(async (value, { req }) => {
-      const duplicate = await fileQueries.findExistingWithName(
-        req.thisUser.id,
-        req.thisFile.directoryId,
-        value
+      const duplicate = await fileQueries.findNamedDuplicate(
+        value,
+        req.thisFile.directoryId
       );
       if (duplicate && duplicate.id !== req.thisFile.id)
         throw new Error(

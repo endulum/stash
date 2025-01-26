@@ -1,5 +1,28 @@
-import { Directory, type UserSettings } from "@prisma/client";
+import { type Directory, type UserSettings } from "@prisma/client";
 import { client } from "../client";
+
+const include = (settings?: UserSettings | null) => ({
+  directories: settings
+    ? {
+        orderBy: [
+          { [settings.sortDirs]: settings.sortDirsDirection },
+          ...(settings.sortDirs === "updated"
+            ? [{ created: settings.sortDirsDirection }]
+            : []),
+        ],
+      }
+    : true,
+  files: settings
+    ? {
+        orderBy: [
+          { [settings.sortFiles]: settings.sortFilesDirection },
+          ...(settings.sortFiles === "updated"
+            ? [{ created: settings.sortFilesDirection }]
+            : []),
+        ],
+      }
+    : true,
+});
 
 export async function create({
   authorId,
@@ -20,89 +43,51 @@ export async function create({
   return id;
 }
 
-export async function edit(
+export async function find(
   id: string,
-  body: {
-    name?: string;
-    location?: string;
-    shareUntil?: string;
-  }
+  authorId?: number,
+  settings?: UserSettings | null
 ) {
-  await client.directory.update({
-    where: { id },
-    data: {
-      ...(body.name && { name: body.name }),
-      ...(body.location && {
-        parentId: body.location === "home" ? null : body.location,
-      }),
-      ...(body.shareUntil && {
-        shareUntil: body.shareUntil === "" ? null : new Date(body.shareUntil),
-      }),
-    },
-  });
-}
-
-export async function find(id: string) {
   return await client.directory.findFirst({
-    where: { id },
+    where: {
+      id,
+      ...(authorId && { authorId }),
+    },
+    include: include(settings),
   });
 }
 
-export async function findShared(id: string) {
+// for GET /dir/root
+export async function findDirsAtRoot(
+  authorId: number,
+  settings?: UserSettings | null
+) {
+  return await client.directory.findMany({
+    where: {
+      parentId: null,
+      ...(authorId && { authorId }),
+    },
+    ...(settings && {
+      orderBy: { [settings.sortDirs]: settings.sortDirsDirection },
+    }),
+  });
+}
+
+// for GET /shared/:sharedDir
+export async function findShared(id: string, settings?: UserSettings | null) {
   return await client.directory.findFirst({
     where: {
       id,
       AND: [{ shareUntil: { not: null } }, { shareUntil: { gte: new Date() } }],
     },
     include: {
-      author: {
-        include: {
-          settings: true,
-        },
-      },
+      ...include(settings),
+      author: { select: { id: true, username: true } },
     },
   });
 }
 
-export async function findWithAuthor(authorId: number, id: string) {
-  return await client.directory.findFirst({
-    where: { id, authorId },
-  });
-}
-
-export async function findChildrenDirs(
-  parentId: string | null,
-  settings: UserSettings
-) {
-  return await client.directory.findMany({
-    where: { parentId },
-    include: {
-      directories: true,
-    },
-    orderBy: [
-      { [settings.sortDirs]: settings.sortDirsDirection },
-      // secondarily sort by created if updated is primary sort
-      ...(settings.sortDirs === "updated"
-        ? [
-            {
-              created: settings.sortDirsDirection,
-            },
-          ]
-        : []),
-    ],
-  });
-}
-
-export async function findExistingWithName(
-  authorId: number,
-  parentId: string,
-  name: string
-) {
-  return await client.directory.findFirst({
-    where: { name, parentId, authorId },
-  });
-}
-
+// assists in directory path component
 export async function findPath(
   dir: Directory | null,
   path: Array<{ name: string; id: string }> = []
@@ -117,16 +102,43 @@ export async function findPath(
   return findPath(parent, path);
 }
 
-export async function getPathString(dir: Directory) {
-  return "/" + (await findPath(dir)).map((loc) => loc.name).join("/") + "/";
+// assists in determining if a directory is a descendant of a shared directory
+export async function trimPath(
+  startingDir: Directory,
+  endingDirId: string | null
+) {
+  const path = await findPath(startingDir);
+  while (path.length > 0) {
+    const p = path.shift();
+    if (!p || p.id === endingDirId) break;
+  }
+  return path;
 }
 
+// assists in preventing similarly-named items at same location
+export async function findNamedDuplicate(
+  name: string,
+  parentId: string | null
+) {
+  return await client.directory.findFirst({
+    where: { name, parentId },
+  });
+}
+
+// convenience for making path strings
+export async function getPathString(dir: Directory) {
+  const path = (await findPath(dir)).map((loc) => loc.name).join("/");
+  return "/" + (path.length > 0 ? path + "/" : "");
+}
+
+// assists in zip building and location dropdowns
 export async function findDescendants(
+  authorId: number,
   parent: { name: string; id: string } | { id: null },
   children: Array<{ id: string; name: string }> = []
 ): Promise<Array<{ id: string; name: string }>> {
   const directories = await client.directory.findMany({
-    where: { parentId: parent.id },
+    where: { authorId, parentId: parent.id },
     select: {
       id: true,
       name: true,
@@ -146,10 +158,33 @@ export async function findDescendants(
     ...children,
     ...(
       await Promise.all(
-        renamedDirectories.map(async (dir) => findDescendants(dir))
+        renamedDirectories.map(async (dir) => findDescendants(authorId, dir))
       )
     ).flat(),
   ];
+}
+
+export async function edit(
+  id: string,
+  body: {
+    name?: string;
+    location?: string;
+    shareUntil?: string;
+  }
+) {
+  await client.directory.update({
+    where: { id },
+    data: {
+      ...(body.name && { name: body.name }),
+      ...(body.location && {
+        parentId: body.location === "home" ? null : body.location,
+      }),
+      ...(body.shareUntil && {
+        shareUntil: body.shareUntil === "" ? null : new Date(body.shareUntil),
+      }),
+      updated: new Date(),
+    },
+  });
 }
 
 export async function del(id: string) {

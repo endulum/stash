@@ -1,10 +1,11 @@
 import { createClient } from "@supabase/supabase-js";
-import { client } from "../prisma/client";
-import { decode } from "base64-arraybuffer";
-
-import dotenv from "dotenv";
 import { ofetch } from "ofetch";
 import { Readable } from "stream";
+import { decode } from "base64-arraybuffer";
+
+import { client } from "../prisma/client";
+
+import dotenv from "dotenv";
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
 export const supabase = createClient(
@@ -65,8 +66,8 @@ async function getSignedUrl(filePath: string) {
   return data.signedUrl;
 }
 
-export async function getBuffer(fileName: string, authorId: number) {
-  const signedUrl = await getSignedUrl(`user_${authorId}/${fileName}`);
+export async function getBuffer(fileId: string, fileAuthorId: number) {
+  const signedUrl = await getSignedUrl(`user_${fileAuthorId}/${fileId}`);
   const response = await ofetch.raw(signedUrl, {
     responseType: "arrayBuffer",
   });
@@ -77,13 +78,14 @@ export async function getBuffer(fileName: string, authorId: number) {
   return { buffer: Buffer.from(buffer), contentType };
 }
 
-export async function getReadable(fileName: string, authorId: number) {
-  const { buffer, contentType } = await getBuffer(fileName, authorId);
+export async function getReadable(fileId: string, fileAuthorId: number) {
+  const { buffer, contentType } = await getBuffer(fileId, fileAuthorId);
   const readable = Readable.from(buffer);
   return { readable, contentType };
 }
 
 export async function empty() {
+  // for dev
   const files = await client.file.findMany({
     where: {},
     select: {

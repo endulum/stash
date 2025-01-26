@@ -9,43 +9,6 @@ import bcrypt from "bcryptjs";
 
 import { client } from "../client";
 
-export async function find({
-  id,
-  username,
-  githubId,
-}: {
-  id?: number;
-  username?: string;
-  githubId?: number;
-}) {
-  const OR: Prisma.UserWhereInput[] = [];
-  if (id && !Object.is(id, NaN)) OR.push({ id });
-  if (username) OR.push({ username });
-  if (githubId) OR.push({ githubId });
-  return client.user.findFirst({
-    where: { OR },
-  });
-}
-
-export async function comparePassword({
-  userData,
-  password,
-}: {
-  userData: string | { password: string | null };
-  password: string;
-}) {
-  let user: { password: string | null } | null = null;
-  if (typeof userData === "string") {
-    user = await client.user.findUnique({
-      where: { username: userData },
-    });
-    if (!user) return false;
-  } else user = userData;
-  if (!user.password) return false;
-  const match = await bcrypt.compare(password, user.password);
-  return match;
-}
-
 export async function create({
   username,
   password,
@@ -78,26 +41,80 @@ export async function create({
   }
 }
 
+export async function find({
+  id,
+  username,
+  githubId,
+}: {
+  id?: number;
+  username?: string;
+  githubId?: number;
+}) {
+  const OR: Prisma.UserWhereInput[] = [];
+  if (id && !Object.is(id, NaN)) OR.push({ id });
+  if (username) OR.push({ username });
+  if (githubId) OR.push({ githubId });
+  return client.user.findFirst({
+    where: { OR },
+    include: { settings: true },
+  });
+}
+
+export async function comparePassword({
+  userData,
+  password,
+}: {
+  userData: string | { password: string | null };
+  password: string;
+}) {
+  let user: { password: string | null } | null = null;
+  if (typeof userData === "string") {
+    user = await client.user.findUnique({
+      where: { username: userData },
+    });
+    if (!user) return false;
+  } else user = userData;
+  if (!user.password) return false;
+  const match = await bcrypt.compare(password, user.password);
+  return match;
+}
+
 export async function update({
   userData,
   body,
 }: {
   userData: { username?: string; id?: number };
-  body: { username?: string; password?: string; bio?: string };
-}) {
-  const data: Record<string, string | null> = {
-    username: body.username ?? null,
+  body: {
+    username?: string;
+    password?: string;
+    sortFiles?: FileSort;
+    sortFilesDirection?: FileSortOrder;
+    sortDirs?: DirSort;
+    sortDirsDirection?: DirSortOrder;
   };
-  if (body.password) {
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(body.password, salt);
-    data.password = hashedPassword;
-  }
+}) {
   await client.user.update({
     where: userData.username
       ? { username: userData.username }
       : { id: userData.id },
-    data,
+    data: {
+      ...(body.username && { username: body.username }),
+      ...(body.password && {
+        password: await bcrypt.hash(body.password, await bcrypt.genSalt(10)),
+      }),
+      settings: {
+        update: {
+          ...(body.sortFiles && { sortFiles: body.sortFiles }),
+          ...(body.sortFilesDirection && {
+            sortFilesDirection: body.sortFilesDirection,
+          }),
+          ...(body.sortDirs && { sortDirs: body.sortDirs }),
+          ...(body.sortDirsDirection && {
+            sortDirsDirection: body.sortDirsDirection,
+          }),
+        },
+      },
+    },
   });
 }
 
@@ -111,29 +128,5 @@ export async function updateGithubUser(id: number, githubUser: string) {
 export async function del(id: number) {
   await client.user.delete({
     where: { id },
-  });
-}
-
-export async function findSettings(userId: number) {
-  return await client.userSettings.findFirst({ where: { userId } });
-}
-
-export async function updateSettings(
-  userId: number,
-  body: {
-    sortFiles: FileSort;
-    sortFilesDirection: FileSortOrder;
-    sortDirs: DirSort;
-    sortDirsDirection: DirSortOrder;
-  }
-) {
-  await client.userSettings.update({
-    where: { userId },
-    data: {
-      sortFiles: body.sortFiles,
-      sortDirs: body.sortDirs,
-      sortFilesDirection: body.sortFilesDirection,
-      sortDirsDirection: body.sortDirsDirection,
-    },
   });
 }

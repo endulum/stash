@@ -15,6 +15,9 @@ export const validate = asyncHandler(async (req, res, next) => {
       []
     );
 
+    // log
+    if (process.env.NODE_ENV === "development") console.warn(errors);
+
     // set custom header to errors array, to easily check with supertest
     res.set("X-Validation-Errors", JSON.stringify(errors));
 
@@ -24,9 +27,6 @@ export const validate = asyncHandler(async (req, res, next) => {
       if (req.formErrors) req.formErrors[error.path] = error.msg;
     });
     res.locals.formErrors = req.formErrors;
-
-    // finally, log
-    if (process.env.NODE_ENV === "development") console.warn(errors);
   } else {
     res.locals.formErrors = null;
   }
