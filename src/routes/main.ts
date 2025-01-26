@@ -50,10 +50,10 @@ router
 
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
+    router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("/file/new").post(module.uploadFile);
     router.route("/file/:file/download").get(module.downloadFile);
     router.route("/serve/:file").get(module.serveFile);
-    router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("*").all(render.notFound);
   });
 } else {

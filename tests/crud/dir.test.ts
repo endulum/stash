@@ -128,10 +128,8 @@ describe("/dir/new", () => {
       name: correctInputs.name,
     };
   });
-});
 
-describe("/dir/:dir", () => {
-  test("GET - ok", async () => {
+  test("GET /dir/:dir - ok", async () => {
     await agent.get(`/dir/${directory.id}`).expect(200);
   });
 });
@@ -167,6 +165,10 @@ describe("/dir/:dir/edit", () => {
       .expect(checkFormOk)
       .expect("Location", `/dir/${directory.id}`);
   });
+
+  test("GET /dir/:dir - ok", async () => {
+    await agent.get(`/dir/${directory.id}`).expect(200);
+  });
 });
 
 describe("/dir/:dir/delete", () => {
@@ -198,3 +200,5 @@ describe("/dir/:dir/delete", () => {
     await agent.post(`/dir/${directory.id}`).expect(404);
   });
 });
+
+// manually test dir download

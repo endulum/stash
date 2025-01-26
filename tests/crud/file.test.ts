@@ -24,6 +24,8 @@ describe("/file/new", () => {
   test("GET - ok", async () => {
     await agent.get("/file/new").expect(200);
   });
+
+  // manually test upload
 });
 
 describe("/file/:file", () => {
@@ -59,6 +61,10 @@ describe("/file/:file/edit", () => {
       .expect(checkFormOk)
       .expect("Location", `/file/${files[0].id}`);
   });
+
+  test("GET /file/:file - ok", async () => {
+    await agent.get(`/file/${files[0].id}`).expect(200);
+  });
 });
 
 describe("/file/:file/delete", () => {
@@ -88,3 +94,5 @@ describe("/file/:file/delete", () => {
     await agent.get(`/file/${files[0].id}`).expect(404);
   });
 });
+
+// manually test file serving and download
