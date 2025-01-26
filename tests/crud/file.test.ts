@@ -95,4 +95,6 @@ describe("/file/:file/delete", () => {
   });
 });
 
-// manually test file serving and download
+// manually test:
+// /serve/:file
+// /file/:file/download

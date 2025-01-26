@@ -11,8 +11,9 @@ import { PrismaClient } from "@prisma/client";
 import dotenv from "dotenv";
 import "./config/passport";
 
-import { errorHandler } from "../src/middleware/errorHandler";
 import { initUser } from "../src/middleware/initUser";
+import { initLocals } from "../src/middleware/initLocals";
+import { router as shareRouter } from "../src/routes/share";
 
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
@@ -80,8 +81,10 @@ app.use(
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use(initUser);
+app.use(initLocals);
 
-app.use(errorHandler);
+app.use("/shared", shareRouter);
+
+app.use(initUser);
 
 export default app;

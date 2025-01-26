@@ -201,4 +201,5 @@ describe("/dir/:dir/delete", () => {
   });
 });
 
-// manually test dir download
+// manually test:
+// /dir/:dir/download
