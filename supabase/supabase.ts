@@ -63,6 +63,13 @@ export async function upload(
   return newFile.id;
 }
 
+export async function del(fileId: string, fileAuthorId: number) {
+  const { error } = await supabase.storage
+    .from(bucketName)
+    .remove([`user_${fileAuthorId}/${fileId}`]);
+  if (error) throw error;
+}
+
 async function getSignedUrl(filePath: string) {
   const { data, error } = await supabase.storage
     .from(bucketName)
@@ -90,19 +97,7 @@ export async function getReadable(fileId: string, fileAuthorId: number) {
 }
 
 export async function empty() {
-  // for dev
-  const files = await client.file.findMany({
-    where: {},
-    select: {
-      authorId: true,
-      id: true,
-    },
-  });
-  if (files.length === 0) return;
-  const fileUrls = files.map((f) => `user_${f.authorId}/${f.id}`);
-  const { error: deleteError } = await supabase.storage
-    .from(bucketName)
-    .remove(fileUrls);
+  const { error: deleteError } = await supabase.storage.emptyBucket(bucketName);
   if (deleteError) throw deleteError;
 }
 

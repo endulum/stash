@@ -42,10 +42,7 @@ router
   .route("/file/:file/edit")
   .get(file.exists, render.editFile)
   .post(file.edit);
-router
-  .route("/file/:file/delete")
-  .get(file.exists, render.deleteFile)
-  .post(file.del);
+router.route("/file/:file/delete").get(file.exists, render.deleteFile);
 
 // etc
 
@@ -53,6 +50,7 @@ router.route("/search").get(search.get);
 
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
+    router.post("/file/:file/delete", module.deleteFile);
     router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("/file/new").post(module.uploadFile);
     router.route("/file/:file/download").get(module.downloadFile);
@@ -60,6 +58,7 @@ if (process.env.NODE_ENV !== "test") {
     router.route("*").all(render.notFound);
   });
 } else {
+  router.post("/file/:file/delete", file.del);
   router.route("*").all(render.notFound);
 }
 

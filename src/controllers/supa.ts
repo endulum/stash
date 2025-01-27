@@ -107,6 +107,15 @@ export const uploadFile = [
   }),
 ];
 
+export const deleteFile = [
+  ...file.delValidate,
+  asyncHandler(async (req, _res, next) => {
+    await supabase.del(req.thisFile.id, req.thisUser.id);
+    return next();
+  }),
+  file.delRedirect,
+];
+
 export const serveFile = [file.exists, pipeServe];
 
 export const serveSharedFile = [...shared.fileIsDescendant, pipeServe];

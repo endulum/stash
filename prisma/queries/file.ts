@@ -84,7 +84,11 @@ export async function edit(
 }
 
 export async function del(id: string) {
-  await client.file.delete({ where: { id } });
+  const { authorId, size } = await client.file.delete({ where: { id } });
+  await client.user.update({
+    where: { id: authorId },
+    data: { storage: { decrement: size } },
+  });
 }
 
 // convenience for making path strings

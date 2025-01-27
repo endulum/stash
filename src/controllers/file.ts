@@ -63,7 +63,7 @@ export const edit = [
   }),
 ];
 
-export const del = [
+export const delValidate = [
   exists,
   body("path")
     .trim()
@@ -75,12 +75,16 @@ export const del = [
   validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.deleteFile(req, res, next);
-    await fileQueries.del(req.thisFile.id);
-    req.flash("success", "File successfully deleted.");
-    res.redirect(
-      req.thisFile.directoryId
-        ? `/dir/${req.thisFile.directoryId}`
-        : "/dir/root"
-    );
+    return next();
   }),
 ];
+
+export const delRedirect = asyncHandler(async (req, res) => {
+  await fileQueries.del(req.thisFile.id);
+  req.flash("success", "File successfully deleted.");
+  res.redirect(
+    req.thisFile.directoryId ? `/dir/${req.thisFile.directoryId}` : "/dir/root"
+  );
+});
+
+export const del = [...delValidate, delRedirect];
