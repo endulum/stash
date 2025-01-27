@@ -23,15 +23,20 @@ async function recursiveRead(dirpath: string, parentId: null | string = null) {
     if (entry.isDirectory()) {
       await recursiveRead(fullPath, directory.id);
     } else {
+      const size = (await fs.stat(fullPath)).size;
       const { id } = await client.file.create({
         data: {
           authorId: 1,
           name: path.parse(fullPath).name,
           type: mime.lookup(fullPath) || "binary",
           ext: path.parse(fullPath).ext.slice(1),
-          size: (await fs.stat(fullPath)).size,
+          size,
           directoryId: directory.id,
         },
+      });
+      await client.user.update({
+        where: { id: 1 },
+        data: { storage: { increment: size } },
       });
       const supaFilePath = `user_1/${id}`;
 

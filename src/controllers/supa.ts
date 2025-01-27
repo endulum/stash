@@ -14,6 +14,7 @@ import * as directory from "./directory";
 import * as shared from "./shared";
 import * as render from "./render";
 import { buildZip } from "../functions/buildZip";
+import { niceBytes } from "../functions/niceBytes";
 
 const storage = multer.memoryStorage();
 const uploadMulter = multer({ storage });
@@ -60,6 +61,12 @@ export const uploadFile = [
         "Files cannot be larger than 5 megabytes (5,242,880 bytes) in size."
       );
     }
+    if (req.thisUser.storage + req.file.size > 52428800)
+      throw new Error(
+        `This file is ${niceBytes(req.file.size)}, but you have ${niceBytes(
+          52428800 - req.thisUser.storage
+        )} of space left. `
+      );
     const duplicate = await fileQueries.findNamedDuplicate(
       req.file.originalname.split(".")[0],
       req.body.location === "home" ? null : req.body.location

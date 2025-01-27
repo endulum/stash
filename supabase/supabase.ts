@@ -55,6 +55,11 @@ export async function upload(
     await client.file.delete({ where: { id: newFile.id } });
     return null;
   }
+
+  await client.user.update({
+    where: { id: authorId },
+    data: { storage: { increment: file.size } },
+  });
   return newFile.id;
 }
 

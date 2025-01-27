@@ -480,3 +480,26 @@ h3 {
     }
   }
 }
+
+/* storage */
+
+.storage-bar {
+  appearance: none;
+  background: transparent;
+  height: 10px;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+
+  &::-webkit-progress-bar {
+    background-color: transparent;
+  }
+
+  &::-webkit-progress-value {
+    background-color: var(--success);
+  }
+
+  &::-moz-progress-bar {
+    background-color: var(--success);
+  }
+}

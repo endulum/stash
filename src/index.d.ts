@@ -8,6 +8,7 @@ declare global {
       password: string;
       githubUser: string | null;
       githubId: number | null;
+      storage: number;
       role: Prisma.Role;
       settings: Prisma.UserSettings;
     }
