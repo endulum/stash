@@ -1,4 +1,9 @@
-import { type Prisma, type UserSettings } from "@prisma/client";
+import {
+  type Directory,
+  type File,
+  type Prisma,
+  type UserSettings,
+} from "@prisma/client";
 
 import { client } from "../client";
 import { findPath as findDirPath } from "./directory";
@@ -59,20 +64,6 @@ export async function findNamedDuplicate(
   });
 }
 
-// convenience for making path strings
-export async function getPathString(
-  file: Prisma.FileGetPayload<{ include: { directory: true } }>
-) {
-  const path = await findPath(file);
-  return (
-    (path.length > 0 ? "/" + path.map((loc) => loc.name).join("/") : "") +
-    "/" +
-    file.name +
-    "." +
-    file.ext
-  );
-}
-
 export async function edit(
   id: string,
   body: {
@@ -94,4 +85,75 @@ export async function edit(
 
 export async function del(id: string) {
   await client.file.delete({ where: { id } });
+}
+
+// convenience for making path strings
+export async function getPathString(
+  file: Prisma.FileGetPayload<{ include: { directory: true } }>
+) {
+  const path = await findPath(file);
+  return (
+    (path.length > 0 ? "/" + path.map((loc) => loc.name).join("/") : "") +
+    "/" +
+    file.name +
+    "." +
+    file.ext
+  );
+}
+
+// convenience for finding all file types a user has
+export async function getUniqueTypes(authorId: number) {
+  return (
+    await client.file.findMany({
+      where: { authorId },
+      distinct: ["type"],
+      select: { type: true },
+    })
+  ).map((type) => type.type);
+}
+
+export async function search(authorId: number, params: Record<string, string>) {
+  const results: (File | Directory)[] = [];
+  const where = {
+    authorId,
+    ...(params.name && { name: { contains: params.name } }),
+  };
+  switch (params.type) {
+    case "directory":
+      results.push(...(await client.directory.findMany({ where })));
+      break;
+
+    case "shared directory":
+      results.push(
+        ...(await client.directory.findMany({
+          where: {
+            ...where,
+            AND: [
+              { shareUntil: { not: null } },
+              { shareUntil: { gte: new Date() } },
+            ],
+          },
+        }))
+      );
+      break;
+
+    case "any":
+      results.push(
+        ...(await client.directory.findMany({ where })),
+        ...(await client.file.findMany({ where, include: { directory: true } }))
+      );
+      break;
+
+    default:
+      results.push(
+        ...(await client.file.findMany({
+          where: {
+            ...where,
+            type: params.type,
+          },
+          include: { directory: true },
+        }))
+      );
+  }
+  return results;
 }

@@ -6,6 +6,7 @@ import * as render from "../controllers/render";
 import * as user from "../controllers/user";
 import * as dir from "../controllers/directory";
 import * as file from "../controllers/file";
+import * as search from "../controllers/search";
 
 const router = express.Router();
 const redirectIndex = asyncHandler(async (_req, res) => {
@@ -47,6 +48,8 @@ router
   .post(file.del);
 
 // etc
+
+router.route("/search").get(search.get);
 
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {

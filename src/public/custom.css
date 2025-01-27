@@ -455,3 +455,28 @@ ul {
 h3 {
   font-weight: normal;
 }
+
+/* search */
+
+.search-results {
+  list-style: none;
+  margin-left: 0;
+}
+
+.search-result {
+  background-color: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  svg {
+    min-width: 1.25rem;
+  }
+}
+
+@container main (width < 600px) {
+  .search-result {
+    flex-direction: column;
+    a[type="button"] {
+      align-self: end;
+    }
+  }
+}

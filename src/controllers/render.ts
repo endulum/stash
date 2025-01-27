@@ -222,3 +222,13 @@ export const sharedFile = asyncHandler(async (_req, res) => {
     title: "Viewing Shared File",
   });
 });
+
+// search
+
+export const search = asyncHandler(async (req, res) => {
+  return res.render("layout", {
+    page: "pages/etc/search",
+    title: "Search Files",
+    prefill: req.query,
+  });
+});

@@ -1,0 +1,101 @@
+<form action="/search" method="get">
+  <%- include('../../components/form-input', {
+    name: 'name',
+    label: 'Name',
+    type: 'text',
+    includePrefill: true,
+    required: false
+  }) %>
+
+  <div class="input">
+    <label for="type">Type</label>
+    <p>
+      <% if (locals.formErrors && 'type' in locals.formErrors) { %>
+        <small class="error" data-for="type">
+          <b>Error: </b>
+          <%= locals.formErrors['type'] %>
+        </small>
+      <% } %>
+    </p>
+    <select name="type" id="type">
+      <option value="any" <%= prefill.type === 'any' && "selected" %>>
+        Any
+      </option>
+      <option value="directory" <%= prefill.type === 'directory' && "selected" %>>
+        Directory
+      </option>
+      <option value="shared directory" <%= prefill.type === 'shared directory' && "selected" %>>
+        Shared Directory
+      </option>
+      <optgroup label="File Types">
+        <% locals.uniqueTypes.forEach(type => { %>
+          <option 
+            value="<%= type || 'any' %>"
+            <%= prefill.type === type && "selected" %>
+          >
+            <%= type %>
+          </option>
+        <% }) %>
+      </optgroup>
+    </select>
+  </div>
+
+  <button type="submit">Submit</button>
+</form>
+
+<% if (Object.keys(locals.prefill).some(key => locals.prefill[key] !== '')) { %>
+  <h3 class="mb-05">Results</h3>
+  <% if (results.length === 0) { %>
+    <p>Nothing was found with your search. Try a different search?</p>
+  <% } else { %>
+    <ul class="search-results flex-col g-1 align-start mt-1" role="list">
+      <% results.forEach(result => { %>
+        <li class="search-result flex-row align-start w100 p-1 g-1 jcspb" aria-label="<%= result.name %>">
+          <div class="flex-row align-start g-1">
+            <% if ('shareUntil' in result) { %>
+              <%- include('../../svg/folder.svg') %>
+              <p>
+                <b><%= result.name %></b>/
+                <br>
+                <small>
+                  <% if (Date.parse(result.shareUntil) > Date.parse(new Date())) { %>
+                    Public directory, until <%= result.shareUntil.toLocaleString('default', { 
+                      month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC', timeZoneName: 'short'
+                    }) %>
+                  <% } else { %>
+                    Private directory
+                  <% } %>
+                </small>
+              </p>
+            <% } else { %>
+              <%- include('../../components/filetype-icon', { type: result.type }) %>
+              <p>
+                <b><%= result.name %></b>.<%= result.ext %>
+                <% if (result.directory ) { %>
+                  under <b><%= result.directory.name %></b>/
+                <% } else { %>
+                  under filesystem root
+                <% } %>
+                <br>
+                <small>
+                  <%= result.type %>, <%= result.size %> bytes
+                </small>
+              </p>
+            <% } %>
+          </div>
+          <% if ('shareUntil' in result) { %>
+            <a type="button" href=<%= '/directory/' + result.id %>>
+              <span>Go to location</span>
+              <%- include('../../svg/go.svg') %>
+            </a>
+          <% } else { %>
+            <a type="button" href=<%= '/file/' + result.id %>>
+              <span>Go to file</span>
+              <%- include('../../svg/go.svg') %>
+            </a>
+          <% } %>
+        </li>
+      <% }) %> 
+    </ul>
+  <% } %>
+<% } %>
