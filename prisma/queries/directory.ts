@@ -1,5 +1,7 @@
 import { type Directory, type UserSettings } from "@prisma/client";
+
 import { client } from "../client";
+import { findDescendantFiles } from "./file";
 
 const include = (settings?: UserSettings | null) => ({
   directories: settings
@@ -187,6 +189,13 @@ export async function edit(
   });
 }
 
-export async function del(id: string) {
-  await client.directory.delete({ where: { id } });
+export async function del(directory: Directory) {
+  const totalFileSize = (
+    await findDescendantFiles(directory, directory.authorId)
+  ).reduce((acc, curr) => acc + curr.size, 0);
+  await client.directory.delete({ where: { id: directory.id } });
+  await client.user.update({
+    where: { id: directory.authorId },
+    data: { storage: { decrement: totalFileSize } },
+  });
 }

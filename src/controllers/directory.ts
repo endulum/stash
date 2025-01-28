@@ -105,7 +105,7 @@ export const edit = [
   }),
 ];
 
-export const del = [
+export const delValidate = [
   exists,
   body("path")
     .trim()
@@ -117,12 +117,18 @@ export const del = [
   validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.deleteDir(req, res, next);
-    await dirQueries.del(req.thisDirectory.id);
-    req.flash("success", "Directory successfully deleted.");
-    res.redirect(
-      req.thisDirectory.parentId
-        ? `/dir/${req.thisDirectory.parentId}`
-        : "/dir/root"
-    );
+    return next();
   }),
 ];
+
+export const delRedirect = asyncHandler(async (req, res) => {
+  await dirQueries.del(req.thisDirectory);
+  req.flash("success", "Directory successfully deleted.");
+  res.redirect(
+    req.thisDirectory.parentId
+      ? `/dir/${req.thisDirectory.parentId}`
+      : "/dir/root"
+  );
+});
+
+export const del = [...delValidate, delRedirect];

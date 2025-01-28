@@ -6,7 +6,10 @@ import {
 } from "@prisma/client";
 
 import { client } from "../client";
-import { findPath as findDirPath } from "./directory";
+import {
+  findPath as findDirPath,
+  findDescendants as findDirDescendants,
+} from "./directory";
 
 export async function find(id: string, authorId?: number) {
   return await client.file.findFirst({
@@ -32,6 +35,28 @@ export async function findFilesAtDir(
       orderBy: { [settings.sortFiles]: settings.sortFilesDirection },
     }),
   });
+}
+
+// for POST /dir/:dir/delete, to find and delete supa uploads
+export async function findDescendantFiles(
+  directory: Directory,
+  authorId: number
+) {
+  const descendantDirectories = await findDirDescendants(authorId, {
+    name: directory.name,
+    id: directory.id,
+  });
+  const descendantFiles: File[] = [];
+  descendantFiles.push(...(await findFilesAtDir(directory.id, authorId)));
+  await Promise.all(
+    descendantDirectories.map(async (desc) => {
+      const files = await client.file.findMany({
+        where: { directoryId: desc.id },
+      });
+      descendantFiles.push(...files);
+    })
+  );
+  return descendantFiles;
 }
 
 // assists in directory path component

@@ -2,8 +2,10 @@ import { createClient } from "@supabase/supabase-js";
 import { ofetch } from "ofetch";
 import { Readable } from "stream";
 import { decode } from "base64-arraybuffer";
+import { type Directory } from "@prisma/client";
 
 import { client } from "../prisma/client";
+import { findDescendantFiles } from "../prisma/queries/file";
 
 import dotenv from "dotenv";
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
@@ -67,6 +69,14 @@ export async function del(fileId: string, fileAuthorId: number) {
   const { error } = await supabase.storage
     .from(bucketName)
     .remove([`user_${fileAuthorId}/${fileId}`]);
+  if (error) throw error;
+}
+
+export async function delDir(directory: Directory) {
+  const files = (await findDescendantFiles(directory, directory.authorId)).map(
+    (f) => `user_${f.authorId}/${f.id}`
+  );
+  const { error } = await supabase.storage.from(bucketName).remove(files);
   if (error) throw error;
 }
 

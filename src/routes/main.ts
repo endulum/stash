@@ -29,10 +29,7 @@ router.route("/dir/root").get(dir.getRoot);
 router.route("/dir/new").get(render.newDir).post(dir.create);
 router.route("/dir/:dir").get(dir.get);
 router.route("/dir/:dir/edit").get(dir.exists, render.editDir).post(dir.edit);
-router
-  .route("/dir/:dir/delete")
-  .get(dir.exists, render.deleteDir)
-  .post(dir.del);
+router.route("/dir/:dir/delete").get(dir.exists, render.deleteDir);
 
 // file
 
@@ -50,6 +47,7 @@ router.route("/search").get(search.get);
 
 if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
+    router.post("/dir/:dir/delete", module.deleteDir);
     router.post("/file/:file/delete", module.deleteFile);
     router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("/file/new").post(module.uploadFile);
@@ -58,6 +56,7 @@ if (process.env.NODE_ENV !== "test") {
     router.route("*").all(render.notFound);
   });
 } else {
+  router.post("/dir/:dir/delete", dir.del);
   router.post("/file/:file/delete", file.del);
   router.route("*").all(render.notFound);
 }

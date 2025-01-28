@@ -116,6 +116,15 @@ export const deleteFile = [
   file.delRedirect,
 ];
 
+export const deleteDir = [
+  ...directory.delValidate,
+  asyncHandler(async (req, _res, next) => {
+    await supabase.delDir(req.thisDirectory);
+    return next();
+  }),
+  directory.delRedirect,
+];
+
 export const serveFile = [file.exists, pipeServe];
 
 export const serveSharedFile = [...shared.fileIsDescendant, pipeServe];
