@@ -25,11 +25,20 @@ try {
     case 'text':
       previewElement = document.createElement('textarea');
       fetch(serveUrl)
-        .then(response => response.text())
+        .then(response => {
+          if (response.ok) return response.text();
+          throw new Error('Something went wrong when fetching text')
+        })
         .then(text => {
           previewElement.textContent = text;
           previewElement.style.height = previewElement.scrollHeight + "px";
         })
+        .catch(e => { 
+          previewBox.removeChild(previewElement);
+          previewElement = document.createElement('p');
+          previewElement.textContent = 'Sorry, there was a problem trying to preview this file.';
+          previewBox.appendChild(previewElement);
+         })
       break;
     default:
       previewElement = document.createElement('p');
