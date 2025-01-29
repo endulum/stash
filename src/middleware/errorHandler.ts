@@ -11,7 +11,7 @@ const errorHandler = (
     "status" in err && typeof err.status === "number" ? err.status : 500;
   res.status(status).render("layout", {
     page: "pages/error",
-    title: "Error",
+    title: "Internal Server Error",
     message: "Sorry, something went wrong when handling your request.",
   });
 };

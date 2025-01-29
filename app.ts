@@ -15,6 +15,7 @@ import "./config/passport";
 import { initUser } from "./src/middleware/initUser";
 import { initLocals } from "./src/middleware/initLocals";
 import { router as shareRouter } from "./src/routes/share";
+import { errorHandler } from "./src/middleware/errorHandler";
 
 dotenv.config({ path: ".env." + process.env.NODE_ENV });
 
@@ -91,6 +92,8 @@ app.use(initLocals);
 app.use("/shared", shareRouter);
 
 app.use(initUser);
+
+app.use(errorHandler);
 
 const port = process.env.PORT ?? 3000;
 app.listen(port, () => {
