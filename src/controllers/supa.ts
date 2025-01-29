@@ -9,6 +9,7 @@ import * as supabase from "../../supabase/supabase";
 import * as fileQueries from "../../prisma/queries/file";
 import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
+import { limiter } from "../middleware/rateLimiter";
 import * as file from "./file";
 import * as directory from "./directory";
 import * as shared from "./shared";
@@ -52,7 +53,10 @@ const pipeDownloadDir = asyncHandler(async (req, res) => {
   readable.pipe(res);
 });
 
+// uploads are rate-limited
+
 const uploadFileValidation = [
+  ...limiter,
   uploadMulter.single("upload"),
   body("upload").custom(async (_value, { req }) => {
     if (!req.file) throw new Error("Please upload a file.");
@@ -160,15 +164,26 @@ export const serveFile = [file.exists, pipeServe];
 
 export const serveSharedFile = [...shared.fileIsDescendant, pipeServe];
 
-export const downloadFile = [file.exists, pipeDownload];
+// downloads are rate-limited
 
-export const downloadSharedFile = [...shared.fileIsDescendant, pipeDownload];
+export const downloadFile = [...limiter, file.exists, pipeDownload];
 
-export const downloadDir = [directory.exists, pipeDownloadDir];
+export const downloadSharedFile = [
+  ...limiter,
+  ...shared.fileIsDescendant,
+  pipeDownload,
+];
 
-export const downloadSharedDir = [...shared.dirIsDescendant, pipeDownloadDir];
+export const downloadDir = [...limiter, directory.exists, pipeDownloadDir];
+
+export const downloadSharedDir = [
+  ...limiter,
+  ...shared.dirIsDescendant,
+  pipeDownloadDir,
+];
 
 export const downloadSharedRoot = [
+  ...limiter,
   shared.exists,
   asyncHandler(async (req, _res, next) => {
     req.thisDirectory = req.thisSharedDirectory;
