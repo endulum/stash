@@ -55,13 +55,6 @@ export const noGhCode = asyncHandler(async (_req, res) => {
 
 // pages
 
-export const index = asyncHandler(async (_req, res) => {
-  return res.render("layout", {
-    page: "pages/index",
-    title: "Home",
-  });
-});
-
 export const login = asyncHandler(async (req, res) => {
   // specific for the signup post handler, saving the new account's username
   const loginUsernamePrefill = req.flash("loginUsernamePrefill");

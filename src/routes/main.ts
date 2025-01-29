@@ -9,13 +9,13 @@ import * as file from "../controllers/file";
 import * as search from "../controllers/search";
 
 const router = express.Router();
-const redirectIndex = asyncHandler(async (_req, res) => {
-  return res.redirect("/");
+const redirectRoot = asyncHandler(async (_req, res) => {
+  return res.redirect("/dir/root");
 });
 
-router.route("/").get(render.index);
-router.route("/login").get(redirectIndex);
-router.route("/signup").get(redirectIndex);
+router.route("/").get(redirectRoot);
+router.route("/login").get(redirectRoot);
+router.route("/signup").get(redirectRoot);
 router.route("/logout").get(logOut);
 
 // account
