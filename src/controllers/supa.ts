@@ -52,7 +52,7 @@ const pipeDownloadDir = asyncHandler(async (req, res) => {
   readable.pipe(res);
 });
 
-export const uploadFile = [
+const uploadFileValidation = [
   uploadMulter.single("upload"),
   body("upload").custom(async (_value, { req }) => {
     if (!req.file) throw new Error("Please upload a file.");
@@ -78,6 +78,37 @@ export const uploadFile = [
   }),
   locationValidation,
   validate,
+];
+
+export const dropFile = [
+  ...uploadFileValidation,
+  asyncHandler(async (req, res) => {
+    if (req.formErrors) res.status(400).json(req.formErrors);
+    else if (!req.file)
+      res
+        .status(400)
+        .send(
+          "Sorry, something went wrong when uploading your file. Try again."
+        );
+    else {
+      const id = await supabase.upload(
+        req.file,
+        req.thisUser.id,
+        req.body.location === "home" ? null : req.body.location
+      );
+      if (!id)
+        res
+          .status(400)
+          .send(
+            "Sorry, something went wrong when uploading your file. Try again."
+          );
+      else res.json({ newFileId: id });
+    }
+  }),
+];
+
+export const uploadFile = [
+  ...uploadFileValidation,
   asyncHandler(async (req, res, next) => {
     if (!req.file) {
       req.flash(

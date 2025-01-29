@@ -49,7 +49,11 @@
     </p>
   </div>
 <% } else { %>
-  <div class="table-wrapper" id="scrolling-table">
+  <div class="table-wrapper" id="scrolling-table" data-dirid="<%= dir ? dir.id : null %>">
+    <div class="flex-col jcc g-05" id="dragndrop-overlay" style="opacity: 0;">
+      <%- include('../../svg/upload.svg') %>
+      <p>Upload a file here</p>
+    </div>
     <table class="w100" cellpadding="0" cellspacing="0">
       <thead>
         <td><span>Name</span></td> 
@@ -165,3 +169,4 @@
 <%- include('../../components/storage-bar') %>
 
 <script src="/scripts/detectTableScroll.js"></script>
+<script src="/scripts/detectDrag.js"></script>

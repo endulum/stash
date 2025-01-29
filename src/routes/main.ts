@@ -51,6 +51,7 @@ if (process.env.NODE_ENV !== "test") {
     router.post("/file/:file/delete", module.deleteFile);
     router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("/file/new").post(module.uploadFile);
+    router.route("/file/drop").post(module.dropFile);
     router.route("/file/:file/download").get(module.downloadFile);
     router.route("/serve/:file").get(module.serveFile);
     router.route("*").all(render.notFound);
