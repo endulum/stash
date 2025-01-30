@@ -6,6 +6,7 @@ import multer from "multer";
 import { Readable } from "stream";
 
 import * as supabase from "../../supabase/supabase";
+import * as redis from "../../redis/client";
 import * as fileQueries from "../../prisma/queries/file";
 import { locationValidation } from "../common/locationValidation";
 import { validate } from "../middleware/validate";
@@ -21,11 +22,23 @@ const storage = multer.memoryStorage();
 const uploadMulter = multer({ storage });
 
 const pipeServe = asyncHandler(async (req, res) => {
-  const { readable, contentType } = await supabase.getReadable(
-    req.thisFile.id,
-    req.thisFile.authorId
+  let buffer: Buffer | string | null = null;
+  const redisBuffer = await redis.findCachedFile(req.thisFile.id);
+  if (!redisBuffer) {
+    const { buffer: supaBuffer } = await supabase.getBuffer(
+      req.thisFile.id,
+      req.thisFile.authorId
+    );
+    await redis.addCachedFile(req.thisFile.id, supaBuffer);
+    buffer = supaBuffer;
+  } else {
+    buffer = redisBuffer;
+  }
+  const readable = Readable.from(buffer!);
+  res.set(
+    "Content-Type",
+    req.thisFile.type ?? "application/x-www-form-urlencoded"
   );
-  res.set("Content-Type", contentType ?? "application/x-www-form-urlencoded");
   readable.pipe(res);
 });
 

@@ -16,6 +16,7 @@
     "docker:migrate": "npm run docker:up && npx dotenv -e .env.test -- npx prisma migrate deploy",
     "docker:rollback": "npm run docker:up && npx dotenv -e .env.test -- npx prisma migrate resolve --rolled-back",
     "docker:reset": "npm run docker:up && npx dotenv -e .env.test -- prisma migrate reset",
+    "docker:flush": "docker exec -it stash-redis-1 redis-cli FLUSHALL",
     "docker:clean": "docker compose down --rmi all --volumes --remove-orphans",
     "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest"
   },
@@ -51,6 +52,7 @@
     "passport-github2": "^0.1.12",
     "passport-local": "^1.0.0",
     "pg": "^8.12.0",
+    "redis": "^4.7.0",
     "supertest": "^7.0.0",
     "typescript-eslint": "^8.20.0"
   },

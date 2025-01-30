@@ -2,11 +2,16 @@ services:
   db:
     image: postgres:13
     restart: always
-    container_name: integration-tests-prisma
+    container_name: postgres
     ports:
-      - '5433:5432'
+      - "5433:5432"
     environment:
       POSTGRES_USER: prisma
       POSTGRES_PASSWORD: prisma
       POSTGRES_DB: tests
       NODE_ENV: test
+
+  redis:
+    image: redis:alpine
+    ports:
+      - 6379:6379
