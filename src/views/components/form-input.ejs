@@ -14,6 +14,7 @@
   </p>
   <%# bottom: where input goes %>
   <input 
+    <%= required && process.env.NODE_ENV === 'production' ? 'required' : '' %>
     type=<%= type %> 
     name=<%= name %> 
     id=<%= name %> 
