@@ -5,7 +5,7 @@ import { body } from "express-validator";
 import multer from "multer";
 import { Readable } from "stream";
 
-import * as supabase from "../../supabase/supabase";
+import * as supabase from "../../supabase/client";
 import * as redis from "../../redis/client";
 import * as fileQueries from "../../prisma/queries/file";
 import { locationValidation } from "../common/locationValidation";

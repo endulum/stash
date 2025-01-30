@@ -3,7 +3,7 @@ import Zip from "adm-zip";
 
 import { findDescendants } from "../../prisma/queries/directory";
 import { findFilesAtDir } from "../../prisma/queries/file";
-import { getBuffer } from "../../supabase/supabase";
+import { getBuffer } from "../../supabase/client";
 
 export async function buildZip(directory: Directory | null, authorId: number) {
   const zip = new Zip();
