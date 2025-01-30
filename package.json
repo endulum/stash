@@ -7,6 +7,7 @@
     "envinit": "cp -n .env.example .env.production && cp -n .env.example .env.development && cp -n .env.example .env.test",
     "dev": "NODE_ENV=development nodemon --watch src --exec ts-node app.ts",
     "db:reset": "NODE_ENV=development nodemon prisma/reset.ts",
+    "db:reset:prod": "NODE_ENV=production nodemon prisma/reset.ts",
     "db:generate": "NODE_ENV=development npx prisma generate",
     "db:migrate": "npx dotenv -e .env.development -- npx prisma migrate dev",
     "lint": "npx eslint .",
@@ -18,7 +19,10 @@
     "docker:reset": "npm run docker:up && npx dotenv -e .env.test -- prisma migrate reset",
     "docker:flush": "docker exec -it stash-redis-1 redis-cli FLUSHALL",
     "docker:clean": "docker compose down --rmi all --volumes --remove-orphans",
-    "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest"
+    "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest",
+    "build": "tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
+    "build:clean": "rm -r ./dist",
+    "build:start": "NODE_ENV=production node ./dist/app.js"
   },
   "keywords": [],
   "author": "",

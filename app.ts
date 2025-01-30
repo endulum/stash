@@ -72,10 +72,11 @@ app.use(
       dbRecordIdFunction: undefined,
     }),
     cookie: {
-      ...(process.env.NODE_ENV === "production" && {
-        secure: true,
-        httpOnly: true,
-      }),
+      ...(process.env.NODE_ENV === "production" &&
+        process.env.DEPLOYMENT_URL?.startsWith("https://") && {
+          secure: true,
+          httpOnly: true,
+        }),
       maxAge: 1000 * 60 * 60 * 24,
     },
   })
