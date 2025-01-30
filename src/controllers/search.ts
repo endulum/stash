@@ -4,8 +4,10 @@ import { query } from "express-validator";
 import * as render from "./render";
 import * as fileQueries from "../../prisma/queries/file";
 import { validate } from "../middleware/validate";
+import { limiter } from "../middleware/rateLimiter";
 
 export const get = [
+  ...limiter,
   query("name").trim().escape(),
   query("type")
     .trim()
