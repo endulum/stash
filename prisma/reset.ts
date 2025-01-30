@@ -3,7 +3,7 @@ dotenv.config({ path: ".env" + process.env.NODE_ENV });
 
 import { client } from "./client";
 import * as devQueries from "./queries/dev";
-import { empty } from "../supabase/supabase";
+import { empty } from "../supabase/client";
 import { readSamples } from "../supabase/readSamples";
 
 async function reset() {

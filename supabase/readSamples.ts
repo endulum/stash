@@ -4,7 +4,7 @@ import mime from "mime-types";
 import { decode } from "base64-arraybuffer";
 
 import { client } from "../prisma/client";
-import { supabase, bucketName } from "./supabase";
+import { supabase, bucketName } from "./client";
 
 async function recursiveRead(dirpath: string, parentId: null | string = null) {
   const entries = await fs.readdir(dirpath, { withFileTypes: true });
