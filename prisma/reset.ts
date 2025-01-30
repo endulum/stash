@@ -11,7 +11,7 @@ async function reset() {
   await devQueries.truncateTable("User");
   await devQueries.truncateTable("Session");
   await devQueries.createAdmin();
-  // await readSamples();
+  await readSamples();
 }
 
 reset()
