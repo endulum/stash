@@ -45,12 +45,12 @@ describe("/login", () => {
       .expect("Location", "/");
   });
 
-  test("GET - 302 and redirects to / if logged in", async () => {
-    await agent.get("/login").expect(302).expect("Location", "/");
+  test("GET - 302 and redirects to filesystem if logged in", async () => {
+    await agent.get("/login").expect(302).expect("Location", "/dir/root");
   });
 
-  test("GET / - 200 and no redirect", async () => {
-    await agent.get("/").expect(200);
+  test("GET / - 200 and redirect to filesystem", async () => {
+    await agent.get("/").expect(302).expect("Location", "/dir/root");
   });
 });
 
