@@ -13,6 +13,7 @@ import { validate } from "../middleware/validate";
 import { limiter } from "../middleware/rateLimiter";
 import * as file from "./file";
 import * as directory from "./directory";
+import * as user from "./user";
 import * as shared from "./shared";
 import * as render from "./render";
 import { buildZip } from "../functions/buildZip";
@@ -171,6 +172,15 @@ export const deleteDir = [
     return next();
   }),
   directory.delRedirect,
+];
+
+export const deleteAccount = [
+  ...user.delValidate,
+  asyncHandler(async (req, _res, next) => {
+    await supabase.delAllUserFiles(req.thisUser.id);
+    return next();
+  }),
+  user.delRedirect,
 ];
 
 export const serveFile = [file.exists, pipeServe];

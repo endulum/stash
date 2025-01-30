@@ -95,7 +95,7 @@ export const edit = [
   }),
 ];
 
-export const del = [
+export const delValidate = [
   body("password")
     .trim()
     .custom(async (value, { req }) => {
@@ -139,14 +139,20 @@ export const del = [
   validate,
   asyncHandler(async (req, res, next) => {
     if (req.formErrors) return render.deleteAccount(req, res, next);
-    await userQueries.del(req.thisUser.id);
-    req.logOut((err) => {
-      if (err) return next(err);
-      req.flash(
-        "success",
-        "Your account and its content has been successfully deleted."
-      );
-      return res.redirect("/signup");
-    });
+    return next();
   }),
 ];
+
+export const delRedirect = asyncHandler(async (req, res, next) => {
+  await userQueries.del(req.thisUser.id);
+  req.logOut((err) => {
+    if (err) return next(err);
+    req.flash(
+      "success",
+      "Your account and its content has been successfully deleted."
+    );
+    return res.redirect("/signup");
+  });
+});
+
+export const del = [...delValidate, delRedirect];

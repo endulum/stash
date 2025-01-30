@@ -21,7 +21,7 @@ router.route("/logout").get(logOut);
 // account
 
 router.route("/account").get(render.account).post(user.edit);
-router.route("/delete").get(render.deleteAccount).post(user.del);
+router.route("/delete").get(render.deleteAccount);
 
 // dir
 
@@ -49,6 +49,7 @@ if (process.env.NODE_ENV !== "test") {
   import("../controllers/supa").then((module) => {
     router.post("/dir/:dir/delete", module.deleteDir);
     router.post("/file/:file/delete", module.deleteFile);
+    router.post("/delete", module.deleteAccount);
     router.route("/dir/:dir/download").get(module.downloadDir);
     router.route("/file/new").post(module.uploadFile);
     router.route("/file/drop").post(module.dropFile);
@@ -57,6 +58,7 @@ if (process.env.NODE_ENV !== "test") {
     router.route("*").all(render.notFound);
   });
 } else {
+  router.post("/delete", user.del);
   router.post("/dir/:dir/delete", dir.del);
   router.post("/file/:file/delete", file.del);
   router.route("*").all(render.notFound);

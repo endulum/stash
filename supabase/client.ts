@@ -81,6 +81,17 @@ export async function delDir(directory: Directory) {
   if (error) throw error;
 }
 
+export async function delAllUserFiles(authorId: number) {
+  const files = (
+    await client.file.findMany({
+      where: { authorId },
+    })
+  ).map((f) => `user_${f.authorId}/${f.id}`);
+  if (files.length === 0) return;
+  const { error } = await supabase.storage.from(bucketName).remove(files);
+  if (error) throw error;
+}
+
 async function getSignedUrl(filePath: string) {
   const { data, error } = await supabase.storage
     .from(bucketName)
