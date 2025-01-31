@@ -22,7 +22,7 @@
     "test": "npm run docker:migrate && npx dotenv -e .env.test -- vitest",
     "build": "tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
     "build:clean": "rm -r ./dist",
-    "build:start": "NODE_ENV=production node ./dist/app.js"
+    "start": "NODE_ENV=production node ./dist/app.js"
   },
   "keywords": [],
   "author": "",
