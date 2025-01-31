@@ -2,7 +2,15 @@
 
 A minimal implementation of a personal storage service.
 
-[Project Spec](https://www.theodinproject.com/lessons/nodejs-file-uploader)
+📓 [Project Spec](https://www.theodinproject.com/lessons/nodejs-file-uploader)
+
+🚄 [Live Deployment](https://stash.up.railway.app)
+
+📂 [Sample Shared File](https://stash.up.railway.app/shared/wilmKb)
+
+![Stash filesystem user interface.](https://github.com/endulum/stash/blob/refresh/screenshot.png?raw=true)
+
+### Installation
 
 Navigate to the root directory where you'd like this project to be, and clone this repo:
 
