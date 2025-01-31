@@ -23,7 +23,7 @@
     "build": "tsc && cp -r ./src/views ./dist/src/views && cp -r ./src/public ./dist/src/public",
     "build:clean": "rm -r ./dist",
     "build:start": "NODE_ENV=production node ./dist/app.js",
-    "start": "NODE_ENV=production npx prisma migrate deploy && npm run build:start"
+    "start": "NODE_ENV=production npx prisma migrate deploy && npm run db:reset:prod && npm run build:start"
   },
   "keywords": [],
   "author": "",
