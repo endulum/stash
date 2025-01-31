@@ -7,7 +7,7 @@
     "envinit": "cp -n .env.example .env.production && cp -n .env.example .env.development && cp -n .env.example .env.test",
     "dev": "NODE_ENV=development nodemon --watch src --exec ts-node app.ts",
     "db:reset": "NODE_ENV=development nodemon prisma/reset.ts",
-    "db:reset:prod": "NODE_ENV=production nodemon prisma/reset.ts",
+    "db:reset:prod": "NODE_ENV=production ts-node prisma/reset.ts",
     "db:generate": "NODE_ENV=development npx prisma generate",
     "db:migrate": "npx dotenv -e .env.development -- npx prisma migrate dev",
     "lint": "npx eslint .",
