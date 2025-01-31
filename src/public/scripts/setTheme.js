@@ -12,5 +12,5 @@ if (themePreference) {
     html.dataset["theme"] = "light";
   }
 } else {
-  html.dataset["theme"] = "light";
+  html.dataset["theme"] = "dark";
 }
