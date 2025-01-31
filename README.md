@@ -8,7 +8,7 @@ A minimal implementation of a personal storage service.
 
 📂 [Sample Shared File](https://stash.up.railway.app/shared/wilmKb)
 
-![Stash filesystem user interface.](https://github.com/endulum/stash/blob/refresh/screenshot.png?raw=true)
+![Stash filesystem user interface.](https://github.com/endulum/stash/blob/main/screenshot.png)
 
 ### Installation
 
