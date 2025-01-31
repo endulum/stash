@@ -1,0 +1,87 @@
+<form action="/account" method="post">
+  <%- include('../../components/input-checklist-wrapper', { 
+    name: 'username',
+    label: 'Username',
+    type: 'text',
+    includePrefill: true,
+    required: true,
+    conditionMessages: [
+      'Between 2 and 32 characters long (spaces at the ends will be trimmed out)',
+      'Contains only lowercase letters, numbers, and hyphens'
+    ],
+    conditionFunctions: [
+      (input) => (input.length < 33 && input.length > 1),
+      (input) => (/^[a-z0-9-]+$/g.test(input))
+    ]
+  }) %>
+
+  <h3>Sorting</h3>
+
+  <%- include('../../components/settings-sort-select', {
+    name: 'Files',
+    label: 'files',
+    options: [
+      { value: 'name', name: 'Name' },
+      { value: 'type', name: 'Type' },
+      { value: 'size', name: 'Size' },
+      { value: 'created', name: 'Created date' },
+      { value: 'updated', name: 'Updated date' }
+    ]
+  }) %>
+
+  <%- include('../../components/settings-sort-select', {
+    name: 'Dirs',
+    label: 'directories',
+    options: [
+      { value: 'name', name: 'Name' },
+      { value: 'created', name: 'Created date' },
+      { value: 'updated', name: 'Updated date' }
+    ]
+  }) %>
+
+  <% if (locals.user.password) { %>
+    <div>
+      <h3>Password</h3>
+      <p>Leave this area blank if you would not like to change your password.</p>
+    </div>
+    
+    <%- include('../../components/input-checklist-wrapper', { 
+      name: 'password',
+      label: 'New password',
+      type: 'password',
+      includePrefill: false,
+      required: false,
+      conditionMessages: [
+        'At least 8 characters long'
+      ],
+      conditionFunctions: [
+        (input) => (input.length > 7)
+      ]
+    }) %>
+
+    <%- include('../../components/form-input', { 
+      name: 'confirmPassword',
+      label: 'Confirm password',
+      type: 'password',
+      includePrefill: false,
+      required: false
+    }) %>
+
+    <%- include('../../components/form-input', { 
+      name: 'currentPassword',
+      label: 'Current password',
+      type: 'password',
+      includePrefill: false,
+      required: false
+    }) %>
+  <% } %>
+
+  <button type="submit">Submit</button>
+</form>
+
+<div class="controls">
+  <a type="button" class="warning" href="/delete">
+    <%- include('../../svg/user-delete.svg') %>
+    <span>Delete Account</span>
+  </a>
+</div>

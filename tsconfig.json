@@ -6,7 +6,7 @@
     "app.ts",
     "./src/index.d.ts"
   ],
-  "exclude": ["node_modules"],
+  "exclude": ["node_modules", "_*/*", "*.js"],
   "compilerOptions": {
     "module": "CommonJS",
     "sourceMap": true,

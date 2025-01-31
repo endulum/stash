@@ -1,0 +1,43 @@
+<%- include('../../components/github-auth-success') %>
+
+<form action="/signup" method="post">
+  <%- include('../../components/input-checklist-wrapper', { 
+    name: 'username',
+    label: 'Username',
+    type: 'text',
+    includePrefill: true,
+    required: true,
+    conditionMessages: [
+      'Between 2 and 32 characters long (spaces at the ends will be trimmed out)',
+      'Contains only lowercase letters, numbers, and hyphens'
+    ],
+    conditionFunctions: [
+      (input) => (input.length < 33 && input.length > 1),
+      (input) => (/^[a-z0-9-]+$/g.test(input))
+    ]
+  }) %>
+
+  <%- include('../../components/input-checklist-wrapper', { 
+    name: 'password',
+    label: 'Password',
+    type: 'password',
+    includePrefill: false,
+    required: true,
+    conditionMessages: [
+      'At least 8 characters long'
+    ],
+    conditionFunctions: [
+      (input) => (input.length > 7)
+    ]
+  }) %>
+
+<%- include('../../components/form-input', { 
+  name: 'confirmPassword',
+    label: 'Confirm password',
+    type: 'password',
+    includePrefill: false,
+    required: true,
+}) %>
+
+  <button type="submit">Submit</button>
+</form>

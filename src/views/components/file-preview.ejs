@@ -1,29 +1,56 @@
-<div id="preview">
-  <p><i>No preview is available for this file.</i></p>
-</div>
+<div id="preview" class="p-1 mb-1 flex-col"></div>
 
-<script defer>
-  const previewBox = document.getElementById('preview')
-  <% if (file.type.startsWith('image')) { %>
-    const imageUrl = 'data:<%= file.type %>;base64,' + '<%= fileDataString %>'
-    const imageElement = document.createElement('img')
-    imageElement.src = imageUrl
-    previewBox.textContent = ''
-    previewBox.appendChild(imageElement)
-  <% } %>
+<script defer nonce="<%= locals.nonce %>">
+const previewBox = document.getElementById("preview");
+let previewElement = null;
+const serveUrl = '<%= process.env.DEPLOYMENT_URL %><%= locals.sharedDir ? '/shared/' + locals.sharedDir.id : '' %>/serve/<%= file.id %>'
+const fileType = '<%= file.type.split('/')[0] %>'
 
-  <% if (file.type.startsWith('text')) { %>
-    const textareaElement = document.createElement('textarea')
-    const unescapedDataString = (`<%= fileDataString %>`)
-      .replace(/&lt;/g, '<')
-      .replace(/&gt;/g, '>')
-      .replace(/&#34;/g, '"')
-      .replace(/&#39;|&#x27;/g, "'")
-      .replace(/&#x2F;/g, '/')
-      .replace(/&amp;/g, '&')
-    textareaElement.value = unescapedDataString
-    previewBox.textContent = ''
-    previewBox.appendChild(textareaElement)
-    textareaElement.style.height = textareaElement.scrollHeight + "px"
-  <% } %>
+try {
+  switch (fileType) {
+    case 'image': 
+      previewElement = document.createElement('img');
+      previewElement.src = serveUrl;
+      break;
+    case 'audio':
+      previewElement = document.createElement('audio');
+      previewElement.controls = true;
+      previewElement.src = serveUrl;
+      break;
+    case 'video':
+      previewElement = document.createElement('video');
+      previewElement.controls = true;
+      previewElement.src = serveUrl
+      break;
+    case 'text':
+      previewElement = document.createElement('textarea');
+      fetch(serveUrl)
+        .then(response => {
+          if (response.ok) return response.text();
+          throw new Error('Something went wrong when fetching text')
+        })
+        .then(text => {
+          previewElement.textContent = text;
+          previewElement.style.height = previewElement.scrollHeight + "px";
+        })
+        .catch(e => { 
+          previewBox.removeChild(previewElement);
+          previewElement = document.createElement('p');
+          previewElement.textContent = 'Sorry, there was a problem trying to preview this file.';
+          previewBox.appendChild(previewElement);
+         })
+      break;
+    default:
+      previewElement = document.createElement('p');
+      previewElement.textContent = 'No preview is available for this file.';
+  }
+} catch (e) { 
+  console.error(e);
+  previewElement = document.createElement('p');
+  previewElement.textContent = 'Sorry, there was a problem trying to preview this file.';
+}
+
+if (previewElement) {
+  previewBox.appendChild(previewElement);
+}
 </script>

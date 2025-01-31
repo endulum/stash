@@ -1,0 +1,23 @@
+<h3 class="mb-1">
+  under 
+  <b><%= sharedDir.name %></b>/ 
+  owned by 
+  <b><%= sharedDir.author.username %></b>
+</h3>
+
+<div class="flex-row jcspb mb-1">
+  <%- include('../../components/directory-path') %>
+
+  <a 
+    type="button" 
+    class="info" 
+    href=<%= `/shared/${sharedDir.id}/file/${file.id}/download` %>
+  >
+    <%- include('../../svg/download.svg') %>
+    <span>Download</span>
+  </a>
+</div>
+
+<%- include('../../components/file-preview') %>
+
+<%- include('../../components/file-details') %>

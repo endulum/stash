@@ -1,96 +1,67 @@
-import express from 'express';
-import asyncHandler from 'express-async-handler';
-import multer from 'multer';
+import express from "express";
+import asyncHandler from "express-async-handler";
 
-import handleValidationErrors from '../middleware/handleValidationErrors';
-import { 
-  controller as account, 
-  validation as accountValidation } from '../controllers/account'
-import {
-  controller as search,
-  validation as searchValidation } from '../controllers/search'
-import { 
-  controller as directory, 
-  validation as directoryValidation } from '../controllers/directory'
-import { 
-  controller as file, 
-  validation as fileValidation } from '../controllers/file'
+import { logOut } from "../controllers/auth";
+import * as render from "../controllers/render";
+import * as user from "../controllers/user";
+import * as dir from "../controllers/directory";
+import * as file from "../controllers/file";
+import * as search from "../controllers/search";
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
 const router = express.Router();
+const redirectRoot = asyncHandler(async (_req, res) => {
+  return res.redirect("/dir/root");
+});
 
-router.route(['/', '/login', '/signup'])
-  .get(asyncHandler(async (req, res) => res.redirect('/directory')))
+router.route("/").get(redirectRoot);
+router.route("/login").get(redirectRoot);
+router.route("/signup").get(redirectRoot);
+router.route("/logout").get(logOut);
 
-// USER SETTINGS
+// account
 
-router.route('/account')
-  .get(account.renderUpdate)
-  .post(accountValidation.forUpdate, handleValidationErrors, account.submitUpdate)
+router.route("/account").get(render.account).post(user.edit);
+router.route("/delete").get(render.deleteAccount);
 
-router.route('/delete')
-  .get(account.renderDelete)
-  .post(accountValidation.forDelete, handleValidationErrors, account.submitDelete)
+// dir
 
-// FILE SEARCH
+router.route("/dir/root").get(dir.getRoot);
+router.route("/dir/new").get(render.newDir).post(dir.create);
+router.route("/dir/:dir").get(dir.get);
+router.route("/dir/:dir/edit").get(dir.exists, render.editDir).post(dir.edit);
+router.route("/dir/:dir/delete").get(dir.exists, render.deleteDir);
 
-router.route('/search')
-  .get(searchValidation, search.renderSearch)
+// file
 
-// DIRECTORY CRUD
+router.route("/file/new").get(render.newFile);
+router.route("/file/:file").get(file.get);
+router
+  .route("/file/:file/edit")
+  .get(file.exists, render.editFile)
+  .post(file.edit);
+router.route("/file/:file/delete").get(file.exists, render.deleteFile);
 
-router.route('/directory/new')
-  .get(directory.renderCreate)
-  .post(directoryValidation.forCreateOrUpdate, handleValidationErrors, directory.submitCreate)
+// etc
 
-router.route('/directory/download')
-  .get(directory.download)
+router.route("/search").get(search.get);
 
-router.route('/directory')
-  .get(directory.renderRead)
+if (process.env.NODE_ENV !== "test") {
+  import("../controllers/supa").then((module) => {
+    router.post("/dir/:dir/delete", module.deleteDir);
+    router.post("/file/:file/delete", module.deleteFile);
+    router.post("/delete", module.deleteAccount);
+    router.route("/dir/:dir/download").get(module.downloadDir);
+    router.route("/file/new").post(module.uploadFile);
+    router.route("/file/drop").post(module.dropFile);
+    router.route("/file/:file/download").get(module.downloadFile);
+    router.route("/serve/:file").get(module.serveFile);
+    router.route("*").all(render.notFound);
+  });
+} else {
+  router.post("/delete", user.del);
+  router.post("/dir/:dir/delete", dir.del);
+  router.post("/file/:file/delete", file.del);
+  router.route("*").all(render.notFound);
+}
 
-router.route('/directory/:directoryId')
-  .get(directory.exists, directory.isYours, directory.renderRead)
-
-router.route('/directory/:directoryId/download')
-  .get(directory.exists, directory.isYours, directory.download)
-
-router.route('/directory/:directoryId/edit')
-  .get(directory.exists, directory.isYours, directory.renderUpdate)
-  .post(directory.exists, directory.isYours, directoryValidation.forCreateOrUpdate, handleValidationErrors, directory.submitUpdate)
-
-router.route('/directory/:directoryId/delete')
-  .get(directory.exists, directory.isYours, directory.renderDelete)
-  .post(directory.exists, directory.isYours, directoryValidation.forDelete, handleValidationErrors, directory.submitDelete)
-
-// FILE CRUD
-
-router.route('/file/new')
-  .get(file.renderCreate)
-  .post(upload.single('upload'), fileValidation.forCreate, handleValidationErrors, file.submitCreate)
-
-router.route('/file/:fileId')
-  .get(file.exists, file.isYours, file.getFileDataString, file.renderRead)
-
-router.route('/file/:fileId/download')
-  .get(file.exists, file.isYours, file.download)
-
-router.route('/file/:fileId/edit')
-  .get(file.exists, file.isYours, file.renderUpdate)
-  .post(file.exists, file.isYours, fileValidation.forUpdate, handleValidationErrors, file.submitUpdate)
-
-router.route('/file/:fileId/delete')
-  .get(file.exists, file.isYours, file.renderDelete)
-  .post(file.exists, file.isYours, fileValidation.forDelete, handleValidationErrors, file.submitDelete)
-
-router.route('/logout')
-  .get(asyncHandler(async (req, res, next) => {
-    req.logOut((err) => {
-      if (err) return next(err)
-      req.flash('success', 'You have been logged out. See you soon!')
-      return res.redirect('/login')
-    })
-  }))
-
-export default router;
+export { router };

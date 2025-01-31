@@ -4,33 +4,19 @@
     <title><%= title %></title>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <link rel="icon" href="/nodejs-icon.svg" type="image/x-icon">
-    <link rel="stylesheet" href="/reset.css">
-    <link rel="stylesheet" href="/style.css">
-    <link rel="stylesheet" href="/fonts/fonts.css">
+    <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
-    <script>
-      html = document.querySelector('html');
-      const themePreference = localStorage.getItem('theme-preference')
+    <!-- look and feel -->
+    <link rel="stylesheet" href="/base.css">
+    <!-- structural -->
+    <link rel="stylesheet" href="/custom.css">
 
-      if (themePreference) { // first, is there a saved theme preference?
-        html.dataset['theme'] = themePreference
-      } else if (window.matchMedia) { // second, does the browser prefer a theme?
-        if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
-          html.dataset['theme'] = 'dark'
-        } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
-          html.dataset['theme'] = 'light'
-        }
-      } else {
-        html.dataset['theme'] = 'light'
-      }
-    </script>
+    <script src="/scripts/setTheme.js"></script>
   </head>
-  <body>
-    <header>
-      <div class="header-body">
-        <p class="header-userstatus">
+  <body class="flex-col">
+    <header class="w100">
+      <div class="body flex-col g-05 align-end">
+        <p class="header-userstatus as-end">
           <% if (locals.user) { %>
             Logged in as <b><%= locals.user.username %></b>
           <% } else { %>
@@ -39,16 +25,16 @@
           |
           <a href="#" id="theme-toggle"></a>
         </p>
-        <div class="header-main">
-          <div class="heading">
+        <div class="header-main flex-row w100 jcspb">
+          <div class="logo flex-row g-05">
             <h1>Stash</h1>
             <a href="https://github.com/endulum/odin-uploader" target="_blank">
               <%- include('svg/github.svg') %>
             </a>
           </div>
-          <nav>
+          <nav class="flex-row g-05">
             <% if (locals.user) { %>
-              <a type="button" href="/">
+              <a type="button" href="/dir/root">
                 <%- include('svg/file-tree.svg') %>
                 <span>Files</span>
               </a>
@@ -79,8 +65,8 @@
       </div>
     </header>
 
-    <main>
-      <div class="main-body">
+    <main class="w100">
+      <div class="body">
         <!-- success alerts -->
         <% if ('success' in locals && locals.success.length > 0) { %>
           <div class="alert success">
@@ -100,33 +86,17 @@
           </div>
         <% } %>
 
-        <h2><%= title %></h2>
+        <h2 class="mb-1"><%= title %></h2>
         <%- include(`${page}`) %>
       </div>
     </main>
 
-    <script defer>
-      const themeToggle = document.getElementById('theme-toggle');
-      const currentTheme = () => html.dataset['theme'];
-
-      function changeToggleText() {
-        if (currentTheme() === 'light') {
-        themeToggle.innerText = 'Lights off'
-        } else if (currentTheme() === 'dark') {
-          themeToggle.innerText = 'Lights on'
-        }
-      }
-
-      changeToggleText()
-      
-      themeToggle.addEventListener('click', () => {
-        const prevTheme = currentTheme()
-        html.dataset['theme'] = prevTheme === 'light' 
-          ? 'dark' : 'light';
-        changeToggleText()
-        localStorage.setItem('theme-preference', prevTheme === 'light' 
-          ? 'dark' : 'light')
-      })
-    </script>
+    <script defer src="/scripts/toggleTheme.js"></script>
   </body>
+
+  <footer class="p-1">
+    <small>
+      &copy; endulum, for The Odin Project.
+    </small>
+  </footer>
 </html>

@@ -1,43 +1,47 @@
 # Stash
-A minimal implementation of a personal storage service.
 
-🚀 [Live on Adaptable](https://bonfires.vercel.app)
+A minimal implementation of a personal storage service.
 
 [Project Spec](https://www.theodinproject.com/lessons/nodejs-file-uploader)
 
-![Preview of the login screen of the app](https://github.com/endulum/odin-uploader/blob/main/screenshot.png?raw=true)
+Navigate to the root directory where you'd like this project to be, and clone this repo:
 
-## Features
-### Users
-- User accounts can be created and logged into
-- User account usernames and passwords can be edited
-- Users can delete their own accounts and content
-### Files and Directories
-- Users can create directories and navigate among them, similarly to a file explorer
-- Directory names and locations can be edited
-- Directories can be given a "share until" date that allows anyone, even those not logged in, to view, navigate, and download them and their file contents
-- Users can upload individual files (with a validation-enforced size limit of 5MB) into directories
-- File names and locations can be edited
-- Files of types `text` and `image` are previewed on the page when viewing them
-- Directories can be downloaded as .zip files, files can be downloaded individually
-- Basic search page to allow searching using name and content type
-### UI
-- Toggleable light and dark themes, with preference stored
+```
+git clone https://github.com/endulum/stash
+```
 
-## Technologies
-- Written in **Typescript**, to enhance dev experience with type safety and IntelliSense
-- **PostgreSQL** as the database client, with **Prisma ORM** to streamline data manipulation with more intuitive queries and quicker editions to the database structure
-- **Express.js** as the server framework, due to its age and maturity, lending to ease of research whenever a problem occurs
-- **PassportJS** to handle user authentication
-- **Supabase** as cloud storage for uploaded files 
+Install all required packages:
 
-## Concerns of Improvement
-- Accessibility - does the interface provide an acceptable accessibility experience?
-- Vulnerability - are some forms, routes, previews prone to attacks?
+```
+npm install
+```
 
-### Miscellaneous TODOs
-- **Enforce total storage limit per user**
-- Button to copy share link
-- Add simple captcha to registration?
-- See if `read` and `read-shared` files can be combined?
-- What other kinds of file types can be previewed?
+### Environment
+
+This project uses three env files: `test`, `development`, and `production`. The repo supplies a file `.env.example` with the variables necessary for the project to run. Copy this file to the three envs described. A handy script for this is provided for you:
+
+```
+npm run envinit
+```
+
+### Required Integrations
+
+Taking a look at `.env.example` should give you an idea of what integrations are necessary.
+
+**Database:** Stash uses Postgres to store account, session, and user filesystem information. `DATABASE_URL` will be your Postgres connection URI, and you'll also need `SESSION_SECRET` (it can be any string) for session storage to work.
+
+**GitHub App:** Stash _optionally_ allows accounts to be created through GitHub authentication. You'll need a [GitHub app](https://github.com/settings/apps) of your own to fill in `GITHUB_CLIENT_ID` and `GITHUB_CLIENT_SECRET`.
+
+**Supabase:** Barring `test` env mode, Stash requires Supabase to store file data. Stash expects two Supabase buckets, `stash_development` and `stash_production`, as well as the Supabase project's service key.
+
+**Redis:** Barring `test` env mode, Stash requires Redis to cache static file serving. For convenience, this project uses Docker to provide a Redis image, and the prefilled `REDIS_URL` value reflects the port used.
+
+### Testing
+
+This project uses Docker to provide an independent Postgres database for testing. For your `.env.test`, make sure the database URL points to that database:
+
+```
+DATABASE_URL=postgresql://prisma:prisma@localhost:5433/tests
+```
+
+The script `npm run test` handles bringing up the container, applying any migrations present, and running the tests.

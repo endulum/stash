@@ -1,0 +1,171 @@
+<% if (
+    dir &&
+    dir.shareUntil && 
+    Date.parse(dir.shareUntil) > Date.parse(new Date())
+  ) { 
+%>
+  <div class="alert">
+    <%- include('../../svg/info.svg') %>
+    <p>
+      This directory is <b>public</b>. You can share this directory with others using the link below.
+      <input 
+        type="text" 
+        value="<%= 
+          process.env.DEPLOYMENT_URL
+          + '/shared/'
+          + dir.id
+        %>"
+      >
+    </p>
+  </div>
+<% } %>
+
+<div class="mb-1 flex-row jcspb">
+  <%- include('../../components/directory-path') %>
+
+  <% if (dir) { %> 
+    <a 
+      type="button" 
+      class="info" 
+      href="<%= '/dir/' + dir.id + '/download' %>"
+    >
+      <%- include('../../svg/download.svg') %>
+      <span>Download</span>
+    </a>
+  <% } %>
+</div>
+
+<%
+  if (
+    !dir &&
+    childDirs.length === 0 &&
+    childFiles.length === 0
+  ) {
+%>
+  <div class="alert">
+    <%- include('../../svg/info.svg') %>
+    <p>
+      Your filesystem is currently empty. You can get started on creating your filesystem with the <b>Add Directory</b> and <b>Add File</b> links below. Files and directories you create will be shown here in a table.
+    </p>
+  </div>
+<% } else { %>
+  <div class="table-wrapper" id="scrolling-table" data-dirid="<%= dir ? dir.id : null %>">
+    <div class="flex-col jcc g-05" id="dragndrop-overlay" style="opacity: 0;">
+      <%- include('../../svg/upload.svg') %>
+      <p>Upload a file here</p>
+    </div>
+    <table class="w100" cellpadding="0" cellspacing="0">
+      <thead>
+        <td><span>Name</span></td> 
+        <td>Type</td> 
+        <td>Size</td> 
+        <td>Created</td>
+        <td>Updated</td>
+      </thead>
+
+      <% if (dir) { %>
+        <tr>
+          <td>
+            <a class="entry-link" href="<%= dir.parentId ? '/dir/' +  dir.parentId : '/dir/root' %>">
+              <span>..</span>
+            </a>
+          </td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+          <td>-</td>
+        </tr>
+      <% } %>
+      
+      <% if (childDirs.length > 0) { %>
+        <tbody>
+          <% childDirs.forEach(child => { %>
+            <tr>
+              <td>
+                <a class="entry-link" href="<%= '/dir/' + child.id %>">
+                  <%- include('../../svg/folder.svg') %>
+                  <span>
+                    <b><%= child.name %></b>/
+                  </span>
+                </a>
+              </td>
+              <td>directory</td>
+              <td>-</td>
+              <td><%= 
+                child.created.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                })
+              %></td>
+              <td><%= 
+                child.updated ? child.updated.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                }) : '-'
+              %></td>
+            </tr>
+            </tr>
+          <% }) %>
+        </tbody>
+      <% } %>
+
+      <% if (childFiles.length > 0) { %>
+        <tbody>
+          <% childFiles.forEach(file => { %>
+            <tr>
+              <td>
+                <a class="entry-link" href="<%= '/file/' + file.id %>">
+                  <%- include('../../components/filetype-icon', { type: file.type }) %>
+                  <span>
+                   <b><%= file.name %></b>.<%= file.ext %>
+                  </span>
+                </a>
+              </td>
+              <td><%= 
+                (file.type.length > 32) 
+                  ? file.type.slice(0, 31) + '...' 
+                  : file.type;
+              %></td>
+              <td><%= file.size %></td>
+              <td><%= 
+                file.created.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                })
+              %></td>
+              <td><%= 
+                file.updated ? file.updated.toLocaleString('default', { 
+                  month: 'numeric', day: 'numeric', year: 'numeric', timeZone: 'UTC'
+                }) : '-'
+              %></td>
+            </tr>
+          <% }) %>
+        </tbody>
+      <% } %>
+    </table>
+  </div>
+  <script src="/scripts/detectTableScroll.js"></script>
+  <script src="/scripts/dragAndDropUpload.js"></script> 
+<% } %>
+
+<div class="controls">
+  <a type="button" class="success" href="<%= '/dir/new' + (dir ? ('?location=' + dir.id) : '')%>">
+    <%- include('../../svg/folder-create.svg') %>
+    <span>Add Directory</span>
+  </a>
+
+  <a type="button" class="success" href="<%= '/file/new' + (dir ? ('?location=' + dir.id) : '') %>">
+    <%- include('../../svg/file-create.svg') %>
+    <span>Add File</span>
+  </a>
+
+  <% if (dir) { %>
+    <a type="button" href="<%= '/dir/' + dir.id + '/edit' %>">
+      <%- include('../../svg/folder-update.svg') %>
+      <span>Edit Directory</span>
+    </a>
+    <a type="button" class="warning" href="<%= '/dir/' + dir.id + '/delete' %>">
+      <%- include('../../svg/folder-delete.svg') %>
+      <span>Delete Directory</span>
+    </a>
+  <% } %>
+</div>
+
+<%- include('../../components/storage-bar') %>

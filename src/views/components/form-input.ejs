@@ -1,23 +1,23 @@
 <div class="input">
-  <!-- top left: where label goes -->
+  <%# top left: where label goes %>
   <label for=<%= name %>>
     <%= label %>
   </label>
-  <!-- top right: where errors belong -->
+  <%# top right: where errors belong %>
   <p>
-    <% if (formErrors && name in formErrors) { %>
-      <small class="error">
+    <% if (locals.formErrors && name in locals.formErrors) { %>
+      <small class="error" data-for="<%= name %>">
         <b>Error: </b>
-        <%= formErrors[name] %>
+        <%= locals.formErrors[name] %>
       </small>
     <% } %>
   </p>
-  <!-- bottom: where input goes -->
+  <%# bottom: where input goes %>
   <input 
-    <%= required ? 'required' : '' %>
+    <%= required && process.env.NODE_ENV === 'production' ? 'required' : '' %>
     type=<%= type %> 
     name=<%= name %> 
     id=<%= name %> 
-    value="<%= includePrevInput && name in prevForm ? prevForm[name] : '' %>"
+    value="<%= includePrefill && name in prefill ? prefill[name] : '' %>"
   >
 </div>

@@ -1,0 +1,33 @@
+<div class="alert warning">
+  <%- include('../../svg/warning.svg') %>
+  <p>Deleting your account will also delete every directory and file owned by you. This is permanent and cannot be undone. Account recovery is not possible.</p>
+</div>
+
+<% if (locals.user.password) { %>
+  <p>To delete your account, input your password below and submit.</p>
+  <br>
+  <form method="post" action="/delete">
+    <%- include('../../components/form-input', { 
+      name: 'password',
+      label: 'Password',
+      type: 'password',
+      includePrefill: false,
+      required: true
+    }) %>
+    <button type="submit">Submit</button>
+  </form>
+<% } else { %>
+  <p>To delete your account, input your GitHub username below and submit.</p>
+  <br>
+  <form method="post" action="/delete">
+    <%- include('../../components/form-input', { 
+      name: 'githubUser',
+      label: 'GitHub username',
+      type: 'text',
+      includePrefill: false,
+      required: true
+    }) %>
+    <button type="submit">Submit</button>
+  </form>
+<% } %>
+

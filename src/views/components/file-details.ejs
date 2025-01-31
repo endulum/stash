@@ -6,12 +6,12 @@
   </li>
   <li>
     <b>Size: </b>
-    <%= file.size %> bytes
+    <%= file.size %>
   </li>
   <li>
     <b>Uploaded: </b>
     <%= 
-      file.createdAt.toLocaleString('default', { 
+      file.created.toLocaleString('default', { 
         month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC', timeZoneName: 'short'
       })
     %>
@@ -19,8 +19,8 @@
   <li>
     <b>Last modified: </b>
     <%= 
-      file.updatedAt
-        ? file.updatedAt.toLocaleString('default', { 
+      file.updated
+        ? file.updated.toLocaleString('default', { 
             month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: 'numeric', timeZone: 'UTC', timeZoneName: 'short'
           })
         : 'Never'
