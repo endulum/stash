@@ -154,9 +154,18 @@ header {
 }
 
 header {
-  padding-top: max(5vh, 2rem);
+  padding-top: max(10vh, 2rem);
   background-color: var(--bg2);
   border-bottom: 1px solid oklch(from var(--border) l c h / 0.75);
+  background-image: linear-gradient(
+      to bottom,
+      oklch(from var(--bg2) l c h / 0.5),
+      var(--bg2) 75%
+    ),
+    url(./assets/design-tools.jpg);
+  background-size: 20rem;
+  background-repeat: repeat;
+  background-blend-mode: luminosity;
 }
 
 .body {
