@@ -14,13 +14,13 @@ client.connect();
 export async function findCachedFile(fileId: string) {
   const buffer = await client.get(
     commandOptions({ returnBuffers: true }),
-    fileId
+    `STASH_${fileId}`
   );
   return buffer ?? null;
 }
 
 export async function addCachedFile(fileId: string, buffer: Buffer) {
-  await client.setEx(fileId, 3600, buffer);
+  await client.setEx(`STASH_${fileId}`, 3600, buffer);
 }
 
 export { client };
