@@ -2,6 +2,24 @@
 
 A file uploader.
 
+### Feature rundown
+
+- Create accounts using traditional username or password, or quickly authenticate using an existing GitHub account
+- Manage, navigate, and search through a hierarchial filesystem of files and directories
+- Upload individual files using a form or drag-and-drop into the viewing directory
+- Download individual files, or download whole directories as `.zip`s
+- Load full previews of text, image, audio, and video files when viewing them
+- Enable sharing for individual directories, allowing other users to visit and browse the directory by link even when unauthenticated
+- Toggleable light and dark mode, with preference remembered
+
+### Tech rundown
+
+- **Language:** TypeScript
+- **Framework:** Express.js
+- **Database:** PostgreSQL with Prisma ORM
+- **Testing:** Vitest
+- **Other:** Passport.js, Supabase API, GitHub Apps API, Redis, Docker
+
 📓 [Project Spec](https://www.theodinproject.com/lessons/nodejs-file-uploader)
 
 🚄 [Live Deployment](https://stash.up.railway.app)
@@ -28,7 +46,7 @@ npm install
 
 This project is not totally Dockerized, but uses Docker for some containers of convenience. You will need Docker Compose installed to be able to run the Docker-related commands of this project.
 
-### Integrations and Environment
+### Integrations and environment
 
 This project uses three env files: `test`, `development`, and `production`. Stash supplies a file `.env.example` with the variables necessary for the project to run. Copy this file to the three envs described. A handy script for this is provided for you, `npm run envinit`.
 
