@@ -30,7 +30,7 @@ This project is not totally Dockerized, but uses Docker for some containers of c
 
 ### Integrations and Environment
 
-This project uses three env files: `test`, `development`, and `production`.  Stash supplies a file `.env.example` with the variables necessary for the project to run. Copy this file to  the three envs described. A handy script for this is provided for you, `npm run envinit`.
+This project uses three env files: `test`, `development`, and `production`. Stash supplies a file `.env.example` with the variables necessary for the project to run. Copy this file to the three envs described. A handy script for this is provided for you, `npm run envinit`.
 
 As you can find in `.env.example`, this project uses the following integrations:
 
@@ -41,7 +41,7 @@ As you can find in `.env.example`, this project uses the following integrations:
 
 #### PostgreSQL
 
-You need an existing PostgreSQL database somewhere and its connection URI. 
+You need an existing PostgreSQL database somewhere and its connection URI.
 
 Note that an independent Postgres database for testing is provided by Docker in this project, so for your `.env.test`, you can have the URI point to that database:
 
@@ -53,13 +53,13 @@ The script `npm run test` handles bringing up the container, applying any migrat
 
 #### Supabase
 
-You need a Supabase account with an active project. Stash utilizes the Supabase Storage filesystem, and needs your project URL and `service_role` key. You can find both under the **Data API** tab of your project settings. Stash expects and utilizes two Supabase buckets, `stash_development` and `stash_production`. 
+You need a Supabase account with an active project. Stash utilizes the Supabase Storage filesystem, and needs your project URL and `service_role` key. You can find both under the **Data API** tab of your project settings. Stash expects and utilizes two Supabase buckets, `stash_development` and `stash_production`.
 
 Note that the Supabase module of this project is not utilized in the `test` environment.
 
 #### GitHub App
 
-Stash needs the client ID and secret of an active GitHub app. 
+Stash needs the client ID and secret of an active GitHub app.
 
 Note that GitHub authentication is not utilized in the `test` environment.
 
@@ -89,3 +89,5 @@ Stash supplies a `reset` script that performs the following:
 - Executes a script to recursively read files in `supabase/sample_files`, add them as records to the database, and upload them to Supabase.
 
 The `sample_files` directory contains some text and media, and can be freely edited to contain any files you wish.
+
+To run this reset, invoke `npm run db:reset`. You can also invoke a reset on your production database and bucket with `npm run db:reset:prod`.
