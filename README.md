@@ -109,3 +109,9 @@ Stash supplies a `reset` script that performs the following:
 The `sample_files` directory contains some text and media, and can be freely edited to contain any files you wish.
 
 To run this reset, invoke `npm run db:reset`. You can also invoke a reset on your production database and bucket with `npm run db:reset:prod`.
+
+### Graphics acknowledgements
+
+Background pattern is ["Design Tools" by Miguel Angel Avila from The Pattern Library](http://thepatternlibrary.com/#design-tools).
+
+UI colors are borrowed from [Tailwind Colors](https://tailscan.com/colors).
